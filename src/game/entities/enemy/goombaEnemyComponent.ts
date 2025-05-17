@@ -1,204 +1,233 @@
 import { Component } from "../../../core/component";
 import { PlayerComponent } from "../playerComponent";
 import { BaseEnemyComponent } from "./baseEnemyComponent";
+import { AssetLoader } from "../../../core/assetLoader";
+import { Animator } from "../../../core/animator";
+import { TILE_SIZE } from "../../constants";
+
+enum EnemyState {
+  WALKING,
+  ATTACKING,
+  STOMPED, 
+  DEAD    
+}
 
 export class GoombaEnemyComponent extends BaseEnemyComponent {
-  private stompAnimationTime = 0;
-  private readonly stompDuration = 0.3;
+  private stompAnimationTimer = 0; 
+  private readonly stompDuration = 0.5; 
+
+  
+  private animator: Animator | null = null;
+  private assetsLoaded: boolean = false;
+  private static readonly SPRITESHEET_PATH = "/assets/images/enemies/crap.png"; 
+  private static readonly TOTAL_FRAMES = 5;
+  private static readonly WALK_FRAMES = [0, 1, 2];
+  private static readonly ATTACK_FRAME = 3;
+  private static readonly STOMPED_FRAME = 4;
+  private static readonly WALK_ANIM_FPS = 6; 
+
+  
+  private currentState: EnemyState = EnemyState.WALKING;
+  private static readonly ATTACK_RANGE = TILE_SIZE;
+  private static readonly ATTACK_DURATION = 0.4; 
+  private static readonly ATTACK_COOLDOWN = 0.5; 
+  private attackTimer = 0;
+  private timeSinceLastAttack = GoombaEnemyComponent.ATTACK_COOLDOWN; 
 
   constructor(x: number, y: number, width: number, height: number) {
     super(x, y, width, height);
     this.speed = this.getDefaultSpeed();
+    this.loadAssets();
+  }
+
+  private async loadAssets() {
+    try {
+      const image = await AssetLoader.loadImage(GoombaEnemyComponent.SPRITESHEET_PATH);
+      const frameWidth = image.width; 
+      const frameHeight = image.height / GoombaEnemyComponent.TOTAL_FRAMES;
+
+      this.animator = new Animator(image, 'vertical', GoombaEnemyComponent.WALK_ANIM_FPS, true);
+      this.animator.frameWidth = frameWidth;
+      this.animator.frameHeight = frameHeight;
+      this.animator.frameCount = GoombaEnemyComponent.TOTAL_FRAMES;
+      this.animator.currentFrame = GoombaEnemyComponent.WALK_FRAMES[0];
+      
+      this.assetsLoaded = true;
+    } catch (error) {
+      console.error(`Failed to load enemy spritesheet from ${GoombaEnemyComponent.SPRITESHEET_PATH}:`, error);
+      
+      this.enabled = false;
+    }
   }
 
   protected getDefaultSpeed(): number {
-    return 1;
+    return 0.75; 
   }
 
   update(dt: number) {
-    if (this.isAlive) {
-      const oldX = this.x;
+    if (!this.assetsLoaded || !this.animator) {
+        
+        if (this.currentState === EnemyState.DEAD) {
+            this.y += this.deathSpeed;
+            this.deathSpeed += this.gravity;
+            if (this.y > 800) { this.visible = false; this.enabled = false; }
+        }
+        return;
+    }
 
-      if (this.isLedgeAhead()) {
-        this.direction *= -1;
-      } else {
-        this.x += this.speed * this.direction;
-        if (this.checkObstacleCollision()) {
-          this.x = oldX;
-          this.direction *= -1;
-        }
-      }
+    this.timeSinceLastAttack += dt;
 
-      if (this.x <= 0 && this.direction === -1) {
-        if (oldX > 0) {
-          this.x = 0;
-          this.direction = 1;
-        } else {
-          this.direction = 1;
+    switch (this.currentState) {
+      case EnemyState.WALKING:
+        this.handleWalking(dt);
+        
+        const player = this.scene.find(c => c instanceof PlayerComponent && !c.isDying) as PlayerComponent | undefined;
+        if (player && this.timeSinceLastAttack >= GoombaEnemyComponent.ATTACK_COOLDOWN) {
+          const distanceToPlayer = Math.abs(player.x - this.x);
+          const yDifference = Math.abs(player.y - this.y);
+          if (distanceToPlayer < GoombaEnemyComponent.ATTACK_RANGE && yDifference < this.height) {
+            
+            if ((player.x < this.x && this.direction === 1) || (player.x > this.x && this.direction === -1)) {
+                 
+            }
+            this.direction = (player.x < this.x) ? -1 : 1; 
+            this.currentState = EnemyState.ATTACKING;
+            this.animator.currentFrame = GoombaEnemyComponent.ATTACK_FRAME;
+            this.attackTimer = 0;
+          }
         }
-      } else if (this.x + this.width >= 3200 && this.direction === 1) { 
-        if (oldX + this.width < 3200) {
-          this.x = 3200 - this.width;
-          this.direction = -1;
-        } else {
-          this.direction = -1;
+        break;
+
+      case EnemyState.ATTACKING:
+        this.attackTimer += dt;
+        
+        if (this.attackTimer >= GoombaEnemyComponent.ATTACK_DURATION) {
+          this.currentState = EnemyState.WALKING;
+          this.animator.currentFrame = GoombaEnemyComponent.WALK_FRAMES[0]; 
+          this.animator.playing = true; 
+          this.timeSinceLastAttack = 0;
         }
-      }
-    } else {
-      if (this.stompAnimationTime > 0) {
-        this.stompAnimationTime -= dt;
-        if (this.stompAnimationTime <= 0) {
-          
-          this.deathSpeed = -8; 
+        break;
+
+      case EnemyState.STOMPED:
+        this.stompAnimationTimer += dt;
+        
+        if (this.stompAnimationTimer >= this.stompDuration) {
+          this.currentState = EnemyState.DEAD;
+          this.deathSpeed = -4; 
         }
-      } else {
+        break;
+
+      case EnemyState.DEAD:
         this.y += this.deathSpeed;
         this.deathSpeed += this.gravity;
-
         if (this.y > 800) { 
           this.visible = false;
           this.enabled = false;
         }
+        break;
+    }
+    
+    
+    if (this.currentState === EnemyState.WALKING && this.animator.playing) {
+        const frameDuration = 1 / GoombaEnemyComponent.WALK_ANIM_FPS;
+        this.animator.timer += dt; 
+        if (this.animator.timer >= frameDuration) {
+            this.animator.timer -= frameDuration;
+            let currentWalkFrameIndex = GoombaEnemyComponent.WALK_FRAMES.indexOf(this.animator.currentFrame);
+            if (currentWalkFrameIndex === -1 || this.animator.currentFrame > GoombaEnemyComponent.WALK_FRAMES[GoombaEnemyComponent.WALK_FRAMES.length-1] || this.animator.currentFrame < GoombaEnemyComponent.WALK_FRAMES[0]) {
+                currentWalkFrameIndex = 0; 
+            } else {
+                currentWalkFrameIndex = (currentWalkFrameIndex + 1) % GoombaEnemyComponent.WALK_FRAMES.length;
+            }
+            this.animator.currentFrame = GoombaEnemyComponent.WALK_FRAMES[currentWalkFrameIndex];
+        }
+    }
+  }
+
+  private handleWalking(dt: number) {
+    const oldX = this.x;
+    if (this.isLedgeAhead()) {
+      this.direction *= -1;
+    } else {
+      this.x += this.speed * this.direction * dt * 60; 
+      if (this.checkObstacleCollision()) {
+        this.x = oldX;
+        this.direction *= -1;
       }
     }
+
+    
+    if (this.x <= 0 && this.direction === -1) { this.x = 0; this.direction = 1; }
+    const worldWidth = 3200; 
+    if (this.x + this.width >= worldWidth && this.direction === 1) { this.x = worldWidth - this.width; this.direction = -1; }
   }
 
   render(ctx: CanvasRenderingContext2D) {
     if (!this.visible) return;
 
-    if (!this.isAlive && this.stompAnimationTime > 0) {
-      this.drawStompedGoomba(ctx);
-    } else if (!this.isAlive) {
-      this.drawDeadFlippingGoomba(ctx);
-    } else {
-      this.drawAliveGoomba(ctx);
+    if (!this.assetsLoaded || !this.animator || !this.animator.spritesheet) {
+      
+      ctx.fillStyle = "brown"; 
+      if (this.currentState === EnemyState.STOMPED || this.currentState === EnemyState.DEAD) {
+        ctx.fillRect(this.x, this.y + this.height * 0.6, this.width, this.height * 0.4);
+      } else {
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+      }
+      return;
+    }
+
+    const sourceRect = this.animator.getFrameSourceRect();
+    if (sourceRect) {
+      ctx.save();
+      
+      
+      if (this.direction === 1) { 
+        ctx.translate(this.x + this.width, this.y);
+        ctx.scale(-1, 1);
+        ctx.drawImage(
+          this.animator.spritesheet,
+          sourceRect.sx, sourceRect.sy, sourceRect.sWidth, sourceRect.sHeight,
+          0, 0, this.width, this.height
+        );
+      } else {
+        ctx.drawImage(
+          this.animator.spritesheet,
+          sourceRect.sx, sourceRect.sy, sourceRect.sWidth, sourceRect.sHeight,
+          this.x, this.y, this.width, this.height
+        );
+      }
+      ctx.restore();
     }
   }
 
-  private drawAliveGoomba(ctx: CanvasRenderingContext2D) {
-    const bodyColor = "#b97a57";
-    const darkBody = "#8b5c36";
-    const footColor = "#6b3a1c";
-    const eyeWhite = "#fff";
-    const eyePupil = "#222";
-    const browColor = "#442100";
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.ellipse(this.x + this.width / 2, this.y + this.height * 0.55, this.width * 0.45, this.height * 0.38, 0, Math.PI, 0, false);
-    ctx.closePath();
-    ctx.fillStyle = bodyColor;
-    ctx.fill();
-    ctx.strokeStyle = darkBody;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.ellipse(this.x + this.width / 2, this.y + this.height * 0.75, this.width * 0.38, this.height * 0.22, 0, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.fillStyle = bodyColor;
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.ellipse(this.x + this.width * 0.32, this.y + this.height * 0.93, this.width * 0.16, this.height * 0.09, 0, 0, Math.PI * 2);
-    ctx.fillStyle = footColor;
-    ctx.fill();
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.ellipse(this.x + this.width * 0.68, this.y + this.height * 0.93, this.width * 0.16, this.height * 0.09, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.ellipse(this.x + this.width * 0.38, this.y + this.height * 0.68, this.width * 0.09, this.height * 0.13, 0, 0, Math.PI * 2);
-    ctx.fillStyle = eyeWhite;
-    ctx.fill();
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.ellipse(this.x + this.width * 0.62, this.y + this.height * 0.68, this.width * 0.09, this.height * 0.13, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(this.x + this.width * 0.38, this.y + this.height * 0.73, this.width * 0.03, 0, Math.PI * 2);
-    ctx.fillStyle = eyePupil;
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(this.x + this.width * 0.62, this.y + this.height * 0.73, this.width * 0.03, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.strokeStyle = browColor;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(this.x + this.width * 0.32, this.y + this.height * 0.62);
-    ctx.lineTo(this.x + this.width * 0.44, this.y + this.height * 0.63);
-    ctx.moveTo(this.x + this.width * 0.56, this.y + this.height * 0.63);
-    ctx.lineTo(this.x + this.width * 0.68, this.y + this.height * 0.62);
-    ctx.stroke();
-
-    ctx.strokeStyle = "#222";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(this.x + this.width / 2, this.y + this.height * 0.81, this.width * 0.13, Math.PI * 0.15, Math.PI * 0.85, false);
-    ctx.stroke();
-
-    ctx.restore();
-  }
-
-  private drawStompedGoomba(ctx: CanvasRenderingContext2D) {
-    const bodyColor = "#b97a57";
-    const darkBody = "#8b5c36";
-    const footColor = "#6b3a1c";
-
-    ctx.save();
-
-    ctx.beginPath();
-    ctx.ellipse(this.x + this.width / 2, this.y + this.height * 0.85, this.width * 0.45, this.height * 0.15, 0, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.fillStyle = bodyColor;
-    ctx.fill();
-    ctx.strokeStyle = darkBody;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.ellipse(this.x + this.width * 0.32, this.y + this.height * 0.93, this.width * 0.16, this.height * 0.09, 0, 0, Math.PI * 2);
-    ctx.fillStyle = footColor;
-    ctx.fill();
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.ellipse(this.x + this.width * 0.68, this.y + this.height * 0.93, this.width * 0.16, this.height * 0.09, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.restore();
-  }
-
-  private drawDeadFlippingGoomba(ctx: CanvasRenderingContext2D) {
-    ctx.save();
-    ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-    ctx.rotate(Math.PI);
-    ctx.translate(-(this.x + this.width / 2), -(this.y + this.height / 2));
-    this.drawAliveGoomba(ctx);
-    ctx.restore();
-  }
-
   stomp() {
-    if (!this.isAlive) return;
-    this.isAlive = false;
-    this.stompAnimationTime = this.stompDuration;
-    
+    if (this.currentState === EnemyState.STOMPED || this.currentState === EnemyState.DEAD) return;
+    this.isAlive = false; 
+    this.currentState = EnemyState.STOMPED;
+    if (this.animator) {
+        this.animator.currentFrame = GoombaEnemyComponent.STOMPED_FRAME;
+        this.animator.playing = false; 
+    }
+    this.stompAnimationTimer = 0;
+    this.solid = false; 
   }
-
-  
 
   resetState() {
-    super.resetState();
-    this.stompAnimationTime = 0;
+    super.resetState(); 
+    this.currentState = EnemyState.WALKING;
+    this.stompAnimationTimer = 0;
+    this.attackTimer = 0;
+    this.timeSinceLastAttack = GoombaEnemyComponent.ATTACK_COOLDOWN;
+    if (this.animator) {
+      this.animator.currentFrame = GoombaEnemyComponent.WALK_FRAMES[0];
+      this.animator.playing = true;
+    }
+    this.solid = false; 
   }
 
   isHarmfulOnContact(): boolean {
-    return this.isAlive;
+    
+    return this.isAlive && this.currentState !== EnemyState.STOMPED && this.currentState !== EnemyState.DEAD;
   }
 }

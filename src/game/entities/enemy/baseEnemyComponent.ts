@@ -32,15 +32,21 @@ export abstract class BaseEnemyComponent extends Component {
   }
 
   protected checkObstacleCollision(): boolean {
+    const collisionEpsilon = 0.1; // Small tolerance for floating point comparisons
+
     for (const c of this.scene) {
       if (c === this || !c.solid || c instanceof PlayerComponent) continue;
       if (
         this.x < c.x + c.width &&
         this.x + this.width > c.x &&
         this.y < c.y + c.height &&
-        this.y + this.height > c.y
+        (this.y + this.height) > (c.y + collisionEpsilon) // Adjusted: shell's bottom must be slightly *below* the obstacle's top + epsilon
       ) {
-        return true;
+        const verticalOverlap = (this.y + this.height > c.y + collisionEpsilon) && (this.y < c.y + c.height - collisionEpsilon);
+
+        if (verticalOverlap) {
+            return true;
+        }
       }
     }
     return false;

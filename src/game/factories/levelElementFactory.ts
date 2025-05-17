@@ -52,11 +52,12 @@ export function createEnemy(
   
   const enemyType = enemyConfig.type || "goomba"; 
   const xPos = enemyConfig.xTile * TILE_SIZE;
-  const yPos = enemyConfig.yTile !== undefined ? enemyConfig.yTile * TILE_SIZE : defaultYPosition;
+  let yPos = enemyConfig.yTile !== undefined ? enemyConfig.yTile * TILE_SIZE : defaultYPosition;
 
   let enemy: BaseEnemyComponent;
 
   if (enemyType === "turtle") {
+    yPos -= 14;
     enemy = new TurtleEnemyComponent(xPos, yPos, TILE_SIZE, TILE_SIZE);
   } else if (enemyType === "bat") {
     const patrolXTiles = enemyConfig.patrolRangeXTiles;

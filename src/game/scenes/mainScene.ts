@@ -36,6 +36,7 @@ import { saveGameState, clearGameState } from "../utils/gameStateManager";
 import { StartScene } from "./startScene";
 import { CloudClusterComponent } from "../entities/map/cloudClusterComponent";
 import { TornadoComponent } from "../entities/effects/TornadoComponent";
+import { PumpkinShellComponent } from "../entities/enemy/PumpkinShellComponent";
 
 export class MainScene extends Scene {
   private player!: PlayerComponent
@@ -49,6 +50,7 @@ export class MainScene extends Scene {
   private coins: CoinComponent[] = []
   private lifeItems: LifeItemComponent[] = []
   private tornadoes: TornadoComponent[] = []
+  private shells: PumpkinShellComponent[] = []
 
   private score = 0
   private lives = MAX_LIVES_ON_LOAD
@@ -63,12 +65,12 @@ export class MainScene extends Scene {
 
   private isUnderwater: boolean = false;
 
-  
+
   private dynamicCloudsEnabled: boolean = false;
   private dynamicCloudSpawnTimer: number = 0;
   private nextDynamicCloudSpawnTime: number = 0;
-  private readonly MIN_CLOUD_SPAWN_INTERVAL = 4; 
-  private readonly MAX_CLOUD_SPAWN_INTERVAL = 8; 
+  private readonly MIN_CLOUD_SPAWN_INTERVAL = 4;
+  private readonly MAX_CLOUD_SPAWN_INTERVAL = 8;
 
   private constructor() {
     super()
@@ -137,11 +139,11 @@ export class MainScene extends Scene {
     this.initialPlayerX = playerInitialXOverride ?? mapData.player.initialX
     this.initialPlayerY = playerInitialYOverride ?? mapData.player.initialY
 
-    
+
     this.dynamicCloudsEnabled = mapData.decorations.dynamicClouds || false;
     if (this.dynamicCloudsEnabled) {
       this.setNextDynamicCloudSpawnTime();
-      this.dynamicCloudSpawnTimer = 0; 
+      this.dynamicCloudSpawnTimer = 0;
     }
 
     if (!playerInitialXOverride && !playerInitialYOverride) {
@@ -279,13 +281,13 @@ export class MainScene extends Scene {
   }
 
   private spawnDynamicCloud(): void {
-    const canvasWidth = SceneManager.getScene().components.find(c => c instanceof BoxComponent && c.zIndex === -10)?.width || 800; 
+    const canvasWidth = SceneManager.getScene().components.find(c => c instanceof BoxComponent && c.zIndex === -10)?.width || 800;
 
     const y = Math.random() * 200 + 30;
     const size = Math.random() * 1.0 + 0.8;
     const speed = -(Math.random() * 25 + 25);
 
-    const startX = Camera.x + canvasWidth + Math.random() * 50 + 50; 
+    const startX = Camera.x + canvasWidth + Math.random() * 50 + 50;
 
     const cloud = createCloudComponent({ x: startX, y, size }, speed);
     this.add(cloud);
@@ -321,7 +323,9 @@ export class MainScene extends Scene {
   private populateEnemies(mapData: MapData) {
     const enemyYPosition = this.newGroundLevelY + mapData.enemies.yOffsetFromGround
     this.enemies = []
+    this.shells = [];
     for (const pos of mapData.enemies.positions) {
+
       const enemy = createEnemy(pos, enemyYPosition, this.components) as BaseEnemyComponent
       this.enemies.push(enemy)
       this.add(enemy)
@@ -342,64 +346,128 @@ export class MainScene extends Scene {
   private checkEnemyCollisions(playerVelocityYBeforeCollisionResolution: number) {
     if (this.playerIsCurrentlyDying || this.player.isDying) return
 
-    for (const enemy of this.enemies) {
-      if (!enemy.isAlive || !enemy.enabled) continue
+    const collidableEnemies = this.components.filter(
+      c => c instanceof BaseEnemyComponent && c.isAlive && c.enabled
+    ) as BaseEnemyComponent[];
 
-      const isEnemyHarmful = enemy.isHarmfulOnContact()
+    for (const enemy of collidableEnemies) {
 
-      if (!isEnemyHarmful && !(enemy instanceof TurtleEnemyComponent && enemy.isShelled && !enemy.isMovingInShell)) {
-        continue
+      if (!enemy.isAlive || !enemy.enabled) continue;
+
+      const isEnemyHarmful = enemy.isHarmfulOnContact();
+
+      if (!isEnemyHarmful && !(enemy instanceof TurtleEnemyComponent)) {
+        if (!(enemy instanceof PumpkinShellComponent)) {
+          continue;
+        }
+      } else {
+
       }
 
-      const playerFeetY = this.player.y + this.player.height
-      const playerPrevFeetY = playerFeetY - playerVelocityYBeforeCollisionResolution
-      const playerLeft = this.player.x
-      const playerRight = this.player.x + this.player.width
-      const playerTop = this.player.y
-      const playerBottom = playerFeetY
+      const playerFeetY = this.player.y + this.player.height;
+      const playerPrevFeetY = playerFeetY - playerVelocityYBeforeCollisionResolution;
+      const playerLeft = this.player.x;
+      const playerRight = this.player.x + this.player.width;
+      const playerTop = this.player.y;
+      const playerBottom = playerFeetY;
 
-      const enemyTop = enemy.y
-      const enemyBottom = enemy.y + enemy.height
-      const enemyLeft = enemy.x
-      const enemyRight = enemy.x + enemy.width
-
+      const enemyTop = enemy.y;
+      const enemyBottom = enemy.y + enemy.height;
+      const enemyLeft = enemy.x;
+      const enemyRight = enemy.x + enemy.width;
+      if (enemy instanceof PumpkinShellComponent) {
+        //log enemy type
+        console.log(`
+          Enemy type: ${enemy.constructor.name} 
+          isEnemyHarmful: ${isEnemyHarmful}, 
+          playerRight: ${playerRight}> enemyLeft: ${enemyLeft}, 
+          playerLeft: ${playerLeft} > enemyRight: ${enemyRight}, 
+          playerBottom: ${playerBottom}> enemyTop: ${enemyTop}, 
+          playerTop: ${playerTop} > enemyBottom: ${enemyBottom},          
+          playerVelocityYBeforeCollisionResolution: ${playerVelocityYBeforeCollisionResolution}`);
+      }
       if (
         playerRight > enemyLeft &&
         playerLeft < enemyRight &&
         playerBottom > enemyTop &&
         playerTop < enemyBottom
       ) {
-        const isFalling = playerVelocityYBeforeCollisionResolution > 0
-        const wasAbove = playerPrevFeetY <= enemyTop + 2
-        const landedOnTop = playerFeetY >= enemyTop && playerFeetY <= enemyTop + Math.min(10, enemy.height * 0.3)
+        const isFalling = playerVelocityYBeforeCollisionResolution > 0;
+        const wasAbove = playerPrevFeetY <= enemyTop + 2;
+        const stompMargin = Math.max(5, Math.min(10, enemy.height * 0.4));
+        const landedOnTop = playerFeetY >= enemyTop && playerFeetY <= enemyTop + stompMargin;
 
-        let stompedEnemy = false
-        if (isFalling && wasAbove && landedOnTop) {
-          enemy.stomp()
-          this.score += 10
-          this.hudController.updateScore(this.score)
-          stompedEnemy = true
+        let stompedEnemy = false;
+        // Allow stomp if player is falling OR player is grounded and overlap from above
+        const canStomp = (
+          playerVelocityYBeforeCollisionResolution > 0 // falling
+          || (
+            this.player['isGrounded'] && // player grounded (private, so use bracket)
+            Math.abs(playerFeetY - enemyTop) < 2 // player feet rất gần enemy top
+          )
+        );
+        if (canStomp && wasAbove && landedOnTop) {
+          console.log("Calling stomp() on", enemy.constructor.name, enemy.x, enemy.y, "state:", (enemy as any).currentState);
+          enemy.stomp();
+          this.score += 10;
+          this.hudController.updateScore(this.score);
+          stompedEnemy = true;
 
-          if (enemy instanceof TurtleEnemyComponent && enemy.isShelled && !enemy.isMovingInShell) {
-            this.player.bounceOffEnemySlightly()
-          } else {
-            this.player.bounceOffEnemy()
+          if (enemy instanceof TurtleEnemyComponent || enemy instanceof GoombaEnemyComponent) {
+            this.player.bounceOffEnemy();
+          } else if (enemy instanceof PumpkinShellComponent) {
+            this.player.bounceOffEnemySlightly();
           }
         }
 
         if (!stompedEnemy && isEnemyHarmful) {
-          let playerDies = true
-          if (enemy instanceof TurtleEnemyComponent) {
-            if (enemy.isShelled && !enemy.isMovingInShell) {
-              playerDies = enemy.hitByPlayerNonStomp()
-            } else {
-              playerDies = true
-            }
-          }
+          let playerDies = true;
 
           if (playerDies) {
-            this.handlePlayerDeath("You were defeated by an enemy!")
+            this.handlePlayerDeath(enemy instanceof PumpkinShellComponent ? "Hit by a pumpkin shell!" : "You were defeated by an enemy!")
           }
+        }
+      }
+    }
+  }
+
+  private checkShellInteractions() {
+    this.shells = this.components.filter(c => c instanceof PumpkinShellComponent && c.isAlive && c.enabled) as PumpkinShellComponent[];
+    // console.log("Shells:", this.shells);
+
+    for (let i = 0; i < this.shells.length; i++) {
+      const shellA = this.shells[i];
+      if (!shellA.isHarmfulOnContact()) continue;
+
+      for (const enemy of this.enemies) {
+        if (!enemy.isAlive || !enemy.enabled || enemy === shellA) continue;
+
+        if (
+          shellA.x < enemy.x + enemy.width &&
+          shellA.x + shellA.width > enemy.x &&
+          shellA.y < enemy.y + enemy.height &&
+          shellA.y + shellA.height > enemy.y
+        ) {
+          if (typeof (enemy as any).kill === 'function') {
+            (enemy as any).kill();
+          } else {
+            enemy.stomp();
+          }
+        }
+      }
+
+      for (let j = i + 1; j < this.shells.length; j++) {
+        const shellB = this.shells[j];
+        if (!shellB.isHarmfulOnContact()) continue;
+
+        if (
+          shellA.x < shellB.x + shellB.width &&
+          shellA.x + shellA.width > shellB.x &&
+          shellA.y < shellB.y + shellB.height &&
+          shellA.y + shellA.height > shellB.y
+        ) {
+          shellA.killAndFall(true);
+          shellB.killAndFall(true);
         }
       }
     }
@@ -411,7 +479,7 @@ export class MainScene extends Scene {
     for (const tornado of this.tornadoes) {
       if (!tornado.enabled || !tornado.isHarmful) continue;
 
-      
+
       if (
         this.player.x < tornado.x + tornado.width &&
         this.player.x + this.player.width > tornado.x &&
@@ -520,29 +588,29 @@ export class MainScene extends Scene {
         playerBottom >= blockTop &&
         playerTop < blockBottom
       ) {
-        
+
         let performHorizontalResolution = true;
 
         if (direction === 'horizontal') {
-          
-          
-          
+
+
+
           const playerIsWalkingOnTopOfThisBlock = (playerBottom <= blockTop + 0.1 && playerTop < blockTop);
 
           if (playerIsWalkingOnTopOfThisBlock) {
-            performHorizontalResolution = false; 
+            performHorizontalResolution = false;
           }
 
           if (performHorizontalResolution) {
-            collided = true; 
-            if (originalX + this.player.width <= blockLeft) { 
+            collided = true;
+            if (originalX + this.player.width <= blockLeft) {
               this.player.x = blockLeft - this.player.width;
-            } else if (originalX >= blockRight) { 
+            } else if (originalX >= blockRight) {
               this.player.x = blockRight;
             }
           }
         } else if (direction === 'vertical') {
-          collided = true; 
+          collided = true;
           if (originalY !== undefined) {
             if (originalY + this.player.height <= blockTop + 0.01) {
               this.player.y = blockTop - this.player.height;
@@ -566,8 +634,8 @@ export class MainScene extends Scene {
       this.player.setGrounded(isGrounded, isGrounded ? groundY : undefined);
     }
 
-    
-    
+
+
     return direction === 'vertical' ? isGrounded : collided;
   }
 
@@ -612,15 +680,15 @@ export class MainScene extends Scene {
   override update(dt: number) {
     if (!this.enabled || !this.player) return;
 
-    
-    
+
+
     if (this.hudController) {
-        this.hudController.getBackToCheckpointButton().update(dt);
-        this.hudController.getRestartLevelButton().update(dt);
-        this.hudController.getBackToMenuButton().update(dt);
+      this.hudController.getBackToCheckpointButton().update(dt);
+      this.hudController.getRestartLevelButton().update(dt);
+      this.hudController.getBackToMenuButton().update(dt);
     }
 
-    
+
     if (this.dynamicCloudsEnabled) {
       this.dynamicCloudSpawnTimer += dt;
       if (this.dynamicCloudSpawnTimer >= this.nextDynamicCloudSpawnTime) {
@@ -662,23 +730,28 @@ export class MainScene extends Scene {
     const playerVelocityYBeforeCollisionResolution = this.player.velocityY;
 
     this.checkAndResolveCollisions('horizontal', originalX);
-    this.checkAndResolveCollisions('vertical', originalX, originalY); 
+    this.checkAndResolveCollisions('vertical', originalX, originalY);
 
-    for (const enemy of this.enemies) {
-      if (enemy.enabled) {
-        enemy.setScene(this.components);
-        enemy.update(dt);
+    for (const component of this.components) {
+      if (component === this.player) continue; // Skip player, already updated explicitly
+
+      if (component.enabled) {
+        if (component instanceof BaseEnemyComponent) {
+          component.setScene(this.components);
+        }
+        component.update(dt);
       }
     }
+
     for (const tornado of this.tornadoes) {
       if (tornado.enabled) {
         tornado.update(dt);
       }
     }
-    
+
     for (let i = this.components.length - 1; i >= 0; i--) {
       const component = this.components[i];
-      if (component instanceof CloudClusterComponent && component.speedX < 0) { 
+      if (component instanceof CloudClusterComponent && component.speedX < 0) {
         if (component.x + component.width < Camera.x) {
           this.remove(component);
         }
@@ -702,6 +775,7 @@ export class MainScene extends Scene {
     }
 
     this.checkEnemyCollisions(playerVelocityYBeforeCollisionResolution);
+    this.checkShellInteractions();
     this.checkTornadoCollisions();
     this.checkGoalCollision();
     this.checkCoinCollisions();
@@ -815,14 +889,14 @@ export class MainScene extends Scene {
   }
 
   private handleBackToMenuButton(): void {
-    
-    
-    
-    
-    
+
+
+
+
+
     console.log("Going back to start scene.")
-    
+
     SceneManager.setScene(new StartScene())
-    
+
   }
 }

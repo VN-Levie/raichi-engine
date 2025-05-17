@@ -9,7 +9,7 @@ export class Animator {
 
   playing = true;
   currentFrame = 0;
-  private timer = 0;
+  timer = 0;
 
   constructor(
     spritesheet: HTMLImageElement,
