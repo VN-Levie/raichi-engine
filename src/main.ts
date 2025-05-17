@@ -38,7 +38,7 @@ Promise.all([
 ]).then(frames => {
     const anim = new Animator(frames, 8, true)
     const sprite = new SpriteComponent(null, anim)
-    sprite.x = 600
+    sprite.x = 300
     sprite.y = 100
     sprite.width = 64
     sprite.height = 64
