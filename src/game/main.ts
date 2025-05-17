@@ -8,7 +8,7 @@ import {
   TextComponent
 } from "../core/core"
 
-import { StartScene } from "../scenes/startScene"
+import { StartScene } from "./scenes/startScene"
 
 Input.init()
 SceneManager.setScene(new StartScene())

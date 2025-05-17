@@ -1,10 +1,10 @@
-import { Scene } from "../core/scene"
-import { TextComponent } from "../entities/textComponent"
-import { ButtonComponent } from "../entities/buttonComponent"
-import { SceneManager } from "../core/sceneManager"
+import { Scene } from "../../core/scene"
+import { TextComponent } from "../../entities/textComponent"
+import { ButtonComponent } from "../../entities/buttonComponent"
+import { SceneManager } from "../../core/sceneManager"
 import { StartScene } from "./startScene"
 import { MainScene } from "./mainScene"
-import { BoxComponent } from "../entities/boxComponent"
+import { BoxComponent } from "../../entities/boxComponent"
 
 export class GameOverScene extends Scene {
   constructor(message: string = "Game Over") {

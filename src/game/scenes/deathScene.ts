@@ -1,11 +1,11 @@
-import { Scene } from "../core/scene";
-import { SceneManager } from "../core/sceneManager";
-import { BoxComponent } from "../entities/boxComponent";
-import { TextComponent } from "../entities/textComponent";
-import { PlayerComponent } from "../game/entities/playerComponent";
+import { Scene } from "../../core/scene";
+import { SceneManager } from "../../core/sceneManager";
+import { BoxComponent } from "../../entities/boxComponent";
+import { TextComponent } from "../../entities/textComponent";
+import { PlayerComponent } from "../entities/playerComponent";
 import { GameOverScene } from "./gameOverScene";
 import { MainScene } from "./mainScene";
-import { Camera } from "../core/camera";
+import { Camera } from "../../core/camera";
 
 export class DeathScene extends Scene {
     private timer: number = 3;

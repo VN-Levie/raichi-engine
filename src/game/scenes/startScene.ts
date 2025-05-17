@@ -6,7 +6,7 @@ import {
     BoxComponent,
     ButtonComponent,
     TextComponent
-} from "../core/core"
+} from "../../core/core"
 
 import { MainScene } from "./mainScene"
 

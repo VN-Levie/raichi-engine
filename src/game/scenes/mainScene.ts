@@ -1,13 +1,13 @@
-import { Scene } from "../core/scene"
-import { BoxComponent } from "../entities/boxComponent"
-import { CircleComponent } from "../entities/circleComponent"
-import { Camera } from "../core/camera"
-import { SceneManager } from "../core/sceneManager"
+import { Scene } from "../../core/scene"
+import { BoxComponent } from "../../entities/boxComponent"
+import { CircleComponent } from "../../entities/circleComponent"
+import { Camera } from "../../core/camera"
+import { SceneManager } from "../../core/sceneManager"
 import { GameOverScene } from "./gameOverScene"
 import { DeathScene } from "./deathScene"
-import { EnemyComponent } from "../game/entities/enemyComponent"
-import { PlayerComponent } from "../game/entities/playerComponent"
-import { TextComponent } from "../entities/textComponent"
+import { EnemyComponent } from "../entities/enemyComponent"
+import { PlayerComponent } from "../entities/playerComponent"
+import { TextComponent } from "../../entities/textComponent"
 
 export class MainScene extends Scene {
   private player: PlayerComponent
