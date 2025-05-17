@@ -4,13 +4,13 @@ import { PipeComponent } from "../entities/PipeComponent";
 import { FloatingPlatformComponent } from "../entities/FloatingPlatformComponent";
 import { CloudClusterComponent } from "../entities/CloudClusterComponent";
 import { BushComponent } from "../entities/BushComponent";
-import { EnemyComponent as GoombaEnemyComponent } from "../entities/enemyComponent"; // Alias for clarity
+import { EnemyComponent as GoombaEnemyComponent } from "../entities/enemyComponent"; 
 import { TurtleEnemyComponent } from "../entities/TurtleEnemyComponent";
 import { GoalComponent } from "../entities/GoalComponent";
 import { TILE_SIZE } from "../constants";
 import { Component } from "../../core/component";
 import { FlagPoleComponent } from "../entities/FlagPoleComponent";
-import { CheckpointComponent } from "../entities/CheckpointComponent"; // Added
+import { CheckpointComponent } from "../entities/CheckpointComponent"; 
 
 export function createCloudComponent(cloudConfig: MapData['decorations']['clouds'][0]): CloudClusterComponent {
   return new CloudClusterComponent(cloudConfig.x, cloudConfig.y, cloudConfig.size);
@@ -35,16 +35,16 @@ export function createFloatingPlatformComponent(platformConfig: MapData['terrain
 export function createEnemy(
     enemyConfig: MapData['enemies']['positions'][0], 
     yPosition: number, 
-    sceneComponents: Component[]): Component { // Return type Component for flexibility
+    sceneComponents: Component[]): Component { 
   
-  const enemyType = enemyConfig.type || "goomba"; // Default to goomba if type not specified
+  const enemyType = enemyConfig.type || "goomba"; 
 
   let enemy: Component;
 
   if (enemyType === "turtle") {
     enemy = new TurtleEnemyComponent(enemyConfig.xTile * TILE_SIZE, yPosition, TILE_SIZE, TILE_SIZE);
     (enemy as TurtleEnemyComponent).setScene(sceneComponents);
-  } else { // Default to goomba
+  } else { 
     enemy = new GoombaEnemyComponent(enemyConfig.xTile * TILE_SIZE, yPosition, TILE_SIZE, TILE_SIZE);
     (enemy as GoombaEnemyComponent).setScene(sceneComponents);
   }

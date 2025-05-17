@@ -10,19 +10,19 @@ export class GoalComponent extends Component {
         this.y = y;
         this.width = width;
         this.height = height;
-        this.solid = false; // It's a trigger, not a solid block
-        this.visible = false; // Typically invisible
+        this.solid = false; 
+        this.visible = false; 
         this.nextMapUrl = nextMapUrl;
         this.isWinGoal = isWinGoal;
     }
 
     update(dt: number): void {
-        // Static trigger, no update logic needed
+        
     }
 
     render(ctx: CanvasRenderingContext2D): void {
-        // Optional: render for debugging
-        if (!this.visible) { // Example to make it visible for debug
+        
+        if (!this.visible) { 
             ctx.save();
             ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
             ctx.fillRect(this.x, this.y, this.width, this.height);

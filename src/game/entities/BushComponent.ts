@@ -9,7 +9,7 @@ export class BushComponent extends Component {
     super();
     const x = xTile * TILE_SIZE;
     this.x = x;
-    this.y = groundLevelY - (24 + size * 8) + 16; // Approximate y
+    this.y = groundLevelY - (24 + size * 8) + 16; 
     this.zIndex = -1;
     this.solid = false;
 
@@ -17,7 +17,7 @@ export class BushComponent extends Component {
     const lightGreen = "#00c800";
     const embedDepth = 16;
 
-    // Main circles
+    
     for (let i = 0; i < size; i++) {
       this.parts.push(new CircleComponent(x + (TILE_SIZE / 2) + i * TILE_SIZE, groundLevelY - (TILE_SIZE / 2) + embedDepth, TILE_SIZE / 2, darkGreen));
     }
@@ -31,7 +31,7 @@ export class BushComponent extends Component {
         this.parts.push(new CircleComponent(x + (TILE_SIZE * 1.5) + i * TILE_SIZE, groundLevelY - (TILE_SIZE * 1.5) + embedDepth, TILE_SIZE / 2, darkGreen));
       }
     }
-    // Highlights
+    
     for (let i = 0; i < size; i++) {
       this.parts.push(new CircleComponent(x + (TILE_SIZE / 2.66) + i * TILE_SIZE, groundLevelY - (TILE_SIZE / 1.6) + embedDepth, TILE_SIZE / 4, lightGreen));
     }
@@ -52,12 +52,12 @@ export class BushComponent extends Component {
   }
 
   update(dt: number): void {
-    // Bushes are static
+    
   }
 
   render(ctx: CanvasRenderingContext2D): void {
     this.parts.forEach(part => {
-        // If BushComponent can move, update part.x and part.y relative to this.x, this.y
+        
         part.render(ctx);
     });
   }

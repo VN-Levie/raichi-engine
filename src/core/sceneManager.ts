@@ -8,10 +8,10 @@ export class SceneManager {
   }
 
   static update(dt: number) {
-    if (this.currentScene && this.currentScene.enabled) { // Check if scene and its enabled flag are true
+    if (this.currentScene && this.currentScene.enabled) { 
       this.currentScene.update(dt)
     }
-    // console.log("SceneManager.update", this.currentScene);
+    
   }
 
   static render(ctx: CanvasRenderingContext2D) {
