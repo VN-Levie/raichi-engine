@@ -12,19 +12,19 @@ export class DeathScene extends Scene {
     private remainingLives: number;
     private currentScore: number;
     private deathReason: string;
+    private mapUrlToRestart: string;
 
     private playerSprite: PlayerComponent;
 
-    constructor(remainingLives: number, currentScore: number, deathReason: string) {
+    constructor(remainingLives: number, currentScore: number, deathReason: string, mapUrl: string) {
         super();
         this.remainingLives = remainingLives;
         this.currentScore = currentScore;
         this.deathReason = deathReason;
-
+        this.mapUrlToRestart = mapUrl;
 
         Camera.resetViewport();
         Camera.setPosition(0, 0);
-
 
         const background = new BoxComponent(0, 0, 800, "black");
         background.height = 600;
@@ -45,11 +45,7 @@ export class DeathScene extends Scene {
         worldText.align = "center";
         this.add(worldText);
 
-
         this.playerSprite = new PlayerComponent(350, 280);
-
-
-
 
         const livesText = new TextComponent(`x  ${this.remainingLives}`, 450, 300, "32px Arial", "white");
         livesText.align = "left";
@@ -62,29 +58,24 @@ export class DeathScene extends Scene {
         this.timer -= dt;
         if (this.timer <= 0) {
             if (this.remainingLives <= 0) {
-                SceneManager.setScene(new GameOverScene(this.deathReason + " - No lives left!"));
+                SceneManager.setScene(new GameOverScene(this.deathReason + " - No lives left!", this.mapUrlToRestart));
             } else {
                 try {
-                    const mainScene = await MainScene.create(this.currentScore, this.remainingLives);
+                    const mainScene = await MainScene.create(this.mapUrlToRestart, this.currentScore, this.remainingLives);
                     SceneManager.setScene(mainScene);
                 } catch (error) {
                     console.error("Failed to create MainScene after death:", error);
-                    SceneManager.setScene(new GameOverScene("Error loading level."));
+                    SceneManager.setScene(new GameOverScene("Error loading level.", this.mapUrlToRestart));
                 }
             }
         }
     }
 
     override render(ctx: CanvasRenderingContext2D) {
-
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         Camera.reset(ctx);
 
-
         super.render(ctx);
-
-
-
 
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -97,10 +88,8 @@ export class DeathScene extends Scene {
             }
         }
 
-
         if (this.playerSprite.visible) {
             ctx.save();
-
 
             (this.playerSprite as any).isGrounded = true;
             (this.playerSprite as any).isMoving = false;

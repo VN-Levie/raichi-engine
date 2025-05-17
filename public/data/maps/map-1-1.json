@@ -71,13 +71,20 @@
   "enemies": {
     "yOffsetFromGround": -32,
     "positions": [
-      { "xTile": 8 },
-      { "xTile": 20 },
-      { "xTile": 32 },
-      { "xTile": 48 },
-      { "xTile": 57 },
-      { "xTile": 67 },
-      { "xTile": 85 }
+      { "xTile": 8, "type": "goomba" },
+      { "xTile": 20, "type": "goomba" },
+      { "xTile": 32, "type": "goomba" },
+      { "xTile": 48, "type": "goomba" },
+      { "xTile": 57, "type": "goomba" },
+      { "xTile": 67, "type": "goomba" },
+      { "xTile": 85, "type": "goomba" }
     ]
+  },
+  "goal": {
+    "xTile": 95,
+    "yTile": 15, 
+    "widthTiles": 2,
+    "heightTiles": 3,
+    "nextMapUrl": "/data/maps/map-1-2.json"
   }
 }

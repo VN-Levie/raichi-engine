@@ -3,6 +3,7 @@ import { Component } from "./component"
 
 export class Scene {
   components: Component[] = []
+  enabled = true; // Add enabled property
 
   add(component: Component) {
     this.components.push(component)
@@ -15,6 +16,7 @@ export class Scene {
   }
 
   update(dt: number) {
+    if (!this.enabled) return; // Check if scene is enabled
     for (const c of this.components) {
       if (c.enabled) c.update(dt)
     }

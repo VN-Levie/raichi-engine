@@ -18,6 +18,14 @@ export interface MapData {
   };
   enemies: {
     yOffsetFromGround: number;
-    positions: Array<{ xTile: number }>;
+    positions: Array<{ xTile: number; type?: "goomba" | "turtle" }>;
+  };
+  goal?: {
+    xTile: number;
+    yTile: number;
+    widthTiles: number;
+    heightTiles: number;
+    nextMapUrl?: string;
+    isWinGoal?: boolean;
   };
 }

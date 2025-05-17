@@ -1,0 +1,57 @@
+{
+  "name": "World 1-2 (Castle Approach)",
+  "player": {
+    "initialX": 100,
+    "initialY": 100
+  },
+  "level": {
+    "groundLevelY": 570,
+    "gameOverY": 600,
+    "backgroundColor": "#222233", 
+    "worldWidthTiles": 80 
+  },
+  "decorations": {
+    "clouds": [ 
+      { "x": 150, "y": 70, "size": 2 },
+      { "x": 500, "y": 90, "size": 2.5 }
+    ],
+    "bushes": [
+      { "xTile": 5, "size": 2 },
+      { "xTile": 25, "size": 3 }
+    ]
+  },
+  "terrain": {
+    "ground": {
+      "segments": [
+        { "startTile": 0, "endTile": 79 }
+      ],
+      "color": "#444444", 
+      "topHighlightColor": "#666666",
+      "textureColor": "#333333"
+    },
+    "pipes": [
+      { "xTile": 15, "heightMultiplier": 2 }
+    ],
+    "floatingPlatforms": [
+      { "xTile": 30, "yTile": 12, "widthTiles": 4, "style": "stone" },
+      { "xTile": 50, "yTile": 10, "widthTiles": 3, "style": "stone" }
+    ]
+  },
+  "enemies": {
+    "yOffsetFromGround": -32,
+    "positions": [
+      { "xTile": 10, "type": "turtle" },
+      { "xTile": 22, "type": "turtle" },
+      { "xTile": 35, "type": "goomba" }, 
+      { "xTile": 45, "type": "turtle" },
+      { "xTile": 60, "type": "turtle" }
+    ]
+  },
+  "goal": {
+    "xTile": 75, 
+    "yTile": 13, 
+    "widthTiles": 3, 
+    "heightTiles": 5, 
+    "isWinGoal": true 
+  }
+}

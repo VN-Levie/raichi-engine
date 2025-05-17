@@ -4,7 +4,9 @@ import { PipeComponent } from "../entities/PipeComponent";
 import { FloatingPlatformComponent } from "../entities/FloatingPlatformComponent";
 import { CloudClusterComponent } from "../entities/CloudClusterComponent";
 import { BushComponent } from "../entities/BushComponent";
-import { EnemyComponent } from "../entities/enemyComponent";
+import { EnemyComponent as GoombaEnemyComponent } from "../entities/enemyComponent"; // Alias for clarity
+import { TurtleEnemyComponent } from "../entities/TurtleEnemyComponent";
+import { GoalComponent } from "../entities/GoalComponent";
 import { TILE_SIZE } from "../constants";
 import { Component } from "../../core/component";
 
@@ -31,8 +33,30 @@ export function createFloatingPlatformComponent(platformConfig: MapData['terrain
 export function createEnemy(
     enemyConfig: MapData['enemies']['positions'][0], 
     yPosition: number, 
-    sceneComponents: Component[]): EnemyComponent {
-  const enemy = new EnemyComponent(enemyConfig.xTile * TILE_SIZE, yPosition, TILE_SIZE, TILE_SIZE);
-  enemy.setScene(sceneComponents); // Enemy needs scene context for its AI (ledge detection, etc.)
+    sceneComponents: Component[]): Component { // Return type Component for flexibility
+  
+  const enemyType = enemyConfig.type || "goomba"; // Default to goomba if type not specified
+
+  let enemy: Component;
+
+  if (enemyType === "turtle") {
+    enemy = new TurtleEnemyComponent(enemyConfig.xTile * TILE_SIZE, yPosition, TILE_SIZE, TILE_SIZE);
+    (enemy as TurtleEnemyComponent).setScene(sceneComponents);
+  } else { // Default to goomba
+    enemy = new GoombaEnemyComponent(enemyConfig.xTile * TILE_SIZE, yPosition, TILE_SIZE, TILE_SIZE);
+    (enemy as GoombaEnemyComponent).setScene(sceneComponents);
+  }
   return enemy;
+}
+
+export function createGoal(goalConfig: MapData['goal']): GoalComponent | null {
+  if (!goalConfig) return null;
+  return new GoalComponent(
+    goalConfig.xTile * TILE_SIZE,
+    goalConfig.yTile * TILE_SIZE,
+    goalConfig.widthTiles * TILE_SIZE,
+    goalConfig.heightTiles * TILE_SIZE,
+    goalConfig.nextMapUrl,
+    goalConfig.isWinGoal
+  );
 }

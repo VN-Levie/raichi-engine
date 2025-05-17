@@ -27,7 +27,7 @@ export class StartScene extends Scene {
         startBtn.height = 60
         startBtn.onClick = async () => {
             try {
-                const mainScene = await MainScene.create();
+                const mainScene = await MainScene.create('/data/maps/map-1-1.json'); // Pass map URL
                 SceneManager.setScene(mainScene);
             } catch (error) {
                 console.error("Failed to create MainScene:", error);

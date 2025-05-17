@@ -13,17 +13,23 @@ import {
   createGroundBlockComponent,
   createPipeComponent,
   createFloatingPlatformComponent,
-  createEnemy
+  createEnemy,
+  createGoal
 } from "../factories/levelElementFactory"
 import { TILE_SIZE } from "../constants"
 import { HUDController } from "../ui/HUDController"
 import { TextComponent } from "../../entities/textComponent"
+import { GoalComponent } from "../entities/GoalComponent"
+import { WinScene } from "./WinScene"
+import { TurtleEnemyComponent } from "../entities/TurtleEnemyComponent"
 
 export class MainScene extends Scene {
   private player!: PlayerComponent
   private gameOverY!: number
-  private enemies: EnemyComponent[] = []
+  private enemies: (EnemyComponent | TurtleEnemyComponent)[] = []
   private newGroundLevelY!: number
+  private goalComponent: GoalComponent | null = null
+  private currentMapUrl!: string
 
   private score = 0
   private lives = 3
@@ -39,13 +45,14 @@ export class MainScene extends Scene {
     super()
   }
 
-  public static async create(initialScore: number = 0, initialLives: number = 3): Promise<MainScene> {
+  public static async create(mapUrl: string, initialScore: number = 0, initialLives: number = 3): Promise<MainScene> {
     const scene = new MainScene()
+    scene.currentMapUrl = mapUrl
     try {
-      const mapData = await AssetLoader.loadJson<MapData>('/data/maps/map-1-1.json')
+      const mapData = await AssetLoader.loadJson<MapData>(mapUrl)
       scene.initializeScene(mapData, initialScore, initialLives)
     } catch (error) {
-      console.error("Failed to load or parse map data using AssetLoader:", error)
+      console.error(`Failed to load or parse map data from ${mapUrl}:`, error)
       scene.initializeScene(scene.getDefaultFallbackMapData(), initialScore, initialLives, true)
     }
     return scene
@@ -66,7 +73,7 @@ export class MainScene extends Scene {
         pipes: [],
         floatingPlatforms: []
       },
-      enemies: { yOffsetFromGround: -32, positions: [] }
+      enemies: { yOffsetFromGround: -32, positions: [{ "xTile": 5, "type": "goomba" }] }
     }
   }
 
@@ -127,6 +134,15 @@ export class MainScene extends Scene {
 
     this.populateEnemies(mapData)
 
+    if (mapData.goal) {
+      this.goalComponent = createGoal(mapData.goal)
+      if (this.goalComponent) {
+        this.add(this.goalComponent)
+      }
+    } else {
+      this.goalComponent = null
+    }
+
     if (isFallback) {
       const errorText = new TextComponent("Failed to load map. Fallback level.", 400, 50, "20px Arial", "red")
       errorText.align = "center"
@@ -141,7 +157,9 @@ export class MainScene extends Scene {
     this.player.resetState(this.initialPlayerX, this.initialPlayerY)
 
     for (const enemy of this.enemies) {
-      enemy.resetState()
+      if ('resetState' in enemy && typeof enemy.resetState === 'function') {
+        enemy.resetState()
+      }
     }
 
     Camera.follow(this.player)
@@ -166,7 +184,7 @@ export class MainScene extends Scene {
     const enemyYPosition = this.newGroundLevelY + mapData.enemies.yOffsetFromGround
     this.enemies = []
     for (const pos of mapData.enemies.positions) {
-      const enemy = createEnemy(pos, enemyYPosition, this.components)
+      const enemy = createEnemy(pos, enemyYPosition, this.components) as EnemyComponent | TurtleEnemyComponent
       this.enemies.push(enemy)
       this.add(enemy)
     }
@@ -183,7 +201,7 @@ export class MainScene extends Scene {
         this.lives--
 
         Camera.resetViewport()
-        SceneManager.setScene(new DeathScene(this.lives, this.score, this.lastDeathReason))
+        SceneManager.setScene(new DeathScene(this.lives, this.score, this.lastDeathReason, this.currentMapUrl))
         return
       }
 
@@ -217,6 +235,7 @@ export class MainScene extends Scene {
     }
 
     this.checkEnemyCollisions(playerVelocityYBeforeCollisionResolution)
+    this.checkGoalCollision()
 
     if (this.player.y > this.gameOverY && !this.player.isDying) {
       this.handlePlayerDeath("You fell into a pit!")
@@ -331,6 +350,30 @@ export class MainScene extends Scene {
     return direction === 'vertical' ? isGrounded : collided
   }
 
+  private async checkGoalCollision() {
+    if (!this.goalComponent || this.playerIsCurrentlyDying || this.player.isDying) return
+
+    const playerRect = { x: this.player.x, y: this.player.y, width: this.player.width, height: this.player.height }
+    const goalRect = { x: this.goalComponent.x, y: this.goalComponent.y, width: this.goalComponent.width, height: this.goalComponent.height }
+
+    if (
+      playerRect.x < goalRect.x + goalRect.width &&
+      playerRect.x + playerRect.width > goalRect.x &&
+      playerRect.y < goalRect.y + goalRect.height &&
+      playerRect.y + playerRect.height > goalRect.y
+    ) {
+      if (this.goalComponent.isWinGoal) {
+        SceneManager.setScene(new WinScene())
+      } else if (this.goalComponent.nextMapUrl) {
+        this.player.enabled = false
+        this.enabled = false
+
+        const nextMapScene = await MainScene.create(this.goalComponent.nextMapUrl, this.score, this.lives)
+        SceneManager.setScene(nextMapScene)
+      }
+    }
+  }
+
   override render(ctx: CanvasRenderingContext2D) {
     if (!this.player) {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
@@ -345,12 +388,10 @@ export class MainScene extends Scene {
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
-    // --- World Space Rendering ---
     Camera.apply(ctx)
 
     for (let i = 0; i < this.components.length; i++) {
       const c = this.components[i]
-      // Skip HUD elements in this pass
       if (c === this.hudController.getScoreTextComponent() || c === this.hudController.getLivesTextComponent()) {
         continue
       }
@@ -364,19 +405,17 @@ export class MainScene extends Scene {
 
     Camera.reset(ctx)
 
-    // --- Screen Space Rendering (UI) ---
-    // Render HUD elements now, after camera reset, so they are in screen coordinates.
-    const scoreText = this.hudController.getScoreTextComponent();
+    const scoreText = this.hudController.getScoreTextComponent()
     if (scoreText.visible) {
       ctx.save()
-      scoreText.render(ctx) // scoreText.x and scoreText.y are now screen coordinates
+      scoreText.render(ctx)
       ctx.restore()
     }
 
-    const livesText = this.hudController.getLivesTextComponent();
+    const livesText = this.hudController.getLivesTextComponent()
     if (livesText.visible) {
       ctx.save()
-      livesText.render(ctx) // livesText.x and livesText.y are now screen coordinates
+      livesText.render(ctx)
       ctx.restore()
     }
   }

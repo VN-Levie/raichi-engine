@@ -8,7 +8,9 @@ export class SceneManager {
   }
 
   static update(dt: number) {
-    this.currentScene?.update(dt)
+    if (this.currentScene && this.currentScene.enabled) { // Check if scene and its enabled flag are true
+      this.currentScene.update(dt)
+    }
     // console.log("SceneManager.update", this.currentScene);
   }
 
