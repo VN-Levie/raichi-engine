@@ -11,11 +11,11 @@ export class BoxComponent extends Component {
     this.width = size
     this.height = size
     this.color = color
+    this.solid = true; // Default to solid unless explicitly changed
   }
 
   update(dt: number) {}
    
-
   render(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = this.color
     ctx.fillRect(this.x, this.y, this.width, this.height)

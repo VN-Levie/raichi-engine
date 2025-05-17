@@ -1,3 +1,4 @@
+import { Camera } from "./camera"
 import { Component } from "./component"
 
 export class Scene {
@@ -5,7 +6,7 @@ export class Scene {
 
   add(component: Component) {
     this.components.push(component)
-    this.components.sort((a, b) => a.zIndex - b.zIndex)
+    this.sortComponents()
   }
 
   remove(component: Component) {
@@ -20,8 +21,25 @@ export class Scene {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    for (const c of this.components) {
-      if (c.visible) c.render(ctx)
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+    Camera.apply(ctx)
+    
+    this.sortComponents()
+    
+    for (let i = 0; i < this.components.length; i++) {
+      const c = this.components[i]
+      if (c.visible) {
+        ctx.save()
+        c.render(ctx)
+        ctx.restore()
+      }
     }
+
+    Camera.reset(ctx)
+  }
+  
+  private sortComponents() {
+    this.components.sort((a, b) => a.zIndex - b.zIndex)
   }
 }

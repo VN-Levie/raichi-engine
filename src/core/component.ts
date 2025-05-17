@@ -6,6 +6,7 @@ export abstract class Component {
   visible = true
   enabled = true
   zIndex = 0
+  solid = false  // New property to indicate if component should have collision
 
   abstract update(dt: number): void
   abstract render(ctx: CanvasRenderingContext2D): void
