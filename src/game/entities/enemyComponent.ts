@@ -11,14 +11,22 @@ export class EnemyComponent extends Component {
   private stompAnimationTime = 0;
   private readonly stompDuration = 0.3;
 
+  initialX: number;
+  initialY: number;
+  initialDirection: number;
+
   constructor(x: number, y: number, width: number, height: number) {
     super();
     this.x = x;
     this.y = y;
+    this.initialX = x;
+    this.initialY = y;
     this.width = width;
     this.height = height;
     this.solid = true;
     this.zIndex = 5;
+    this.initialDirection = 1; // Default initial direction
+    this.direction = this.initialDirection;
   }
 
   setScene(scene: Component[]) {
@@ -263,5 +271,19 @@ export class EnemyComponent extends Component {
     this.solid = false;
     this.stompAnimationTime = 0;
     this.deathSpeed = -8;
+  }
+
+  resetState() {
+    this.x = this.initialX;
+    this.y = this.initialY;
+    this.isAlive = true;
+    this.visible = true;
+    this.enabled = true;
+    this.solid = true;
+    this.direction = this.initialDirection;
+    this.stompAnimationTime = 0;
+    this.deathSpeed = 0;
+    // Ensure speed is reset if it can change
+    this.speed = 1; 
   }
 }

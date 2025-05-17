@@ -14,6 +14,11 @@ export class PlayerComponent extends Component {
   private animTimer = 0
   private jumpPressed = false
   private groundY = 0
+
+  isDying = false;
+  private deathAnimTimer = 0;
+  private readonly DEATH_ANIM_DURATION = 1.5; // seconds for death animation
+  private readonly DEATH_BOUNCE_FORCE = -7;
   
   constructor(x: number, y: number) {
     super()
@@ -26,7 +31,49 @@ export class PlayerComponent extends Component {
     this.velocityY = 0
   }
 
+  startDeathSequence(deathType: 'enemy' | 'pit') {
+    if (this.isDying) return; // Already dying
+
+    this.isDying = true;
+    this.deathAnimTimer = this.DEATH_ANIM_DURATION;
+    this.isGrounded = false; // Player is airborne during death
+    this.solid = false;      // Player passes through objects when dying
+
+    if (deathType === 'enemy') {
+      this.velocityY = this.DEATH_BOUNCE_FORCE; // Bounce up for enemy death
+    } else if (deathType === 'pit') {
+      // For pit fall, no upward bounce, just continue falling.
+      // Gravity will continue to apply in the update method.
+    }
+  }
+
+  isDeathAnimationComplete(): boolean {
+    return this.isDying && this.deathAnimTimer <= 0;
+  }
+
+  resetState(initialX: number, initialY: number) {
+    this.x = initialX;
+    this.y = initialY;
+    this.velocityY = 0;
+    this.isGrounded = false;
+    this.isDying = false;
+    this.deathAnimTimer = 0;
+    this.solid = true;
+    this.direction = 1;
+    this.animFrame = 0;
+    this.isMoving = false;
+  }
+
   update(dt: number) {
+    if (this.isDying) {
+      this.velocityY += this.gravity; // Apply gravity
+      this.y += this.velocityY;       // Fall
+      this.deathAnimTimer -= dt;
+      // Animation frame can be set to jumping or a specific death frame
+      this.animFrame = 1; // Use jumping pose for falling
+      return; // Skip normal input and movement
+    }
+
     // Handle horizontal movement - should work regardless of grounded state
     this.isMoving = false
     
@@ -47,7 +94,7 @@ export class PlayerComponent extends Component {
 
     // Handle jumping - only when grounded and jump key is pressed
     if (Input.isKeyDown("ArrowUp")) {
-      if (this.isGrounded && !this.jumpPressed) {
+      if (this.isGrounded && !this.jumpPressed && !this.isDying) { // Prevent jumping if dying
         this.velocityY = this.jumpForce
         this.isGrounded = false
         this.jumpPressed = true;
@@ -666,6 +713,8 @@ export class PlayerComponent extends Component {
   }
 
   setGrounded(isGrounded: boolean, groundY?: number) {
+    if (this.isDying) return; // Don't change grounded state if dying
+
     if (groundY !== undefined) {
       this.groundY = groundY;
       // Position player exactly on ground to prevent sinking
@@ -677,14 +726,18 @@ export class PlayerComponent extends Component {
   }
 
   stopVerticalMovement() {
+    if (this.isDying) return; // Don't stop if dying
     this.velocityY = 0;
   }
 
   bounceOffEnemy() {
+    if (this.isDying) return; // Don't bounce if dying
     this.velocityY = -5;
   }
 
   checkEnemyCollision(enemy: EnemyComponent): boolean {
+    if (this.isDying) return false; // No collision checks if dying
+
     const playerBottom = this.y + this.height;
     const playerTop = this.y;
     const enemyTop = enemy.y;

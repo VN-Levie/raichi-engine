@@ -6,12 +6,24 @@ import { SceneManager } from "../core/sceneManager"
 import { GameOverScene } from "./gameOverScene"
 import { EnemyComponent } from "../game/entities/enemyComponent"
 import { PlayerComponent } from "../game/entities/playerComponent"
+import { TextComponent } from "../entities/textComponent"
 
 export class MainScene extends Scene {
   private player: PlayerComponent
   private gameOverY = 750
   private enemies: EnemyComponent[] = []
   private newGroundLevelY = 450
+
+  private score = 0
+  private lives = 3
+  private scoreText: TextComponent
+  private livesText: TextComponent
+
+  private initialPlayerX = 150
+  private initialPlayerY = 100
+
+  private playerIsCurrentlyDying = false;
+  private lastDeathReason = "";
 
   constructor() {
     super()
@@ -47,11 +59,9 @@ export class MainScene extends Scene {
       this.createDetailedCloud(cloudPos.x, cloudPos.y, cloudPos.size)
     }
 
-
     this.createGroundWithGaps()
 
-
-    this.player = new PlayerComponent(150, 100)
+    this.player = new PlayerComponent(this.initialPlayerX, this.initialPlayerY)
     this.add(this.player)
 
     const bushPositions = [
@@ -73,10 +83,53 @@ export class MainScene extends Scene {
     this.createPipes()
     this.createFloatingPlatforms()
 
-
     this.createEnemies()
 
+    
+    this.scoreText = new TextComponent(`Score: ${this.score}`, 10, 30, "20px Arial", "black")
+    this.scoreText.zIndex = 100
+    this.add(this.scoreText)
+
+    this.livesText = new TextComponent(`Lives: ${this.lives}`, 790, 30, "20px Arial", "black")
+    this.livesText.align = "right"
+    this.livesText.zIndex = 100
+    this.add(this.livesText)
+
     Camera.follow(this.player)
+  }
+
+  private updateScoreUI() {
+    this.scoreText.text = `Score: ${this.score}`
+  }
+
+  private updateLivesUI() {
+    this.livesText.text = `Lives: ${this.lives}`
+  }
+
+  private resetPlayerAndLevel() {
+    this.player.resetState(this.initialPlayerX, this.initialPlayerY);
+
+    for (const enemy of this.enemies) {
+      enemy.resetState()
+    }
+
+    Camera.follow(this.player)
+    Camera.update() 
+    this.playerIsCurrentlyDying = false; 
+  }
+
+  private handlePlayerDeath(reason: string) {
+    if (this.playerIsCurrentlyDying || this.player.isDying) return; 
+
+    this.playerIsCurrentlyDying = true;
+    this.lastDeathReason = reason;
+
+    if (reason === "You fell into a pit!") {
+      this.player.startDeathSequence('pit');
+    } else { 
+      this.player.startDeathSequence('enemy');
+    }
+    
   }
 
   private createEnemies() {
@@ -116,18 +169,15 @@ export class MainScene extends Scene {
         const blockX = i * 32;
         const blockY = this.newGroundLevelY;
 
-
         const g = new BoxComponent(blockX, blockY, 32, groundColor);
         g.width = 32;
         g.height = 32;
         g.zIndex = 0;
         g.solid = true;
 
-
         const originalGroundRender = g.render.bind(g);
         g.render = (ctx) => {
           originalGroundRender(ctx);
-
 
           ctx.fillStyle = groundTextureColor;
           const lineThickness = 2;
@@ -138,7 +188,6 @@ export class MainScene extends Scene {
           }
         }
         this.add(g);
-
 
         const topHighlight = new BoxComponent(blockX, blockY, 32, groundTopHighlightColor);
         topHighlight.height = 6;
@@ -396,58 +445,78 @@ export class MainScene extends Scene {
   }
 
   override update(dt: number) {
-    Camera.update()
+    if (this.playerIsCurrentlyDying) {
+      this.player.update(dt); 
 
+      if (this.player.isDeathAnimationComplete()) {
+        this.playerIsCurrentlyDying = false; 
+        this.lives--;
+        this.updateLivesUI();
+        Camera.resetViewport();
+
+        if (this.lives <= 0) {
+          Camera.resetViewport();
+          SceneManager.setScene(new GameOverScene(`${this.lastDeathReason} - No lives left!`));
+          return;
+        } else {
+          this.resetPlayerAndLevel();
+        }
+      }
+      
+      
+      for (const enemy of this.enemies) {
+        if (enemy.enabled) {
+          enemy.setScene(this.components);
+          enemy.update(dt);
+        }
+      }
+      Camera.update(); 
+      return; 
+    }
+
+    
+    Camera.update()
 
     const originalX = this.player.x
     const originalY = this.player.y
 
-
-    this.player.update(dt)
-
-    const playerVelocityYBeforeCollisionResolution = this.player.velocityY;
-
+    this.player.update(dt) 
+    const playerVelocityYBeforeCollisionResolution = this.player.velocityY
 
     this.checkAndResolveCollisions('horizontal', originalX)
-
-
     const isGrounded = this.checkAndResolveCollisions('vertical', originalX, originalY)
     this.player.setGrounded(isGrounded)
 
-
     for (const enemy of this.enemies) {
-      enemy.setScene(this.components)
-      enemy.update(dt)
+      if (enemy.enabled) {
+        enemy.setScene(this.components)
+        enemy.update(dt)
+      }
     }
-
 
     this.checkEnemyCollisions(playerVelocityYBeforeCollisionResolution)
 
-
-    if (this.player.y > this.gameOverY) {
-      Camera.resetViewport()
-      SceneManager.setScene(new GameOverScene("You fell into a pit!"))
+    if (this.player.y > this.gameOverY && !this.player.isDying) { 
+      this.handlePlayerDeath("You fell into a pit!")
     }
   }
 
   private checkEnemyCollisions(playerVelocityYBeforeCollisionResolution: number) {
+    if (this.playerIsCurrentlyDying || this.player.isDying) return; 
+
     for (const enemy of this.enemies) {
-      if (!enemy.isAlive) continue;
+      if (!enemy.isAlive || !enemy.enabled) continue
 
-      const playerFeetY = this.player.y + this.player.height;
+      const playerFeetY = this.player.y + this.player.height
+      const playerPrevFeetY = playerFeetY - playerVelocityYBeforeCollisionResolution
+      const playerLeft = this.player.x
+      const playerRight = this.player.x + this.player.width
+      const playerTop = this.player.y
 
-
-
-      const playerPrevFeetY = playerFeetY - playerVelocityYBeforeCollisionResolution;
-      const playerLeft = this.player.x;
-      const playerRight = this.player.x + this.player.width;
-      const playerTop = this.player.y;
-
-      const enemyTop = enemy.y;
-      const enemyBottom = enemy.y + enemy.height;
-      const enemyLeft = enemy.x;
-      const enemyRight = enemy.x + enemy.width;
-
+      const enemyTop = enemy.y
+      const enemyBottom = enemy.y + enemy.height
+      const enemyLeft = enemy.x
+      const enemyRight = enemy.x + enemy.width
 
       if (
         playerRight > enemyLeft &&
@@ -455,33 +524,25 @@ export class MainScene extends Scene {
         playerFeetY >= enemyTop &&
         playerTop < enemyBottom
       ) {
-
-        const isFalling = playerVelocityYBeforeCollisionResolution > 0;
-
-        const wasAbove = playerPrevFeetY <= enemyTop + 2;
-
-        console.log(`Enemy Collision: isFalling: ${isFalling} (using vel ${playerVelocityYBeforeCollisionResolution.toFixed(2)}), wasAbove: ${wasAbove} (prevFeetY: ${playerPrevFeetY.toFixed(2)}, enemyTop+2: ${(enemyTop + 2).toFixed(2)}) ` +
-          `PlayerCurrentY: ${this.player.y.toFixed(2)}, PlayerCurrentVelY: ${this.player.velocityY.toFixed(2)}, PlayerFeetY: ${playerFeetY.toFixed(2)}, EnemyTop: ${enemyTop.toFixed(2)}`);
+        const isFalling = playerVelocityYBeforeCollisionResolution > 0
+        const wasAbove = playerPrevFeetY <= enemyTop + 2
 
         if (isFalling && wasAbove) {
-          const stompDepthTolerance = Math.min(10, enemy.height * 0.3);
+          const stompDepthTolerance = Math.min(10, enemy.height * 0.3)
 
           if (playerFeetY <= enemyTop + stompDepthTolerance) {
-            console.log("Stomp confirmed: Player landed on top.");
-            enemy.stomp();
-            this.player.bounceOffEnemy();
+            enemy.stomp()
+            this.player.bounceOffEnemy()
+            this.score += 10
+            this.updateScoreUI()
           } else {
-            console.log("Stomp failed: Player fell through or hit side too low.");
             if (enemy.isAlive) {
-              Camera.resetViewport()
-              SceneManager.setScene(new GameOverScene("You were defeated by an enemy!"));
+              this.handlePlayerDeath("You were defeated by an enemy!")
             }
           }
         } else {
-          console.log("Hit: Not a stomp (e.g., rising, side/bottom collision, or failed wasAbove/isFalling).");
           if (enemy.isAlive) {
-            Camera.resetViewport()
-            SceneManager.setScene(new GameOverScene("You were defeated by an enemy!"));
+            this.handlePlayerDeath("You were defeated by an enemy!")
           }
         }
       }
@@ -489,6 +550,11 @@ export class MainScene extends Scene {
   }
 
   private checkAndResolveCollisions(direction: 'horizontal' | 'vertical', originalX: number, originalY?: number): boolean {
+    if (this.playerIsCurrentlyDying || this.player.isDying) { 
+      if (direction === 'vertical') return false; 
+      return false; 
+    }
+
     let collided = false;
     let isGrounded = false;
     let groundY = 0;
@@ -506,7 +572,6 @@ export class MainScene extends Scene {
       const blockTop = c.y;
       const blockBottom = c.y + c.height;
 
-
       if (
         playerRight > blockLeft &&
         playerLeft < blockRight &&
@@ -516,23 +581,19 @@ export class MainScene extends Scene {
         collided = true;
 
         if (direction === 'horizontal') {
-
           if (originalX + this.player.width <= blockLeft) {
             this.player.x = blockLeft - this.player.width;
           } else if (originalX >= blockRight) {
             this.player.x = blockRight;
           }
         } else if (direction === 'vertical') {
-
           if (originalY !== undefined) {
             if (originalY + this.player.height <= blockTop) {
-
               this.player.y = blockTop - this.player.height;
               this.player.stopVerticalMovement();
               isGrounded = true;
               groundY = blockTop;
             } else if (originalY >= blockBottom) {
-
               this.player.y = blockBottom;
               this.player.velocityY = 0.1;
             }
@@ -541,11 +602,40 @@ export class MainScene extends Scene {
       }
     }
 
-
     if (direction === 'vertical') {
       this.player.setGrounded(isGrounded, isGrounded ? groundY : undefined);
     }
 
     return direction === 'vertical' ? isGrounded : collided;
+  }
+
+  override render(ctx: CanvasRenderingContext2D) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+    Camera.apply(ctx)
+
+    for (let i = 0; i < this.components.length; i++) {
+      const c = this.components[i]
+      if (c === this.scoreText || c === this.livesText) continue
+
+      if (c.visible) {
+        ctx.save()
+        c.render(ctx)
+        ctx.restore()
+      }
+    }
+
+    Camera.reset(ctx)
+
+    if (this.scoreText.visible) {
+      ctx.save()
+      this.scoreText.render(ctx)
+      ctx.restore()
+    }
+    if (this.livesText.visible) {
+      ctx.save()
+      this.livesText.render(ctx)
+      ctx.restore()
+    }
   }
 }
