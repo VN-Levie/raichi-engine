@@ -27,6 +27,7 @@ export class StartScene extends Scene {
         startBtn.width = 200
         startBtn.height = 60
         startBtn.onClick = async () => {
+            // Starting a new game, score and totalCoins default to 0 in MainScene.create
             SceneManager.setScene(new LoadingScene(async () => MainScene.create('/data/maps/map-1-1.json')));
         }
 

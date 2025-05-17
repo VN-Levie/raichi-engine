@@ -10,7 +10,9 @@ import { GoalComponent } from "../entities/GoalComponent";
 import { TILE_SIZE } from "../constants";
 import { Component } from "../../core/component";
 import { FlagPoleComponent } from "../entities/FlagPoleComponent";
-import { CheckpointComponent } from "../entities/CheckpointComponent"; 
+import { CheckpointComponent } from "../entities/CheckpointComponent";
+import { CoinComponent } from "../entities/CoinComponent";
+import { LifeItemComponent } from "../entities/LifeItemComponent";
 
 export function createCloudComponent(cloudConfig: MapData['decorations']['clouds'][0]): CloudClusterComponent {
   return new CloudClusterComponent(cloudConfig.x, cloudConfig.y, cloudConfig.size);
@@ -70,4 +72,12 @@ export function createFlagPoleComponent(flagPoleConfig: MapData['decorations']['
 
 export function createCheckpointComponent(checkpointConfig: { xTile: number }, gameHeight: number): CheckpointComponent {
   return new CheckpointComponent(checkpointConfig.xTile, gameHeight);
+}
+
+export function createCoinComponent(coinConfig: { xTile: number; yTile: number }): CoinComponent {
+  return new CoinComponent(coinConfig.xTile, coinConfig.yTile);
+}
+
+export function createLifeItemComponent(lifeItemConfig: { xTile: number; yTile: number }): LifeItemComponent {
+  return new LifeItemComponent(lifeItemConfig.xTile, lifeItemConfig.yTile);
 }

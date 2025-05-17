@@ -91,5 +91,21 @@
   "checkpoints": [
     { "xTile": 30 },
     { "xTile": 60 }
+  ],
+  "coins": [
+    { "xTile": 7, "yTile": 14 },
+    { "xTile": 8, "yTile": 14 },
+    { "xTile": 9, "yTile": 14 },
+    { "xTile": 23, "yTile": 9 },
+    { "xTile": 24, "yTile": 8 },
+    { "xTile": 25, "yTile": 9 },
+    { "xTile": 40, "yTile": 15 },
+    { "xTile": 55, "yTile": 11 },
+    { "xTile": 56, "yTile": 11 },
+    { "xTile": 70, "yTile": 16 }
+  ],
+  "lifeItems": [
+    { "xTile": 15, "yTile": 10 },
+    { "xTile": 75, "yTile": 12 }
   ]
 }

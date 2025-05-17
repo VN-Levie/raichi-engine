@@ -765,4 +765,9 @@ export class PlayerComponent extends Component {
     if (this.isDying) return;
     this.velocityY = -5;
   }
+
+  bounceOffEnemySlightly() {
+    if (this.isDying) return;
+    this.velocityY = -3; // A smaller bounce
+  }
 }

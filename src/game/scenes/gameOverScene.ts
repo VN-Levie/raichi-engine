@@ -51,9 +51,8 @@ export class GameOverScene extends Scene {
     retryButton.onClick = async () => {
         const mapToLoad = this.mapUrlToRestart || '/data/maps/map-1-1.json';
         // For "Play Again" after Game Over, score is 0, lives reset to 3.
-        // No respawn coordinates are passed, so MainScene uses map's default start.
-        // PlayerComponent's resetToMapStart will be effectively called via its constructor.
-        SceneManager.setScene(new LoadingScene(async () => MainScene.create(mapToLoad, 0, 3)));
+        // Total coins are also reset to 0 (default in MainScene.create).
+        SceneManager.setScene(new LoadingScene(async () => MainScene.create(mapToLoad, 0, 3))); // No totalCoins passed, defaults to 0
     }
     this.add(retryButton)
 

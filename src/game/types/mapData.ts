@@ -30,4 +30,6 @@ export interface MapData {
     isWinGoal?: boolean;
   };
   checkpoints?: Array<{ xTile: number }>; // Added checkpoints
+  coins?: Array<{ xTile: number; yTile: number }>; // Added coins
+  lifeItems?: Array<{ xTile: number; yTile: number }>; // Added life items
 }

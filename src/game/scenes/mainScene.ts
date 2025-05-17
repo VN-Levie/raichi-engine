@@ -7,7 +7,7 @@ import { EnemyComponent } from "../entities/enemyComponent"
 import { PlayerComponent } from "../entities/playerComponent"
 import { AssetLoader } from "../../core/assetLoader"
 import { MapData } from "../types/mapData"
-import { 
+import {
   createCloudComponent,
   createBushComponent,
   createGroundBlockComponent,
@@ -16,7 +16,9 @@ import {
   createEnemy,
   createGoal,
   createFlagPoleComponent,
-  createCheckpointComponent
+  createCheckpointComponent,
+  createCoinComponent,
+  createLifeItemComponent
 } from "../factories/levelElementFactory"
 import { TILE_SIZE } from "../constants"
 import { HUDController } from "../ui/HUDController"
@@ -26,6 +28,8 @@ import { WinScene } from "./WinScene"
 import { TurtleEnemyComponent } from "../entities/TurtleEnemyComponent"
 import { LoadingScene } from "./LoadingScene";
 import { CheckpointComponent } from "../entities/CheckpointComponent";
+import { CoinComponent } from "../entities/CoinComponent";
+import { LifeItemComponent } from "../entities/LifeItemComponent";
 
 export class MainScene extends Scene {
   private player!: PlayerComponent
@@ -36,9 +40,12 @@ export class MainScene extends Scene {
   private currentMapUrl!: string
   private mapName: string = ""
   private checkpoints: CheckpointComponent[] = []
+  private coins: CoinComponent[] = []
+  private lifeItems: LifeItemComponent[] = []
 
   private score = 0
-  private lives = 3
+  private lives = 10
+  private totalCoinsCollected = 0
   private hudController!: HUDController
 
   private initialPlayerX!: number
@@ -52,20 +59,21 @@ export class MainScene extends Scene {
   }
 
   public static async create(
-    mapUrl: string, 
-    initialScore: number = 0, 
-    initialLives: number = 3,
+    mapUrl: string,
+    initialScore: number = 0,
+    initialLives: number = 10,
     playerStartX?: number,
-    playerStartY?: number
+    playerStartY?: number,
+    initialTotalCoins: number = 0
   ): Promise<MainScene> {
     const scene = new MainScene()
     scene.currentMapUrl = mapUrl
     try {
       const mapData = await AssetLoader.loadJson<MapData>(mapUrl)
-      scene.initializeScene(mapData, initialScore, initialLives, false, playerStartX, playerStartY)
+      scene.initializeScene(mapData, initialScore, initialLives, false, playerStartX, playerStartY, initialTotalCoins)
     } catch (error) {
       console.error(`Failed to load or parse map data from ${mapUrl}:`, error)
-      scene.initializeScene(scene.getDefaultFallbackMapData(), initialScore, initialLives, true, playerStartX, playerStartY)
+      scene.initializeScene(scene.getDefaultFallbackMapData(), initialScore, initialLives, true, playerStartX, playerStartY, initialTotalCoins)
     }
     return scene
   }
@@ -86,20 +94,24 @@ export class MainScene extends Scene {
         floatingPlatforms: []
       },
       enemies: { yOffsetFromGround: -32, positions: [{ "xTile": 5, "type": "goomba" }] },
-      checkpoints: []
+      checkpoints: [],
+      coins: [],
+      lifeItems: []
     }
   }
 
   private initializeScene(
-    mapData: MapData, 
-    initialScore: number, 
-    initialLives: number, 
+    mapData: MapData,
+    initialScore: number,
+    initialLives: number,
     isFallback: boolean = false,
     playerInitialXOverride?: number,
-    playerInitialYOverride?: number
+    playerInitialYOverride?: number,
+    initialTotalCoins: number = 0
   ) {
     this.score = initialScore
     this.lives = initialLives
+    this.totalCoinsCollected = initialTotalCoins
     this.mapName = mapData.name
 
     this.gameOverY = mapData.level.gameOverY
@@ -111,8 +123,10 @@ export class MainScene extends Scene {
     this.hudController = new HUDController()
     this.add(this.hudController.getScoreTextComponent())
     this.add(this.hudController.getLivesTextComponent())
+    this.add(this.hudController.getCoinsTextComponent())
     this.hudController.updateScore(this.score)
     this.hudController.updateLives(this.lives)
+    this.hudController.updateCoins(this.totalCoinsCollected)
 
     const background = new BoxComponent(0, 0, 800, mapData.level.backgroundColor)
     background.height = 600
@@ -163,6 +177,24 @@ export class MainScene extends Scene {
         const checkpoint = createCheckpointComponent(cpConfig, gameHeight)
         this.add(checkpoint)
         this.checkpoints.push(checkpoint)
+      }
+    }
+
+    this.coins = []
+    if (mapData.coins) {
+      for (const coinConfig of mapData.coins) {
+        const coin = createCoinComponent(coinConfig)
+        this.add(coin)
+        this.coins.push(coin)
+      }
+    }
+
+    this.lifeItems = []
+    if (mapData.lifeItems) {
+      for (const lifeItemConfig of mapData.lifeItems) {
+        const lifeItem = createLifeItemComponent(lifeItemConfig)
+        this.add(lifeItem)
+        this.lifeItems.push(lifeItem)
       }
     }
 
@@ -229,121 +261,122 @@ export class MainScene extends Scene {
     }
   }
 
-  override update(dt: number) {
-    if (!this.enabled || !this.player) return
-
-    if (this.playerIsCurrentlyDying) {
-      this.player.update(dt)
-
-      if (this.player.isDeathAnimationComplete()) {
-        this.playerIsCurrentlyDying = false
-        this.lives--
-        const playerRespawnPoint = this.player.getRespawnPoint()
-
-        Camera.resetViewport()
-        SceneManager.setScene(new DeathScene(this.lives, this.score, this.lastDeathReason, this.currentMapUrl, this.mapName, playerRespawnPoint.x, playerRespawnPoint.y))
-        return
-      }
-
-      for (const enemy of this.enemies) {
-        if (enemy.enabled) {
-          enemy.setScene(this.components)
-          enemy.update(dt)
-        }
-      }
-      Camera.update()
-      return
-    }
-
-    Camera.update()
-
-    const originalX = this.player.x
-    const originalY = this.player.y
-
-    this.player.update(dt)
-    const playerVelocityYBeforeCollisionResolution = this.player.velocityY
-
-    this.checkAndResolveCollisions('horizontal', originalX)
-    const isGrounded = this.checkAndResolveCollisions('vertical', originalX, originalY)
-    this.player.setGrounded(isGrounded)
-
-    for (const enemy of this.enemies) {
-      if (enemy.enabled) {
-        enemy.setScene(this.components)
-        enemy.update(dt)
-      }
-    }
-
-    this.checkEnemyCollisions(playerVelocityYBeforeCollisionResolution)
-    this.checkGoalCollision()
-    this.checkCheckpointCollisions()
-
-    if (this.player.y > this.gameOverY && !this.player.isDying) {
-      this.handlePlayerDeath("You fell into a pit!")
-    }
-  }
-
-  private checkCheckpointCollisions() {
-    if (!this.player || this.player.isDying) return
-
-    for (const checkpoint of this.checkpoints) {
-      if (checkpoint.activated) continue
-
-      const playerCenterX = this.player.x + this.player.width / 2
-
-      if (playerCenterX >= checkpoint.x && playerCenterX < checkpoint.x + checkpoint.width) {
-        checkpoint.activate()
-        const respawnX = checkpoint.x + checkpoint.width / 2 - this.player.width / 2
-        const respawnY = this.newGroundLevelY - this.player.height
-        this.player.setRespawnPoint(respawnX, respawnY)
-      }
-    }
-  }
-
   private checkEnemyCollisions(playerVelocityYBeforeCollisionResolution: number) {
     if (this.playerIsCurrentlyDying || this.player.isDying) return
 
     for (const enemy of this.enemies) {
-      if (!enemy.isAlive || !enemy.enabled) continue
+
+      let isEnemyHarmful = false;
+      if (enemy instanceof TurtleEnemyComponent) {
+        isEnemyHarmful = enemy.isHarmfulOnContact();
+      } else if (enemy instanceof EnemyComponent) {
+        isEnemyHarmful = enemy.isAlive;
+      } else {
+        isEnemyHarmful = (enemy as any).isAlive !== undefined ? (enemy as any).isAlive : true;
+      }
+
+      if (!isEnemyHarmful || !enemy.enabled) continue;
+
 
       const playerFeetY = this.player.y + this.player.height
       const playerPrevFeetY = playerFeetY - playerVelocityYBeforeCollisionResolution
       const playerLeft = this.player.x
       const playerRight = this.player.x + this.player.width
       const playerTop = this.player.y
+      const playerBottom = playerFeetY
 
       const enemyTop = enemy.y
       const enemyBottom = enemy.y + enemy.height
       const enemyLeft = enemy.x
       const enemyRight = enemy.x + enemy.width
 
+
       if (
         playerRight > enemyLeft &&
         playerLeft < enemyRight &&
-        playerFeetY >= enemyTop &&
+        playerBottom > enemyTop &&
         playerTop < enemyBottom
       ) {
-        const isFalling = playerVelocityYBeforeCollisionResolution > 0
-        const wasAbove = playerPrevFeetY <= enemyTop + 2
 
-        if (isFalling && wasAbove) {
-          const stompDepthTolerance = Math.min(10, enemy.height * 0.3)
+        const isFalling = playerVelocityYBeforeCollisionResolution > 0;
+        const wasAbove = playerPrevFeetY <= enemyTop + 2;
+        const landedOnTop = playerFeetY >= enemyTop && playerFeetY <= enemyTop + Math.min(10, enemy.height * 0.3);
 
-          if (playerFeetY <= enemyTop + stompDepthTolerance) {
-            enemy.stomp()
-            this.player.bounceOffEnemy()
-            this.score += 10
-            this.hudController.updateScore(this.score)
-          } else {
-            if (enemy.isAlive) {
-              this.handlePlayerDeath("You were defeated by an enemy!")
+        let stompedEnemy = false;
+        if (isFalling && wasAbove && landedOnTop) {
+          if (enemy instanceof TurtleEnemyComponent) {
+            enemy.stomp();
+
+            if (enemy.isShelled && !enemy.isMovingInShell) {
+              this.player.bounceOffEnemySlightly();
+            } else {
+              this.player.bounceOffEnemy();
             }
-          }
-        } else {
-          if (enemy.isAlive) {
-            this.handlePlayerDeath("You were defeated by an enemy!")
+            this.score += 10;
+            this.hudController.updateScore(this.score);
+            stompedEnemy = true;
+          } else if (enemy instanceof EnemyComponent) {
+            enemy.stomp();
+            this.player.bounceOffEnemy();
+            this.score += 10;
+            this.hudController.updateScore(this.score);
+            stompedEnemy = true;
           }
         }
+
+        if (!stompedEnemy) {
+
+
+
+          let playerDies = true;
+          if (enemy instanceof TurtleEnemyComponent) {
+            playerDies = enemy.hitByPlayerNonStomp();
+          }
+
+
+          if (playerDies) {
+            this.handlePlayerDeath("You were defeated by an enemy!");
+          }
+        }
+      }
+    }
+  }
+
+  private checkCoinCollisions() {
+    if (!this.player || this.player.isDying) return
+
+    for (const coin of this.coins) {
+      if (coin.collected || !coin.enabled) continue
+
+      if (
+        this.player.x < coin.x + coin.width &&
+        this.player.x + this.player.width > coin.x &&
+        this.player.y < coin.y + coin.height &&
+        this.player.y + this.player.height > coin.y
+      ) {
+        coin.collect()
+        this.score += coin.value
+        this.totalCoinsCollected++
+        this.hudController.updateScore(this.score)
+        this.hudController.updateCoins(this.totalCoinsCollected)
+      }
+    }
+  }
+
+  private checkLifeItemCollisions() {
+    if (!this.player || this.player.isDying) return
+
+    for (const lifeItem of this.lifeItems) {
+      if (lifeItem.collected || !lifeItem.enabled) continue
+      if (
+        this.player.x < lifeItem.x + lifeItem.width &&
+        this.player.x + this.player.width > lifeItem.x &&
+        this.player.y < lifeItem.y + lifeItem.height &&
+        this.player.y + this.player.height > lifeItem.y
+      ) {
+        lifeItem.collect()
+        this.lives += lifeItem.value
+        this.hudController.updateLives(this.lives)
       }
     }
   }
@@ -430,8 +463,65 @@ export class MainScene extends Scene {
         const nextMapUrl = this.goalComponent.nextMapUrl
         const currentScore = this.score
         const currentLives = this.lives
-        SceneManager.setScene(new LoadingScene(async () => await MainScene.create(nextMapUrl, currentScore, currentLives)))
+        const currentTotalCoins = this.totalCoinsCollected
+        SceneManager.setScene(new LoadingScene(async () => await MainScene.create(nextMapUrl, currentScore, currentLives, undefined, undefined, currentTotalCoins)))
       }
+    }
+  }
+
+  override update(dt: number) {
+    if (!this.enabled || !this.player) return
+
+    if (this.playerIsCurrentlyDying) {
+      this.player.update(dt)
+
+      if (this.player.isDeathAnimationComplete()) {
+        this.playerIsCurrentlyDying = false
+        this.lives--
+        const playerRespawnPoint = this.player.getRespawnPoint()
+
+        Camera.resetViewport()
+        SceneManager.setScene(new DeathScene(this.lives, 0, this.lastDeathReason, this.currentMapUrl, this.mapName, playerRespawnPoint.x, playerRespawnPoint.y, this.totalCoinsCollected))
+        return
+      }
+
+      for (const enemy of this.enemies) {
+        if (enemy.enabled) {
+          enemy.setScene(this.components)
+          enemy.update(dt)
+        }
+      }
+      Camera.update()
+      return
+    }
+
+    Camera.update()
+
+    const originalX = this.player.x
+    const originalY = this.player.y
+
+    this.player.update(dt)
+    const playerVelocityYBeforeCollisionResolution = this.player.velocityY
+
+    this.checkAndResolveCollisions('horizontal', originalX)
+    const isGrounded = this.checkAndResolveCollisions('vertical', originalX, originalY)
+    this.player.setGrounded(isGrounded)
+
+    for (const enemy of this.enemies) {
+      if (enemy.enabled) {
+        enemy.setScene(this.components)
+        enemy.update(dt)
+      }
+    }
+
+    this.checkEnemyCollisions(playerVelocityYBeforeCollisionResolution)
+    this.checkGoalCollision()
+    // this.checkCheckpointCollisions()
+    this.checkCoinCollisions()
+    this.checkLifeItemCollisions()
+
+    if (this.player.y > this.gameOverY && !this.player.isDying) {
+      this.handlePlayerDeath("You fell into a pit!")
     }
   }
 
@@ -477,6 +567,13 @@ export class MainScene extends Scene {
     if (livesText.visible) {
       ctx.save()
       livesText.render(ctx)
+      ctx.restore()
+    }
+
+    const coinsText = this.hudController.getCoinsTextComponent()
+    if (coinsText.visible) {
+      ctx.save()
+      coinsText.render(ctx)
       ctx.restore()
     }
   }

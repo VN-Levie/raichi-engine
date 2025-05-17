@@ -23,7 +23,8 @@ export class EnemyComponent extends Component {
     this.initialY = y;
     this.width = width;
     this.height = height;
-    this.solid = true;
+    this.solid = false; // Player should not be "blocked" by enemies via generic collision.
+                       // Player-enemy interaction is handled by checkEnemyCollisions.
     this.zIndex = 5;
     this.initialDirection = 1; // Default initial direction
     this.direction = this.initialDirection;
@@ -261,14 +262,12 @@ export class EnemyComponent extends Component {
     
     if (!this.isAlive) return;
     this.isAlive = false;
-    this.solid = false;
     this.stompAnimationTime = this.stompDuration;
   }
 
   kill() {
     if (!this.isAlive) return;
     this.isAlive = false;
-    this.solid = false;
     this.stompAnimationTime = 0;
     this.deathSpeed = -8;
   }
@@ -279,7 +278,7 @@ export class EnemyComponent extends Component {
     this.isAlive = true;
     this.visible = true;
     this.enabled = true;
-    this.solid = true;
+    this.solid = false; // Keep it false
     this.direction = this.initialDirection;
     this.stompAnimationTime = 0;
     this.deathSpeed = 0;

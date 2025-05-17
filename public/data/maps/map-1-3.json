@@ -51,5 +51,12 @@
   "checkpoints": [
     { "xTile": 20 },
     { "xTile": 40 }
+  ],
+  "coins": [
+    { "xTile": 12, "yTile": 12 },
+    { "xTile": 22, "yTile": 10 },
+    { "xTile": 32, "yTile": 8 },
+    { "xTile": 42, "yTile": 12 },
+    { "xTile": 43, "yTile": 12 }
   ]
 }
