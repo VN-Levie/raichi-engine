@@ -1,6 +1,6 @@
-import { CircleComponent } from "../../entities/circleComponent";
-import { Component } from "../../core/component";
-import { TILE_SIZE } from "../constants";
+import { CircleComponent } from "../../../entities/circleComponent";
+import { Component } from "../../../core/component";
+import { TILE_SIZE } from "../../constants";
 
 export class BushComponent extends Component {
   private parts: CircleComponent[] = [];

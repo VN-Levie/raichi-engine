@@ -1,8 +1,8 @@
-import { Component } from "../../core/component";
-import { TILE_SIZE } from "../constants";
-import { AssetLoader } from "../../core/assetLoader";
-import { SpriteComponent } from "../../entities/spriteComponent";
-import { Animator } from "../../core/animator";
+import { Component } from "../../../core/component";
+import { TILE_SIZE } from "../../constants";
+import { AssetLoader } from "../../../core/assetLoader";
+import { SpriteComponent } from "../../../entities/spriteComponent";
+import { Animator } from "../../../core/animator";
 
 export abstract class CollectableComponent extends Component {
     public collected = false;

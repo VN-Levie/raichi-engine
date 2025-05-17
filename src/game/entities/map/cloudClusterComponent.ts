@@ -1,5 +1,5 @@
-import { CircleComponent } from "../../entities/circleComponent";
-import { Component } from "../../core/component";
+import { CircleComponent } from "../../../entities/circleComponent";
+import { Component } from "../../../core/component";
 
 export class CloudClusterComponent extends Component {
   private parts: CircleComponent[] = [];

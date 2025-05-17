@@ -1,8 +1,8 @@
-import { Component } from "../../core/component";
-import { PlayerComponent } from "./playerComponent";
+import { Component } from "../../../core/component";
+import { PlayerComponent } from "../playerComponent";
 
 export class TurtleEnemyComponent extends Component {
-    private speed = 0.5; // Slower than Goomba
+    private speed = 0.5; 
     private direction = 1;
     isAlive = true;
     private deathSpeed = 0;
@@ -12,12 +12,12 @@ export class TurtleEnemyComponent extends Component {
     initialY: number;
     initialDirection: number;
 
-    // Turtle-specific states
+    
     isShelled = false;
     isMovingInShell = false;
-    private shellSpeed = 4; // Speed when moving in shell
+    private shellSpeed = 4; 
     private timeInShell = 0;
-    private readonly shellRecoverTime = 5; // Time in seconds before recovering from shell state
+    private readonly shellRecoverTime = 5; 
 
     constructor(x: number, y: number, width: number, height: number) {
         super();
@@ -27,7 +27,7 @@ export class TurtleEnemyComponent extends Component {
         this.initialY = y;
         this.width = width;
         this.height = height;
-        this.solid = false; // Player should not be "blocked" by enemies via generic collision.
+        this.solid = false; 
         this.zIndex = 5;
         this.initialDirection = 1;
         this.direction = this.initialDirection;
@@ -53,19 +53,19 @@ export class TurtleEnemyComponent extends Component {
         if (this.isShelled && !this.isMovingInShell) {
             this.timeInShell += dt;
             if (this.timeInShell >= this.shellRecoverTime) {
-                // Recover from shell state
+                
                 this.isShelled = false;
                 this.isMovingInShell = false;
                 this.timeInShell = 0;
             }
-            // No movement if shelled and not moving
+            
             return;
         }
 
         const oldX = this.x;
         const currentSpeed = this.isMovingInShell ? this.shellSpeed : this.speed;
 
-        if (this.isLedgeAhead() && !this.isMovingInShell) { // Don't check for ledges if moving in shell (shells fall off)
+        if (this.isLedgeAhead() && !this.isMovingInShell) { 
             this.direction *= -1;
         } else {
             this.x += currentSpeed * this.direction;
@@ -91,7 +91,7 @@ export class TurtleEnemyComponent extends Component {
                 this.y + this.height > c.y
             ) {
                 if (this.isMovingInShell) {
-                    // Potentially add logic here to "break" certain blocks if hit by shell
+                    
                 }
                 return true;
             }
@@ -116,10 +116,10 @@ export class TurtleEnemyComponent extends Component {
 
         if (this.isShelled && !this.isMovingInShell) {
             this.isMovingInShell = true;
-            this.timeInShell = 0; // Reset recovery timer
+            this.timeInShell = 0; 
         } else if (this.isShelled && this.isMovingInShell) {
             this.isMovingInShell = false;
-            this.timeInShell = 0; // Reset recovery timer
+            this.timeInShell = 0; 
         } else {
             this.isShelled = true;
             this.isMovingInShell = false;
@@ -151,7 +151,7 @@ export class TurtleEnemyComponent extends Component {
         this.isAlive = true;
         this.visible = true;
         this.enabled = true;
-        this.solid = false; // Keep it false
+        this.solid = false; 
         this.direction = this.initialDirection;
         this.deathSpeed = 0;
         this.isShelled = false;

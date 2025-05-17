@@ -1,6 +1,6 @@
-import { BoxComponent } from "../../entities/boxComponent";
-import { Component } from "../../core/component";
-import { TILE_SIZE } from "../constants";
+import { BoxComponent } from "../../../entities/boxComponent";
+import { Component } from "../../../core/component";
+import { TILE_SIZE } from "../../constants";
 
 export class GroundBlockComponent extends Component {
   private baseBlock: BoxComponent;

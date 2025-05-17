@@ -1,18 +1,18 @@
 import { MapData } from "../types/mapData";
-import { GroundBlockComponent } from "../entities/GroundBlockComponent";
-import { PipeComponent } from "../entities/PipeComponent";
-import { FloatingPlatformComponent } from "../entities/FloatingPlatformComponent";
-import { CloudClusterComponent } from "../entities/CloudClusterComponent";
-import { BushComponent } from "../entities/BushComponent";
-import { EnemyComponent as GoombaEnemyComponent } from "../entities/enemyComponent"; 
-import { TurtleEnemyComponent } from "../entities/TurtleEnemyComponent";
-import { GoalComponent } from "../entities/GoalComponent";
+import { GroundBlockComponent } from "../entities/map/groundBlockComponent";
+import { PipeComponent } from "../entities/map/pipeComponent";
+import { FloatingPlatformComponent } from "../entities/map/floatingPlatformComponent";
+import { CloudClusterComponent } from "../entities/map/cloudClusterComponent";
+import { BushComponent } from "../entities/map/bushComponent";
+import { GoombaEnemyComponent as GoombaEnemyComponent } from "../entities/enemy/goombaEnemyComponent"; 
+import { TurtleEnemyComponent } from "../entities/enemy/turtleEnemyComponent";
+import { GoalComponent } from "../entities/map/goalComponent";
 import { TILE_SIZE } from "../constants";
 import { Component } from "../../core/component";
-import { FlagPoleComponent } from "../entities/FlagPoleComponent";
-import { CheckpointComponent } from "../entities/CheckpointComponent";
-import { CoinComponent } from "../entities/CoinComponent";
-import { LifeItemComponent } from "../entities/LifeItemComponent";
+import { FlagPoleComponent } from "../entities/map/flagPoleComponent";
+import { CheckpointComponent } from "../entities/map/checkpointComponent";
+import { CoinComponent } from "../entities/collectable/coinComponent";
+import { LifeItemComponent } from "../entities/collectable/lifeItemComponent";
 
 export function createCloudComponent(cloudConfig: MapData['decorations']['clouds'][0]): CloudClusterComponent {
   return new CloudClusterComponent(cloudConfig.x, cloudConfig.y, cloudConfig.size);

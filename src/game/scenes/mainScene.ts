@@ -3,7 +3,7 @@ import { BoxComponent } from "../../entities/boxComponent"
 import { Camera } from "../../core/camera"
 import { SceneManager } from "../../core/sceneManager"
 import { DeathScene } from "./deathScene"
-import { EnemyComponent } from "../entities/enemyComponent"
+import { GoombaEnemyComponent } from "../entities/enemy/goombaEnemyComponent"
 import { PlayerComponent } from "../entities/playerComponent"
 import { AssetLoader } from "../../core/assetLoader"
 import { MapData } from "../types/mapData"
@@ -23,18 +23,18 @@ import {
 import { TILE_SIZE } from "../constants"
 import { HUDController } from "../ui/HUDController"
 import { TextComponent } from "../../entities/textComponent"
-import { GoalComponent } from "../entities/GoalComponent"
+import { GoalComponent } from "../entities/map/goalComponent"
 import { WinScene } from "./WinScene"
-import { TurtleEnemyComponent } from "../entities/TurtleEnemyComponent"
+import { TurtleEnemyComponent } from "../entities/enemy/turtleEnemyComponent"
 import { LoadingScene } from "./LoadingScene";
-import { CheckpointComponent } from "../entities/CheckpointComponent";
-import { CoinComponent } from "../entities/CoinComponent";
-import { LifeItemComponent } from "../entities/LifeItemComponent";
+import { CheckpointComponent } from "../entities/map/checkpointComponent";
+import { CoinComponent } from "../entities/collectable/coinComponent";
+import { LifeItemComponent } from "../entities/collectable/lifeItemComponent";
 
 export class MainScene extends Scene {
   private player!: PlayerComponent
   private gameOverY!: number
-  private enemies: (EnemyComponent | TurtleEnemyComponent)[] = []
+  private enemies: (GoombaEnemyComponent | TurtleEnemyComponent)[] = []
   private newGroundLevelY!: number
   private goalComponent: GoalComponent | null = null
   private currentMapUrl!: string
@@ -255,7 +255,7 @@ export class MainScene extends Scene {
     const enemyYPosition = this.newGroundLevelY + mapData.enemies.yOffsetFromGround
     this.enemies = []
     for (const pos of mapData.enemies.positions) {
-      const enemy = createEnemy(pos, enemyYPosition, this.components) as EnemyComponent | TurtleEnemyComponent
+      const enemy = createEnemy(pos, enemyYPosition, this.components) as GoombaEnemyComponent | TurtleEnemyComponent
       this.enemies.push(enemy)
       this.add(enemy)
     }
@@ -269,7 +269,7 @@ export class MainScene extends Scene {
       let isEnemyHarmful = false;
       if (enemy instanceof TurtleEnemyComponent) {
         isEnemyHarmful = enemy.isHarmfulOnContact();
-      } else if (enemy instanceof EnemyComponent) {
+      } else if (enemy instanceof GoombaEnemyComponent) {
         isEnemyHarmful = enemy.isAlive;
       } else {
         isEnemyHarmful = (enemy as any).isAlive !== undefined ? (enemy as any).isAlive : true;
@@ -315,7 +315,7 @@ export class MainScene extends Scene {
             this.score += 10;
             this.hudController.updateScore(this.score);
             stompedEnemy = true;
-          } else if (enemy instanceof EnemyComponent) {
+          } else if (enemy instanceof GoombaEnemyComponent) {
             enemy.stomp();
             this.player.bounceOffEnemy();
             this.score += 10;

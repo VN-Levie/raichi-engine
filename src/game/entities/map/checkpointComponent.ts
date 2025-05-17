@@ -1,5 +1,5 @@
-import { Component } from "../../core/component";
-import { TILE_SIZE } from "../constants";
+import { Component } from "../../../core/component";
+import { TILE_SIZE } from "../../constants";
 
 export class CheckpointComponent extends Component {
     activated: boolean = false;

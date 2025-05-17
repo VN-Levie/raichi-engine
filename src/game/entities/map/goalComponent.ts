@@ -1,4 +1,4 @@
-import { Component } from "../../core/component";
+import { Component } from "../../../core/component";
 
 export class GoalComponent extends Component {
     public nextMapUrl?: string;

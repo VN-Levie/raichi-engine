@@ -1,7 +1,7 @@
-import { Component } from "../../core/component";
-import { PlayerComponent } from "./playerComponent";
+import { Component } from "../../../core/component";
+import { PlayerComponent } from "../playerComponent";
 
-export class EnemyComponent extends Component {
+export class GoombaEnemyComponent extends Component {
   private speed = 1;
   private direction = 1;
   isAlive = true;
@@ -258,8 +258,6 @@ export class EnemyComponent extends Component {
   }
 
   stomp() {
-    console.log("stomp");
-
     if (!this.isAlive) return;
     this.isAlive = false;
     this.stompAnimationTime = this.stompDuration;

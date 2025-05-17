@@ -1,7 +1,7 @@
-import { Component } from "../../core/component";
-import { BoxComponent } from "../../entities/boxComponent";
-import { CircleComponent } from "../../entities/circleComponent";
-import { TILE_SIZE } from "../constants";
+import { Component } from "../../../core/component";
+import { BoxComponent } from "../../../entities/boxComponent";
+import { CircleComponent } from "../../../entities/circleComponent";
+import { TILE_SIZE } from "../../constants";
 
 export class FlagPoleComponent extends Component {
     private pole: BoxComponent;

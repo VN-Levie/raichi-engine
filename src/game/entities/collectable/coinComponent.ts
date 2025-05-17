@@ -1,6 +1,6 @@
-import { Component } from "../../core/component";
-import { TILE_SIZE } from "../constants";
-import { CollectableComponent } from "./CollectableComponent"; // Import the base class
+import { Component } from "../../../core/component";
+import { TILE_SIZE } from "../../constants";
+import { CollectableComponent } from "./collectableComponent"; // Import the base class
 
 export class CoinComponent extends CollectableComponent {
     public readonly value = 10; // Coins give 10 points (or 1 for totalCoinsCollected logic)
