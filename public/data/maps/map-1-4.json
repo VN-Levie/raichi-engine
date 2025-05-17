@@ -1,0 +1,78 @@
+{
+  "name": "World 1-4 (Underground Passage)",
+  "player": {
+    "initialX": 100,
+    "initialY": 100
+  },
+  "level": {
+    "groundLevelY": 570,
+    "gameOverY": 600,
+    "backgroundColor": "#1A1A2E",
+    "worldWidthTiles": 90
+  },
+  "decorations": {
+    "clouds": [],
+    "bushes": [],
+    "flagPole": { "xTile": 85, "yTile": 18 }
+  },
+  "terrain": {
+    "ground": {
+      "segments": [
+        { "startTile": 0, "endTile": 10 },
+        { "startTile": 15, "endTile": 25 },
+        { "startTile": 30, "endTile": 40 },
+        { "startTile": 48, "endTile": 60 },
+        { "startTile": 65, "endTile": 89 }
+      ],
+      "color": "#3D2B1F",
+      "topHighlightColor": "#5C4033",
+      "textureColor": "#2A1D14"
+    },
+    "pipes": [
+      { "xTile": 8, "heightMultiplier": 2 },
+      { "xTile": 20, "heightMultiplier": 2.5 },
+      { "xTile": 35, "heightMultiplier": 1.5 },
+      { "xTile": 52, "heightMultiplier": 2.5 },
+      { "xTile": 70, "heightMultiplier": 2 }
+    ],
+    "floatingPlatforms": [
+      { "xTile": 12, "yTile": 13, "widthTiles": 2, "style": "stone" },
+      { "xTile": 27, "yTile": 11, "widthTiles": 2, "style": "stone" },
+      { "xTile": 42, "yTile": 16, "widthTiles": 3, "style": "stone" },
+      { "xTile": 45, "yTile": 14, "widthTiles": 3, "style": "stone" },
+      { "xTile": 62, "yTile": 12, "widthTiles": 2, "style": "stone" }
+    ]
+  },
+  "enemies": {
+    "yOffsetFromGround": -32,
+    "positions": [
+      { "xTile": 18, "type": "goomba" },
+      { "xTile": 33, "type": "turtle" },
+      { "xTile": 50, "type": "goomba" },
+      { "xTile": 58, "type": "turtle" },
+      { "xTile": 75, "type": "goomba" }
+    ]
+  },
+  "goal": {
+    "xTile": 85,
+    "yTile": 15,
+    "widthTiles": 2,
+    "heightTiles": 3,
+    "nextMapUrl": "/data/maps/map-1-5.json",
+    "isWinGoal": false
+  },
+  "checkpoints": [
+    { "xTile": 30 },
+    { "xTile": 60 }
+  ],
+  "coins": [
+    { "xTile": 9, "yTile": 10 },
+    { "xTile": 21, "yTile": 9 },
+    { "xTile": 36, "yTile": 12 },
+    { "xTile": 53, "yTile": 8 },
+    { "xTile": 71, "yTile": 10 }
+  ],
+  "lifeItems": [
+    { "xTile": 45, "yTile": 10 }
+  ]
+}

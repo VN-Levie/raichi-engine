@@ -1,0 +1,83 @@
+{
+  "name": "World 1-6 (Enemy Gauntlet)",
+  "player": {
+    "initialX": 120,
+    "initialY": 450
+  },
+  "level": {
+    "groundLevelY": 570,
+    "gameOverY": 600,
+    "backgroundColor": "#FF6347",
+    "worldWidthTiles": 80
+  },
+  "decorations": {
+    "clouds": [],
+    "bushes": [
+      { "xTile": 5, "size": 2 },
+      { "xTile": 70, "size": 3 }
+    ],
+    "flagPole": { "xTile": 75, "yTile": 18 }
+  },
+  "terrain": {
+    "ground": {
+      "segments": [
+        { "startTile": 0, "endTile": 79 }
+      ],
+      "color": "#D2691E",
+      "topHighlightColor": "#F4A460",
+      "textureColor": "#8B4513"
+    },
+    "pipes": [
+      { "xTile": 10, "heightMultiplier": 1.5 },
+      { "xTile": 25, "heightMultiplier": 2 },
+      { "xTile": 40, "heightMultiplier": 1.5 },
+      { "xTile": 55, "heightMultiplier": 2.5 },
+      { "xTile": 70, "heightMultiplier": 1 }
+    ],
+    "floatingPlatforms": [
+      { "xTile": 15, "yTile": 12, "widthTiles": 3, "style": "stone" },
+      { "xTile": 30, "yTile": 10, "widthTiles": 2, "style": "stone" },
+      { "xTile": 45, "yTile": 12, "widthTiles": 3, "style": "stone" },
+      { "xTile": 60, "yTile": 9, "widthTiles": 2, "style": "stone" }
+    ]
+  },
+  "enemies": {
+    "yOffsetFromGround": -32,
+    "positions": [
+      { "xTile": 8, "type": "goomba" },
+      { "xTile": 12, "type": "turtle" },
+      { "xTile": 18, "type": "goomba" },
+      { "xTile": 22, "type": "goomba" },
+      { "xTile": 28, "type": "turtle" },
+      { "xTile": 33, "type": "goomba" },
+      { "xTile": 38, "type": "turtle" },
+      { "xTile": 43, "type": "goomba" },
+      { "xTile": 48, "type": "turtle" },
+      { "xTile": 53, "type": "goomba" },
+      { "xTile": 58, "type": "turtle" },
+      { "xTile": 63, "type": "goomba" },
+      { "xTile": 68, "type": "turtle" }
+    ]
+  },
+  "goal": {
+    "xTile": 75,
+    "yTile": 15,
+    "widthTiles": 2,
+    "heightTiles": 3,
+    "nextMapUrl": "/data/maps/map-1-7.json",
+    "isWinGoal": false
+  },
+  "checkpoints": [
+    { "xTile": 20 },
+    { "xTile": 50 }
+  ],
+  "coins": [
+    { "xTile": 16, "yTile": 10 },
+    { "xTile": 31, "yTile": 8 },
+    { "xTile": 46, "yTile": 10 },
+    { "xTile": 61, "yTile": 7 }
+  ],
+  "lifeItems": [
+    { "xTile": 35, "yTile": 14 }
+  ]
+}

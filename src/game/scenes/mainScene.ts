@@ -20,7 +20,7 @@ import {
   createCoinComponent,
   createLifeItemComponent
 } from "../factories/levelElementFactory"
-import { TILE_SIZE } from "../constants"
+import { TILE_SIZE, INITIAL_LIVES, MAX_LIVES_ON_LOAD } from "../constants"
 import { HUDController } from "../ui/HUDController"
 import { TextComponent } from "../../entities/textComponent"
 import { GoalComponent } from "../entities/map/goalComponent"
@@ -31,6 +31,8 @@ import { CheckpointComponent } from "../entities/map/checkpointComponent";
 import { CoinComponent } from "../entities/collectable/coinComponent";
 import { LifeItemComponent } from "../entities/collectable/lifeItemComponent";
 import { BaseEnemyComponent } from "../entities/enemy/baseEnemyComponent";
+import { saveGameState, clearGameState } from "../utils/gameStateManager";
+import { StartScene } from "./startScene";
 
 export class MainScene extends Scene {
   private player!: PlayerComponent
@@ -45,7 +47,7 @@ export class MainScene extends Scene {
   private lifeItems: LifeItemComponent[] = []
 
   private score = 0
-  private lives = 10
+  private lives = MAX_LIVES_ON_LOAD
   private totalCoinsCollected = 0
   private hudController!: HUDController
 
@@ -62,7 +64,7 @@ export class MainScene extends Scene {
   public static async create(
     mapUrl: string,
     initialScore: number = 0,
-    initialLives: number = 10,
+    initialLives: number = MAX_LIVES_ON_LOAD,
     playerStartX?: number,
     playerStartY?: number,
     initialTotalCoins: number = 0
@@ -121,10 +123,25 @@ export class MainScene extends Scene {
     this.initialPlayerX = playerInitialXOverride ?? mapData.player.initialX
     this.initialPlayerY = playerInitialYOverride ?? mapData.player.initialY
 
+    if (!playerInitialXOverride && !playerInitialYOverride) {
+      this.player = new PlayerComponent(this.initialPlayerX, this.initialPlayerY)
+      this.player.setRespawnPoint(this.initialPlayerX, this.initialPlayerY)
+    } else {
+      this.player = new PlayerComponent(this.initialPlayerX, this.initialPlayerY)
+    }
+
     this.hudController = new HUDController()
     this.add(this.hudController.getScoreTextComponent())
     this.add(this.hudController.getLivesTextComponent())
     this.add(this.hudController.getCoinsTextComponent())
+    this.add(this.hudController.getBackToCheckpointButton())
+    this.add(this.hudController.getRestartLevelButton())
+    this.add(this.hudController.getRestartGameButton())
+
+    this.hudController.getBackToCheckpointButton().onClick = () => this.handleBackToLastCheckpointClick()
+    this.hudController.getRestartLevelButton().onClick = () => this.handleRestartLevelClick()
+    this.hudController.getRestartGameButton().onClick = () => this.handleRestartGameClick()
+
     this.hudController.updateScore(this.score)
     this.hudController.updateLives(this.lives)
     this.hudController.updateCoins(this.totalCoinsCollected)
@@ -154,7 +171,6 @@ export class MainScene extends Scene {
       }
     }
 
-    this.player = new PlayerComponent(this.initialPlayerX, this.initialPlayerY)
     this.add(this.player)
 
     for (const bushConfig of mapData.decorations.bushes) {
@@ -223,6 +239,15 @@ export class MainScene extends Scene {
     }
 
     Camera.follow(this.player)
+
+    saveGameState({
+      mapUrl: this.currentMapUrl,
+      respawnX: this.player.getRespawnPoint().x,
+      respawnY: this.player.getRespawnPoint().y,
+      score: this.score,
+      lives: this.lives,
+      totalCoinsCollected: this.totalCoinsCollected,
+    })
   }
 
   private resetPlayerAndLevel() {
@@ -381,6 +406,15 @@ export class MainScene extends Scene {
           checkpoint.activate()
           this.player.setRespawnPoint(checkpoint.x, this.player.y)
           console.log(`Checkpoint activated at ${checkpoint.x}, new respawn: ${this.player.getRespawnPoint().x}, ${this.player.getRespawnPoint().y}`)
+
+          saveGameState({
+            mapUrl: this.currentMapUrl,
+            respawnX: this.player.getRespawnPoint().x,
+            respawnY: this.player.getRespawnPoint().y,
+            score: this.score,
+            lives: this.lives,
+            totalCoinsCollected: this.totalCoinsCollected,
+          })
         }
       }
     }
@@ -469,6 +503,16 @@ export class MainScene extends Scene {
         const currentScore = this.score
         const currentLives = this.lives
         const currentTotalCoins = this.totalCoinsCollected
+
+        saveGameState({
+          mapUrl: nextMapUrl,
+          respawnX: 0,
+          respawnY: 0,
+          score: currentScore,
+          lives: currentLives,
+          totalCoinsCollected: currentTotalCoins,
+        })
+
         SceneManager.setScene(new LoadingScene(async () => await MainScene.create(nextMapUrl, currentScore, currentLives, undefined, undefined, currentTotalCoins)))
       }
     }
@@ -563,7 +607,12 @@ export class MainScene extends Scene {
 
     for (let i = 0; i < this.components.length; i++) {
       const c = this.components[i]
-      if (c === this.hudController.getScoreTextComponent() || c === this.hudController.getLivesTextComponent()) {
+      if (c === this.hudController.getScoreTextComponent() || 
+          c === this.hudController.getLivesTextComponent() ||
+          c === this.hudController.getCoinsTextComponent() ||
+          c === this.hudController.getBackToCheckpointButton() ||
+          c === this.hudController.getRestartLevelButton() ||
+          c === this.hudController.getRestartGameButton()) {
         continue
       }
 
@@ -596,5 +645,56 @@ export class MainScene extends Scene {
       coinsText.render(ctx)
       ctx.restore()
     }
+
+    const backToCheckpointButton = this.hudController.getBackToCheckpointButton()
+    if (backToCheckpointButton.visible) {
+      ctx.save()
+      backToCheckpointButton.render(ctx)
+      ctx.restore()
+    }
+
+    const restartLevelButton = this.hudController.getRestartLevelButton()
+    if (restartLevelButton.visible) {
+      ctx.save()
+      restartLevelButton.render(ctx)
+      ctx.restore()
+    }
+
+    const restartGameButton = this.hudController.getRestartGameButton()
+    if (restartGameButton.visible) {
+      ctx.save()
+      restartGameButton.render(ctx)
+      ctx.restore()
+    }
+  }
+
+  private handleRestartLevelClick(): void {
+    console.log("Restarting level:", this.currentMapUrl)
+    SceneManager.setScene(new LoadingScene(async () => 
+      MainScene.create(this.currentMapUrl, this.score, this.lives, undefined, undefined, this.totalCoinsCollected)
+    ))
+  }
+
+  private handleBackToLastCheckpointClick(): void {
+    console.log("Going back to last checkpoint.")
+    this.player.resetToLastCheckpoint()
+    Camera.follow(this.player)
+    Camera.update()
+    saveGameState({
+      mapUrl: this.currentMapUrl,
+      respawnX: this.player.getRespawnPoint().x,
+      respawnY: this.player.getRespawnPoint().y,
+      score: this.score,
+      lives: this.lives,
+      totalCoinsCollected: this.totalCoinsCollected,
+    })
+  }
+
+  private handleRestartGameClick(): void {
+    console.log("Restarting game from beginning.")
+    clearGameState()
+    SceneManager.setScene(new LoadingScene(async () => 
+      MainScene.create('/data/maps/map-1-1.json', 0, INITIAL_LIVES, undefined, undefined, 0)
+    ))
   }
 }

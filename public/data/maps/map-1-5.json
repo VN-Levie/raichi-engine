@@ -1,0 +1,85 @@
+{
+  "name": "World 1-5 (Sky Platforms & Bats)",
+  "player": {
+    "initialX": 80,
+    "initialY": 50
+  },
+  "level": {
+    "groundLevelY": 570,
+    "gameOverY": 600,
+    "backgroundColor": "#87CEEB",
+    "worldWidthTiles": 100
+  },
+  "decorations": {
+    "clouds": [
+      { "x": 50, "y": 150, "size": 3 },
+      { "x": 250, "y": 120, "size": 2.5 },
+      { "x": 500, "y": 180, "size": 3.5 },
+      { "x": 750, "y": 100, "size": 2 },
+      { "x": 950, "y": 160, "size": 3 }
+    ],
+    "bushes": [],
+    "flagPole": { "xTile": 95, "yTile": 18 }
+  },
+  "terrain": {
+    "ground": {
+      "segments": [
+        { "startTile": 0, "endTile": 5 },
+        { "startTile": 94, "endTile": 99 }
+      ],
+      "color": "#90EE90",
+      "topHighlightColor": "#98FB98",
+      "textureColor": "#3CB371"
+    },
+    "pipes": [
+      { "xTile": 3, "heightMultiplier": 1 }
+    ],
+    "floatingPlatforms": [
+      { "xTile": 8, "yTile": 16, "widthTiles": 4, "style": "stone" },
+      { "xTile": 14, "yTile": 15, "widthTiles": 4, "style": "stone" },
+      { "xTile": 20, "yTile": 14, "widthTiles": 5, "style": "stone" },
+      { "xTile": 27, "yTile": 15, "widthTiles": 4, "style": "stone" },
+      { "xTile": 33, "yTile": 13, "widthTiles": 5, "style": "stone" },
+      { "xTile": 40, "yTile": 14, "widthTiles": 4, "style": "stone" },
+      { "xTile": 46, "yTile": 12, "widthTiles": 5, "style": "stone" },
+      { "xTile": 53, "yTile": 13, "widthTiles": 4, "style": "stone" },
+      { "xTile": 59, "yTile": 11, "widthTiles": 5, "style": "stone" },
+      { "xTile": 66, "yTile": 12, "widthTiles": 4, "style": "stone" },
+      { "xTile": 72, "yTile": 14, "widthTiles": 5, "style": "stone" },
+      { "xTile": 79, "yTile": 13, "widthTiles": 4, "style": "stone" },
+      { "xTile": 85, "yTile": 15, "widthTiles": 5, "style": "stone" }
+    ]
+  },
+  "enemies": {
+    "yOffsetFromGround": -32,
+    "positions": [
+      { "xTile": 10, "yTile": 11, "type": "bat", "patrolRangeXTiles": [8, 18] },
+      { "xTile": 25, "yTile": 10, "type": "bat", "patrolRangeXTiles": [22, 32] },
+      { "xTile": 38, "yTile": 9, "type": "bat", "patrolRangeXTiles": [35, 45] },
+      { "xTile": 50, "yTile": 8, "type": "bat", "patrolRangeXTiles": [47, 57] },
+      { "xTile": 63, "yTile": 7, "type": "bat", "patrolRangeXTiles": [60, 70] },
+      { "xTile": 77, "yTile": 10, "type": "bat", "patrolRangeXTiles": [74, 88] }
+    ]
+  },
+  "goal": {
+    "xTile": 95,
+    "yTile": 15,
+    "widthTiles": 2,
+    "heightTiles": 3,
+    "nextMapUrl": "/data/maps/map-1-6.json",
+    "isWinGoal": false
+  },
+  "checkpoints": [
+    { "xTile": 30 },
+    { "xTile": 65 }
+  ],
+  "coins": [
+    { "xTile": 11, "yTile": 13 },
+    { "xTile": 19, "yTile": 11 },
+    { "xTile": 36, "yTile": 12 },
+    { "xTile": 52, "yTile": 13 },
+    { "xTile": 70, "yTile": 9 },
+    { "xTile": 85, "yTile": 10 }
+  ],
+  "lifeItems": []
+}

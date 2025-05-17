@@ -6,6 +6,8 @@ import { StartScene } from "./startScene"
 import { MainScene } from "./mainScene"
 import { BoxComponent } from "../../entities/boxComponent"
 import { LoadingScene } from "./LoadingScene";
+import { clearGameState } from "../utils/gameStateManager";
+import { INITIAL_LIVES } from "../constants";
 
 export class GameOverScene extends Scene {
   private mapUrlToRestart: string;
@@ -49,10 +51,9 @@ export class GameOverScene extends Scene {
     retryButton.color = "#444"
     retryButton.hoverColor = "#666"
     retryButton.onClick = async () => {
+        clearGameState(); // Clear save before starting a new attempt from game over
         const mapToLoad = this.mapUrlToRestart || '/data/maps/map-1-1.json';
-        // For "Play Again" after Game Over, score is 0, lives reset to 3.
-        // Total coins are also reset to 0 (default in MainScene.create).
-        SceneManager.setScene(new LoadingScene(async () => MainScene.create(mapToLoad, 0, 3))); // No totalCoins passed, defaults to 0
+        SceneManager.setScene(new LoadingScene(async () => MainScene.create(mapToLoad, 0, INITIAL_LIVES, undefined, undefined, 0)));
     }
     this.add(retryButton)
 
@@ -65,6 +66,7 @@ export class GameOverScene extends Scene {
     menuButton.color = "#444"
     menuButton.hoverColor = "#666"
     menuButton.onClick = () => {
+      clearGameState(); // Clear save when returning to menu
       SceneManager.setScene(new StartScene())
     }
     this.add(menuButton)

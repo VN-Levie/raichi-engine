@@ -19,7 +19,12 @@ export interface MapData {
   };
   enemies: {
     yOffsetFromGround: number;
-    positions: Array<{ xTile: number; type?: "goomba" | "turtle" }>;
+    positions: Array<{
+      xTile: number;
+      yTile?: number;
+      type?: "goomba" | "turtle" | "bat";
+      patrolRangeXTiles?: [number, number]; // Optional: [startXTile, endXTile] for bat patrol
+    }>;
   };
   goal?: {
     xTile: number;

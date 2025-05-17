@@ -1,0 +1,74 @@
+{
+  "name": "World 1-7 (Final Fortress)",
+  "player": {
+    "initialX": 100,
+    "initialY": 450
+  },
+  "level": {
+    "groundLevelY": 570,
+    "gameOverY": 600,
+    "backgroundColor": "#0D0D0D",
+    "worldWidthTiles": 70
+  },
+  "decorations": {
+    "clouds": [],
+    "bushes": [],
+    "flagPole": { "xTile": 65, "yTile": 18 }
+  },
+  "terrain": {
+    "ground": {
+      "segments": [
+        { "startTile": 0, "endTile": 69 }
+      ],
+      "color": "#282828",
+      "topHighlightColor": "#404040",
+      "textureColor": "#181818"
+    },
+    "pipes": [
+      { "xTile": 12, "heightMultiplier": 3 },
+      { "xTile": 40, "heightMultiplier": 2.5 }
+    ],
+    "floatingPlatforms": [
+      { "xTile": 5, "yTile": 15, "widthTiles": 4, "style": "stone" },
+      { "xTile": 18, "yTile": 13, "widthTiles": 5, "style": "stone" },
+      { "xTile": 28, "yTile": 11, "widthTiles": 3, "style": "stone" },
+      { "xTile": 35, "yTile": 14, "widthTiles": 2, "style": "stone" },
+      { "xTile": 45, "yTile": 12, "widthTiles": 4, "style": "stone" },
+      { "xTile": 55, "yTile": 10, "widthTiles": 3, "style": "stone" }
+    ]
+  },
+  "enemies": {
+    "yOffsetFromGround": -32,
+    "positions": [
+      { "xTile": 8, "type": "turtle" },
+      { "xTile": 20, "type": "goomba" },
+      { "xTile": 22, "type": "turtle" },
+      { "xTile": 30, "type": "goomba" },
+      { "xTile": 38, "type": "turtle" },
+      { "xTile": 48, "type": "goomba" },
+      { "xTile": 50, "type": "turtle" },
+      { "xTile": 58, "type": "goomba" }
+    ]
+  },
+  "goal": {
+    "xTile": 65,
+    "yTile": 13,
+    "widthTiles": 3,
+    "heightTiles": 5,
+    "isWinGoal": true
+  },
+  "checkpoints": [
+    { "xTile": 25 },
+    { "xTile": 50 }
+  ],
+  "coins": [
+    { "xTile": 6, "yTile": 13 },
+    { "xTile": 19, "yTile": 11 },
+    { "xTile": 36, "yTile": 12 },
+    { "xTile": 46, "yTile": 10 },
+    { "xTile": 56, "yTile": 8 }
+  ],
+  "lifeItems": [
+    { "xTile": 32, "yTile": 15 }
+  ]
+}

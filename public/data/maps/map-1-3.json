@@ -1,5 +1,5 @@
 {
-  "name": "World 1-3 (The Castle)",
+  "name": "World 1-3 (The Castle Interior)",
   "player": {
     "initialX": 80,
     "initialY": 450 
@@ -46,7 +46,8 @@
     "yTile": 13, 
     "widthTiles": 3,
     "heightTiles": 5,
-    "isWinGoal": true 
+    "nextMapUrl": "/data/maps/map-1-4.json",
+    "isWinGoal": false
   },
   "checkpoints": [
     { "xTile": 20 },

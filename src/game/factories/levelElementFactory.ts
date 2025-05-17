@@ -14,6 +14,7 @@ import { CheckpointComponent } from "../entities/map/checkpointComponent";
 import { CoinComponent } from "../entities/collectable/coinComponent";
 import { LifeItemComponent } from "../entities/collectable/lifeItemComponent";
 import { BaseEnemyComponent } from "../entities/enemy/baseEnemyComponent";
+import { BatEnemyComponent } from "../entities/enemy/BatEnemyComponent";
 
 export function createCloudComponent(cloudConfig: MapData['decorations']['clouds'][0]): CloudClusterComponent {
   return new CloudClusterComponent(cloudConfig.x, cloudConfig.y, cloudConfig.size);
@@ -37,17 +38,25 @@ export function createFloatingPlatformComponent(platformConfig: MapData['terrain
 
 export function createEnemy(
     enemyConfig: MapData['enemies']['positions'][0], 
-    yPosition: number, 
+    defaultYPosition: number, 
     sceneComponents: Component[]): BaseEnemyComponent { 
   
   const enemyType = enemyConfig.type || "goomba"; 
+  const xPos = enemyConfig.xTile * TILE_SIZE;
+  const yPos = enemyConfig.yTile !== undefined ? enemyConfig.yTile * TILE_SIZE : defaultYPosition;
 
   let enemy: BaseEnemyComponent;
 
   if (enemyType === "turtle") {
-    enemy = new TurtleEnemyComponent(enemyConfig.xTile * TILE_SIZE, yPosition, TILE_SIZE, TILE_SIZE);
+    enemy = new TurtleEnemyComponent(xPos, yPos, TILE_SIZE, TILE_SIZE);
+  } else if (enemyType === "bat") {
+    const patrolXTiles = enemyConfig.patrolRangeXTiles;
+    const patrolRangeXPx: [number, number] | undefined = patrolXTiles ?
+      [patrolXTiles[0] * TILE_SIZE, patrolXTiles[1] * TILE_SIZE] :
+      undefined;
+    enemy = new BatEnemyComponent(xPos, yPos, TILE_SIZE, TILE_SIZE, patrolRangeXPx);
   } else { 
-    enemy = new GoombaEnemyComponent(enemyConfig.xTile * TILE_SIZE, yPosition, TILE_SIZE, TILE_SIZE);
+    enemy = new GoombaEnemyComponent(xPos, yPos, TILE_SIZE, TILE_SIZE);
   }
   enemy.setScene(sceneComponents);
   return enemy;

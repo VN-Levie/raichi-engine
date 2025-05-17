@@ -4,6 +4,7 @@ import { ButtonComponent } from "../../entities/buttonComponent";
 import { SceneManager } from "../../core/sceneManager";
 import { StartScene } from "./startScene";
 import { BoxComponent } from "../../entities/boxComponent";
+import { clearGameState } from "../utils/gameStateManager";
 
 export class WinScene extends Scene {
   constructor() {
@@ -41,6 +42,7 @@ export class WinScene extends Scene {
     menuButton.color = "#4CAF50";
     menuButton.hoverColor = "#45a049";
     menuButton.onClick = () => {
+      clearGameState(); // Clear save when finishing the game and returning to menu
       SceneManager.setScene(new StartScene());
     };
     this.add(menuButton);
