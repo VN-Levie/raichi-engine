@@ -31,7 +31,8 @@
       { "xTile": 65, "size": 2 },
       { "xTile": 78, "size": 3 },
       { "xTile": 89, "size": 5 }
-    ]
+    ],
+    "flagPole": { "xTile": 95, "yTile": 18 }
   },
   "terrain": {
     "ground": {

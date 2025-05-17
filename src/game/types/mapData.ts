@@ -5,6 +5,7 @@ export interface MapData {
   decorations: {
     clouds: Array<{ x: number; y: number; size: number }>;
     bushes: Array<{ xTile: number; size: number }>;
+    flagPole?: { xTile: number; yTile: number }; // Added flagpole
   };
   terrain: {
     ground: {

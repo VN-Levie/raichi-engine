@@ -5,13 +5,16 @@ import { SceneManager } from "../../core/sceneManager"
 import { StartScene } from "./startScene"
 import { MainScene } from "./mainScene"
 import { BoxComponent } from "../../entities/boxComponent"
+import { LoadingScene } from "./LoadingScene";
 
 export class GameOverScene extends Scene {
   private mapUrlToRestart: string;
+  private mapName: string;
 
-  constructor(message: string = "Game Over", mapUrl: string = '/data/maps/map-1-1.json') { // Default to map 1-1 if not specified
+  constructor(message: string = "Game Over", mapUrl: string = '/data/maps/map-1-1.json', mapName: string = "World 1-1") { 
     super()
     this.mapUrlToRestart = mapUrl;
+    this.mapName = mapName;
 
     const background = new BoxComponent(0, 0, 800, "rgba(0, 0, 0, 0.7)")
     background.height = 600
@@ -46,14 +49,8 @@ export class GameOverScene extends Scene {
     retryButton.color = "#444"
     retryButton.hoverColor = "#666"
     retryButton.onClick = async () => {
-      try {
-        // Restart the level player was on, or default if mapUrlToRestart is somehow undefined/empty
         const mapToLoad = this.mapUrlToRestart || '/data/maps/map-1-1.json';
-        const mainScene = await MainScene.create(mapToLoad); 
-        SceneManager.setScene(mainScene);
-      } catch (error) {
-        console.error("Failed to create MainScene on retry:", error);
-      }
+        SceneManager.setScene(new LoadingScene(async () => MainScene.create(mapToLoad, 0, 3)));
     }
     this.add(retryButton)
 

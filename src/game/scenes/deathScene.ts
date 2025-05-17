@@ -6,6 +6,7 @@ import { PlayerComponent } from "../entities/playerComponent";
 import { GameOverScene } from "./gameOverScene";
 import { MainScene } from "./mainScene";
 import { Camera } from "../../core/camera";
+import { LoadingScene } from "./LoadingScene";
 
 export class DeathScene extends Scene {
     private timer: number = 3;
@@ -13,15 +14,17 @@ export class DeathScene extends Scene {
     private currentScore: number;
     private deathReason: string;
     private mapUrlToRestart: string;
+    private mapName: string;
 
     private playerSprite: PlayerComponent;
 
-    constructor(remainingLives: number, currentScore: number, deathReason: string, mapUrl: string) {
+    constructor(remainingLives: number, currentScore: number, deathReason: string, mapUrl: string, mapName: string) {
         super();
         this.remainingLives = remainingLives;
         this.currentScore = currentScore;
         this.deathReason = deathReason;
         this.mapUrlToRestart = mapUrl;
+        this.mapName = mapName;
 
         Camera.resetViewport();
         Camera.setPosition(0, 0);
@@ -41,7 +44,7 @@ export class DeathScene extends Scene {
         };
         this.add(background);
 
-        const worldText = new TextComponent("WORLD 1-1", 400, 200, "32px Arial", "white");
+        const worldText = new TextComponent(this.mapName.toUpperCase(), 400, 200, "32px Arial", "white");
         worldText.align = "center";
         this.add(worldText);
 
@@ -58,15 +61,12 @@ export class DeathScene extends Scene {
         this.timer -= dt;
         if (this.timer <= 0) {
             if (this.remainingLives <= 0) {
-                SceneManager.setScene(new GameOverScene(this.deathReason + " - No lives left!", this.mapUrlToRestart));
+                SceneManager.setScene(new GameOverScene(this.deathReason + " - No lives left!", this.mapUrlToRestart, this.mapName));
             } else {
-                try {
-                    const mainScene = await MainScene.create(this.mapUrlToRestart, this.currentScore, this.remainingLives);
-                    SceneManager.setScene(mainScene);
-                } catch (error) {
-                    console.error("Failed to create MainScene after death:", error);
-                    SceneManager.setScene(new GameOverScene("Error loading level.", this.mapUrlToRestart));
-                }
+                const score = this.currentScore;
+                const lives = this.remainingLives;
+                const mapUrl = this.mapUrlToRestart;
+                SceneManager.setScene(new LoadingScene(async () => MainScene.create(mapUrl, score, lives)));
             }
         }
     }

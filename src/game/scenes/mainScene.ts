@@ -14,7 +14,8 @@ import {
   createPipeComponent,
   createFloatingPlatformComponent,
   createEnemy,
-  createGoal
+  createGoal,
+  createFlagPoleComponent
 } from "../factories/levelElementFactory"
 import { TILE_SIZE } from "../constants"
 import { HUDController } from "../ui/HUDController"
@@ -22,6 +23,7 @@ import { TextComponent } from "../../entities/textComponent"
 import { GoalComponent } from "../entities/GoalComponent"
 import { WinScene } from "./WinScene"
 import { TurtleEnemyComponent } from "../entities/TurtleEnemyComponent"
+import { LoadingScene } from "./LoadingScene";
 
 export class MainScene extends Scene {
   private player!: PlayerComponent
@@ -30,6 +32,7 @@ export class MainScene extends Scene {
   private newGroundLevelY!: number
   private goalComponent: GoalComponent | null = null
   private currentMapUrl!: string
+  private mapName: string = ""
 
   private score = 0
   private lives = 3
@@ -80,6 +83,7 @@ export class MainScene extends Scene {
   private initializeScene(mapData: MapData, initialScore: number, initialLives: number, isFallback: boolean = false) {
     this.score = initialScore
     this.lives = initialLives
+    this.mapName = mapData.name
 
     this.gameOverY = mapData.level.gameOverY
     this.newGroundLevelY = mapData.level.groundLevelY
@@ -138,6 +142,13 @@ export class MainScene extends Scene {
       this.goalComponent = createGoal(mapData.goal)
       if (this.goalComponent) {
         this.add(this.goalComponent)
+
+        if (mapData.decorations.flagPole) {
+          const flagPole = createFlagPoleComponent(mapData.decorations.flagPole)
+          if (flagPole) {
+            this.add(flagPole)
+          }
+        }
       }
     } else {
       this.goalComponent = null
@@ -201,7 +212,7 @@ export class MainScene extends Scene {
         this.lives--
 
         Camera.resetViewport()
-        SceneManager.setScene(new DeathScene(this.lives, this.score, this.lastDeathReason, this.currentMapUrl))
+        SceneManager.setScene(new DeathScene(this.lives, this.score, this.lastDeathReason, this.currentMapUrl, this.mapName))
         return
       }
 
@@ -362,14 +373,17 @@ export class MainScene extends Scene {
       playerRect.y < goalRect.y + goalRect.height &&
       playerRect.y + playerRect.height > goalRect.y
     ) {
+      this.player.enabled = false
+      this.enabled = false
+
       if (this.goalComponent.isWinGoal) {
+        Camera.resetViewport()
         SceneManager.setScene(new WinScene())
       } else if (this.goalComponent.nextMapUrl) {
-        this.player.enabled = false
-        this.enabled = false
-
-        const nextMapScene = await MainScene.create(this.goalComponent.nextMapUrl, this.score, this.lives)
-        SceneManager.setScene(nextMapScene)
+        const nextMapUrl = this.goalComponent.nextMapUrl
+        const currentScore = this.score
+        const currentLives = this.lives
+        SceneManager.setScene(new LoadingScene(async () => await MainScene.create(nextMapUrl, currentScore, currentLives)))
       }
     }
   }

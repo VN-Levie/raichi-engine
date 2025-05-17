@@ -9,6 +9,7 @@ import {
 } from "../../core/core"
 
 import { MainScene } from "./mainScene"
+import { LoadingScene } from "./LoadingScene"; // Added
 
 export class StartScene extends Scene {
     constructor() {
@@ -26,13 +27,7 @@ export class StartScene extends Scene {
         startBtn.width = 200
         startBtn.height = 60
         startBtn.onClick = async () => {
-            try {
-                const mainScene = await MainScene.create('/data/maps/map-1-1.json'); // Pass map URL
-                SceneManager.setScene(mainScene);
-            } catch (error) {
-                console.error("Failed to create MainScene:", error);
-                // Optionally, handle this error in the UI, e.g., show a message
-            }
+            SceneManager.setScene(new LoadingScene(async () => MainScene.create('/data/maps/map-1-1.json')));
         }
 
         this.add(startBtn)

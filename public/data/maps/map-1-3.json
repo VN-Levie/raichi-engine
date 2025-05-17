@@ -1,0 +1,51 @@
+{
+  "name": "World 1-3 (The Castle)",
+  "player": {
+    "initialX": 80,
+    "initialY": 450 
+  },
+  "level": {
+    "groundLevelY": 570,
+    "gameOverY": 600,
+    "backgroundColor": "#111122", 
+    "worldWidthTiles": 60
+  },
+  "decorations": {
+    "clouds": [], 
+    "bushes": [],
+    "flagPole": { "xTile": 55, "yTile": 18 } 
+  },
+  "terrain": {
+    "ground": {
+      "segments": [
+        { "startTile": 0, "endTile": 59 }
+      ],
+      "color": "#303030",
+      "topHighlightColor": "#505050",
+      "textureColor": "#202020"
+    },
+    "pipes": [],
+    "floatingPlatforms": [
+      { "xTile": 10, "yTile": 14, "widthTiles": 5, "style": "stone" },
+      { "xTile": 20, "yTile": 12, "widthTiles": 4, "style": "stone" },
+      { "xTile": 30, "yTile": 10, "widthTiles": 3, "style": "stone" },
+      { "xTile": 40, "yTile": 14, "widthTiles": 5, "style": "stone" }
+    ]
+  },
+  "enemies": {
+    "yOffsetFromGround": -32,
+    "positions": [
+      { "xTile": 15, "type": "turtle" },
+      { "xTile": 25, "type": "turtle" },
+      { "xTile": 35, "type": "goomba" },
+      { "xTile": 45, "type": "turtle" }
+    ]
+  },
+  "goal": {
+    "xTile": 55, 
+    "yTile": 13, 
+    "widthTiles": 3,
+    "heightTiles": 5,
+    "isWinGoal": true 
+  }
+}
