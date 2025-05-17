@@ -4,8 +4,8 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
+    "build": "tsc && node scripts/fixImportExtension.js",
+    "watch": "tsc && node scripts/fixImportExtension.js --watch",
     "start": "node dist/server.js",
     "dev": "concurrently \"npm run watch\" \"nodemon dist/server.js\""
   },
@@ -22,6 +22,7 @@
     "@types/ws": "^8.18.1",
     "concurrently": "^9.1.2",
     "nodemon": "^3.1.10",
+    "tsc-alias": "^1.8.16",
     "typescript": "^5.8.3",
     "undici-types": "^7.9.0"
   }
