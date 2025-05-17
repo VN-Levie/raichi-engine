@@ -1,5 +1,5 @@
-import { Component } from "../core/component.js"
-import { Animator } from "../core/animator.js"
+import { Component } from "../core/component"
+import { Animator } from "../core/animator"
 
 export class SpriteComponent extends Component {
   image?: HTMLImageElement

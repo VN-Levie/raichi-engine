@@ -13,10 +13,8 @@ export class BoxComponent extends Component {
     this.color = color
   }
 
-  update(dt: number) {
-    this.x += this.speed * dt
-    if (this.x > 800) this.x = -this.width
-  }
+  update(dt: number) {}
+   
 
   render(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = this.color

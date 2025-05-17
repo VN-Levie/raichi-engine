@@ -20,11 +20,14 @@ scene.add(box)
 setInterval(() => {
     if (Input.isKeyDown("ArrowRight")) box.x += 5
     if (Input.isKeyDown("ArrowLeft")) box.x -= 5
+    if (Input.isKeyDown("ArrowUp")) box.y -= 5
+    if (Input.isKeyDown("ArrowDown")) box.y += 5
 }, 16)
 
 
 const btn = new ButtonComponent()
 btn.text = "Click Me"
+btn.color = "#999"
 btn.x = 300
 btn.y = 200
 btn.width = 150
