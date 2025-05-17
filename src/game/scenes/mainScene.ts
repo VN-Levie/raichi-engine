@@ -381,6 +381,25 @@ export class MainScene extends Scene {
     }
   }
 
+  private checkCheckpointCollisions() {
+    if (!this.player || this.player.isDying) return
+
+    for (const checkpoint of this.checkpoints) {
+      if (!checkpoint.activated && checkpoint.enabled) {
+        if (
+          this.player.x < checkpoint.x + checkpoint.width &&
+          this.player.x + this.player.width > checkpoint.x &&
+          this.player.y < checkpoint.y + checkpoint.height &&
+          this.player.y + this.player.height > checkpoint.y
+        ) {
+          checkpoint.activate()
+          this.player.setRespawnPoint(checkpoint.x, this.player.y)
+          console.log(`Checkpoint activated at ${checkpoint.x}, new respawn: ${this.player.getRespawnPoint().x}, ${this.player.getRespawnPoint().y}`)
+        }
+      }
+    }
+  }
+
   private checkAndResolveCollisions(direction: 'horizontal' | 'vertical', originalX: number, originalY?: number): boolean {
     if (this.playerIsCurrentlyDying || this.player.isDying) {
       if (direction === 'vertical') return false
@@ -513,12 +532,27 @@ export class MainScene extends Scene {
         enemy.update(dt)
       }
     }
+    for (const coint of this.coins) {
+      if (coint.enabled) {
+        coint.update(dt)
+      }
+    }
+    for (const lifeItem of this.lifeItems) {
+      if (lifeItem.enabled) {
+        lifeItem.update(dt)
+      }
+    }
+    for (const checkpoint of this.checkpoints) {
+      if (checkpoint.enabled) {
+        checkpoint.update(dt)
+      }
+    }
 
     this.checkEnemyCollisions(playerVelocityYBeforeCollisionResolution)
     this.checkGoalCollision()
-    // this.checkCheckpointCollisions()
     this.checkCoinCollisions()
     this.checkLifeItemCollisions()
+    this.checkCheckpointCollisions()
 
     if (this.player.y > this.gameOverY && !this.player.isDying) {
       this.handlePlayerDeath("You fell into a pit!")

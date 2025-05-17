@@ -23,10 +23,10 @@ export class EnemyComponent extends Component {
     this.initialY = y;
     this.width = width;
     this.height = height;
-    this.solid = false; // Player should not be "blocked" by enemies via generic collision.
-                       // Player-enemy interaction is handled by checkEnemyCollisions.
+    this.solid = false;
+
     this.zIndex = 5;
-    this.initialDirection = 1; // Default initial direction
+    this.initialDirection = 1;
     this.direction = this.initialDirection;
   }
 
@@ -38,36 +38,36 @@ export class EnemyComponent extends Component {
     if (this.isAlive) {
       const oldX = this.x;
 
-      // Check for a ledge ahead before moving
+
       if (this.isLedgeAhead()) {
-        this.direction *= -1; // Turn around
-        // No horizontal movement this frame if turning at a ledge
+        this.direction *= -1;
+
       } else {
-        // No ledge, proceed with movement
+
         this.x += this.speed * this.direction;
 
-        // Check for collision with obstacles after moving
+
         if (this.checkObstacleCollision()) {
-          this.x = oldX; // Revert position
-          this.direction *= -1; // Change direction
+          this.x = oldX;
+          this.direction *= -1;
         }
       }
 
-      // World boundary checks
-      // Ensure enemy turns around at world edges. Check against oldX to prevent rapid flipping if stuck.
-      if (this.x <= 0 && this.direction === -1) { // If moving left and hit or passed left boundary
-        if (oldX > 0) { // Only flip if it wasn't already at 0
-             this.x = 0;
-             this.direction = 1;
-        } else { // If it started at 0 and direction is -1, force direction to 1
-            this.direction = 1;
+
+
+      if (this.x <= 0 && this.direction === -1) {
+        if (oldX > 0) {
+          this.x = 0;
+          this.direction = 1;
+        } else {
+          this.direction = 1;
         }
-      } else if (this.x + this.width >= 3200 && this.direction === 1) { // If moving right and hit or passed right boundary (3200 is world width)
-        if (oldX + this.width < 3200) { // Only flip if it wasn't already at the boundary
-            this.x = 3200 - this.width;
-            this.direction = -1;
-        } else { // If it started at boundary and direction is 1, force direction to -1
-            this.direction = -1;
+      } else if (this.x + this.width >= 3200 && this.direction === 1) {
+        if (oldX + this.width < 3200) {
+          this.x = 3200 - this.width;
+          this.direction = -1;
+        } else {
+          this.direction = -1;
         }
       }
     } else {
@@ -104,26 +104,26 @@ export class EnemyComponent extends Component {
   }
 
   private isLedgeAhead(): boolean {
-    // Determine the probe point: 1px beyond the leading edge in the current direction,
-    // and 1px below the enemy's feet.
+
+
     const probeX = this.x + (this.direction === 1 ? this.width : -1);
-    const probeY = this.y + this.height + 1; // Check 1px below the base of the enemy
+    const probeY = this.y + this.height + 1;
 
     for (const c of this.scene) {
-      // Consider only solid components that are not the enemy itself or the player
+
       if (c === this || !c.solid || c instanceof PlayerComponent) continue;
 
-      // Check if the probe point (probeX, probeY) falls within the bounds of component 'c'
+
       if (
         probeX >= c.x &&
         probeX < c.x + c.width &&
         probeY >= c.y &&
         probeY < c.y + c.height
       ) {
-        return false; // Ground detected ahead
+        return false;
       }
     }
-    return true; // No ground detected, it's a ledge
+    return true;
   }
 
   render(ctx: CanvasRenderingContext2D) {
@@ -139,7 +139,7 @@ export class EnemyComponent extends Component {
   }
 
   private drawAliveGoomba(ctx: CanvasRenderingContext2D) {
-    // Goomba colors
+
     const bodyColor = "#b97a57";
     const darkBody = "#8b5c36";
     const footColor = "#6b3a1c";
@@ -147,7 +147,7 @@ export class EnemyComponent extends Component {
     const eyePupil = "#222";
     const browColor = "#442100";
 
-    // Body (main mushroom cap)
+
     ctx.save();
     ctx.beginPath();
     ctx.ellipse(this.x + this.width / 2, this.y + this.height * 0.55, this.width * 0.45, this.height * 0.38, 0, Math.PI, 0, false);
@@ -158,7 +158,7 @@ export class EnemyComponent extends Component {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Lower body (face)
+
     ctx.beginPath();
     ctx.ellipse(this.x + this.width / 2, this.y + this.height * 0.75, this.width * 0.38, this.height * 0.22, 0, 0, Math.PI * 2);
     ctx.closePath();
@@ -166,7 +166,7 @@ export class EnemyComponent extends Component {
     ctx.fill();
     ctx.stroke();
 
-    // Feet
+
     ctx.beginPath();
     ctx.ellipse(this.x + this.width * 0.32, this.y + this.height * 0.93, this.width * 0.16, this.height * 0.09, 0, 0, Math.PI * 2);
     ctx.fillStyle = footColor;
@@ -177,7 +177,7 @@ export class EnemyComponent extends Component {
     ctx.fill();
     ctx.stroke();
 
-    // Eyes
+
     ctx.beginPath();
     ctx.ellipse(this.x + this.width * 0.38, this.y + this.height * 0.68, this.width * 0.09, this.height * 0.13, 0, 0, Math.PI * 2);
     ctx.fillStyle = eyeWhite;
@@ -188,7 +188,7 @@ export class EnemyComponent extends Component {
     ctx.fill();
     ctx.stroke();
 
-    // Pupils
+
     ctx.beginPath();
     ctx.arc(this.x + this.width * 0.38, this.y + this.height * 0.73, this.width * 0.03, 0, Math.PI * 2);
     ctx.fillStyle = eyePupil;
@@ -197,7 +197,7 @@ export class EnemyComponent extends Component {
     ctx.arc(this.x + this.width * 0.62, this.y + this.height * 0.73, this.width * 0.03, 0, Math.PI * 2);
     ctx.fill();
 
-    // Eyebrows
+
     ctx.strokeStyle = browColor;
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -207,7 +207,7 @@ export class EnemyComponent extends Component {
     ctx.lineTo(this.x + this.width * 0.68, this.y + this.height * 0.62);
     ctx.stroke();
 
-    // Mouth (frown)
+
     ctx.strokeStyle = "#222";
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -218,13 +218,13 @@ export class EnemyComponent extends Component {
   }
 
   private drawStompedGoomba(ctx: CanvasRenderingContext2D) {
-    // Squished Goomba
+
     const bodyColor = "#b97a57";
     const darkBody = "#8b5c36";
     const footColor = "#6b3a1c";
 
     ctx.save();
-    // Squished body
+
     ctx.beginPath();
     ctx.ellipse(this.x + this.width / 2, this.y + this.height * 0.85, this.width * 0.45, this.height * 0.15, 0, 0, Math.PI * 2);
     ctx.closePath();
@@ -234,7 +234,7 @@ export class EnemyComponent extends Component {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Feet (flattened)
+
     ctx.beginPath();
     ctx.ellipse(this.x + this.width * 0.32, this.y + this.height * 0.93, this.width * 0.16, this.height * 0.09, 0, 0, Math.PI * 2);
     ctx.fillStyle = footColor;
@@ -259,7 +259,7 @@ export class EnemyComponent extends Component {
 
   stomp() {
     console.log("stomp");
-    
+
     if (!this.isAlive) return;
     this.isAlive = false;
     this.stompAnimationTime = this.stompDuration;
@@ -278,11 +278,11 @@ export class EnemyComponent extends Component {
     this.isAlive = true;
     this.visible = true;
     this.enabled = true;
-    this.solid = false; // Keep it false
+    this.solid = false;
     this.direction = this.initialDirection;
     this.stompAnimationTime = 0;
     this.deathSpeed = 0;
-    // Ensure speed is reset if it can change
-    this.speed = 1; 
+
+    this.speed = 1;
   }
 }
