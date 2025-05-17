@@ -9,7 +9,9 @@
     "dev": "tsc-watch --onFirstSuccess \"npm run postcompile:and:start --silent\" --onSuccess \"npm run postcompile --silent --noClear\" ",
     "postcompile": "tsc-alias && node scripts/fixImportExtension.js",
     "start:server": "nodemon --watch dist --ext js,mjs,json --delay 1s dist/server.js",
-    "postcompile:and:start": "npm run postcompile --silent && npm run start:server"
+    "postcompile:and:start": "npm run postcompile --silent && npm run start:server",
+    "watch:build": "tsc-watch --onSuccess \"npm run postcompile --silent --noClear\""
+
   },
   "keywords": [],
   "author": "",
