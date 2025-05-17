@@ -28,19 +28,38 @@ export class EnemyComponent extends Component {
   update(dt: number) {
     if (this.isAlive) {
       const oldX = this.x;
-      this.x += this.speed * this.direction;
 
-      if (this.checkObstacleCollision()) {
-        this.x = oldX;
-        this.direction *= -1;
+      // Check for a ledge ahead before moving
+      if (this.isLedgeAhead()) {
+        this.direction *= -1; // Turn around
+        // No horizontal movement this frame if turning at a ledge
+      } else {
+        // No ledge, proceed with movement
+        this.x += this.speed * this.direction;
+
+        // Check for collision with obstacles after moving
+        if (this.checkObstacleCollision()) {
+          this.x = oldX; // Revert position
+          this.direction *= -1; // Change direction
+        }
       }
 
-      if (this.x <= 0) {
-        this.x = 0;
-        this.direction = 1;
-      } else if (this.x + this.width >= 3200) {
-        this.x = 3200 - this.width;
-        this.direction = -1;
+      // World boundary checks
+      // Ensure enemy turns around at world edges. Check against oldX to prevent rapid flipping if stuck.
+      if (this.x <= 0 && this.direction === -1) { // If moving left and hit or passed left boundary
+        if (oldX > 0) { // Only flip if it wasn't already at 0
+             this.x = 0;
+             this.direction = 1;
+        } else { // If it started at 0 and direction is -1, force direction to 1
+            this.direction = 1;
+        }
+      } else if (this.x + this.width >= 3200 && this.direction === 1) { // If moving right and hit or passed right boundary (3200 is world width)
+        if (oldX + this.width < 3200) { // Only flip if it wasn't already at the boundary
+            this.x = 3200 - this.width;
+            this.direction = -1;
+        } else { // If it started at boundary and direction is 1, force direction to -1
+            this.direction = -1;
+        }
       }
     } else {
       if (this.stompAnimationTime > 0) {
@@ -73,6 +92,29 @@ export class EnemyComponent extends Component {
       }
     }
     return false;
+  }
+
+  private isLedgeAhead(): boolean {
+    // Determine the probe point: 1px beyond the leading edge in the current direction,
+    // and 1px below the enemy's feet.
+    const probeX = this.x + (this.direction === 1 ? this.width : -1);
+    const probeY = this.y + this.height + 1; // Check 1px below the base of the enemy
+
+    for (const c of this.scene) {
+      // Consider only solid components that are not the enemy itself or the player
+      if (c === this || !c.solid || c instanceof PlayerComponent) continue;
+
+      // Check if the probe point (probeX, probeY) falls within the bounds of component 'c'
+      if (
+        probeX >= c.x &&
+        probeX < c.x + c.width &&
+        probeY >= c.y &&
+        probeY < c.y + c.height
+      ) {
+        return false; // Ground detected ahead
+      }
+    }
+    return true; // No ground detected, it's a ledge
   }
 
   render(ctx: CanvasRenderingContext2D) {

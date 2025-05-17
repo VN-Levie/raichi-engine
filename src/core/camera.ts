@@ -21,4 +21,36 @@ export class Camera {
     static reset(ctx: CanvasRenderingContext2D) {
         ctx.setTransform(1, 0, 0, 1, 0, 0)
     }
+
+    static setPosition(x: number, y: number) {
+        this.x = x
+        this.y = y
+    }
+
+    static getPosition() {
+        return { x: this.x, y: this.y }
+    }
+
+    static getViewport() {
+        return {
+            x: this.x,
+            y: this.y,
+            width: window.innerWidth,
+            height: window.innerHeight
+        }
+    }
+
+
+    static setViewport(width: number, height: number) {
+        window.innerWidth = width
+        window.innerHeight = height
+    }
+
+    //reset
+    static resetViewport() {
+        window.innerWidth = window.innerWidth
+        window.innerHeight = window.innerHeight
+        this.x = 0
+        this.y = 0
+    }
 }
