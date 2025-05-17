@@ -26,5 +26,6 @@ function walkAndFix(dir) {
     }
   }
 }
+console.log("Fixing import extensions...");
 
 walkAndFix("dist")

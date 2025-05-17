@@ -16,7 +16,7 @@ app.use(express.static(path.join(__dirname, "../dist")));
 let hasReloaded = false;
 
 wss.on("connection", (ws) => {
-  console.log("Client connected!");
+  console.log("Client connected");
   if (!hasReloaded) {
     hasReloaded = true;
     setTimeout(() => {
