@@ -4,6 +4,7 @@ import { CircleComponent } from "../entities/circleComponent"
 import { Camera } from "../core/camera"
 import { SceneManager } from "../core/sceneManager"
 import { GameOverScene } from "./gameOverScene"
+import { DeathScene } from "./deathScene"
 import { EnemyComponent } from "../game/entities/enemyComponent"
 import { PlayerComponent } from "../game/entities/playerComponent"
 import { TextComponent } from "../entities/textComponent"
@@ -25,8 +26,11 @@ export class MainScene extends Scene {
   private playerIsCurrentlyDying = false;
   private lastDeathReason = "";
 
-  constructor() {
+  constructor(initialScore: number = 0, initialLives: number = 3) {
     super()
+
+    this.score = initialScore;
+    this.lives = initialLives;
 
     const background = new BoxComponent(0, 0, 800, "lightblue")
     background.height = 600
@@ -85,7 +89,6 @@ export class MainScene extends Scene {
 
     this.createEnemies()
 
-    
     this.scoreText = new TextComponent(`Score: ${this.score}`, 10, 30, "20px Arial", "black")
     this.scoreText.zIndex = 100
     this.add(this.scoreText)
@@ -94,6 +97,10 @@ export class MainScene extends Scene {
     this.livesText.align = "right"
     this.livesText.zIndex = 100
     this.add(this.livesText)
+
+    // Initialize UI with current values
+    this.updateScoreUI();
+    this.updateLivesUI();
 
     Camera.follow(this.player)
   }
@@ -107,6 +114,9 @@ export class MainScene extends Scene {
   }
 
   private resetPlayerAndLevel() {
+    // This method is now effectively handled by creating a new MainScene instance
+    // with the correct score and lives, managed by DeathScene.
+    // Kept for clarity, but its direct usage for reset is reduced.
     this.player.resetState(this.initialPlayerX, this.initialPlayerY);
 
     for (const enemy of this.enemies) {
@@ -129,7 +139,6 @@ export class MainScene extends Scene {
     } else { 
       this.player.startDeathSequence('enemy');
     }
-    
   }
 
   private createEnemies() {
@@ -450,19 +459,12 @@ export class MainScene extends Scene {
 
       if (this.player.isDeathAnimationComplete()) {
         this.playerIsCurrentlyDying = false; 
-        this.lives--;
-        this.updateLivesUI();
-        Camera.resetViewport();
+        this.lives--; 
 
-        if (this.lives <= 0) {
-          Camera.resetViewport();
-          SceneManager.setScene(new GameOverScene(`${this.lastDeathReason} - No lives left!`));
-          return;
-        } else {
-          this.resetPlayerAndLevel();
-        }
+        Camera.resetViewport();
+        SceneManager.setScene(new DeathScene(this.lives, this.score, this.lastDeathReason));
+        return; 
       }
-      
       
       for (const enemy of this.enemies) {
         if (enemy.enabled) {
@@ -474,7 +476,6 @@ export class MainScene extends Scene {
       return; 
     }
 
-    
     Camera.update()
 
     const originalX = this.player.x
