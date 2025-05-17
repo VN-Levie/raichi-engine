@@ -15,16 +15,28 @@ export class DeathScene extends Scene {
     private deathReason: string;
     private mapUrlToRestart: string;
     private mapName: string;
+    private playerRespawnX: number; // Added
+    private playerRespawnY: number; // Added
 
     private playerSprite: PlayerComponent;
 
-    constructor(remainingLives: number, currentScore: number, deathReason: string, mapUrl: string, mapName: string) {
+    constructor(
+        remainingLives: number, 
+        currentScore: number, 
+        deathReason: string, 
+        mapUrl: string, 
+        mapName: string,
+        playerRespawnX: number, // Added
+        playerRespawnY: number  // Added
+        ) {
         super();
         this.remainingLives = remainingLives;
         this.currentScore = currentScore;
         this.deathReason = deathReason;
         this.mapUrlToRestart = mapUrl;
         this.mapName = mapName;
+        this.playerRespawnX = playerRespawnX; // Store respawn coords
+        this.playerRespawnY = playerRespawnY;
 
         Camera.resetViewport();
         Camera.setPosition(0, 0);
@@ -66,7 +78,8 @@ export class DeathScene extends Scene {
                 const score = this.currentScore;
                 const lives = this.remainingLives;
                 const mapUrl = this.mapUrlToRestart;
-                SceneManager.setScene(new LoadingScene(async () => MainScene.create(mapUrl, score, lives)));
+                // Pass respawn coordinates to MainScene.create
+                SceneManager.setScene(new LoadingScene(async () => MainScene.create(mapUrl, score, lives, this.playerRespawnX, this.playerRespawnY)));
             }
         }
     }

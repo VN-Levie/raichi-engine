@@ -15,7 +15,8 @@ import {
   createFloatingPlatformComponent,
   createEnemy,
   createGoal,
-  createFlagPoleComponent
+  createFlagPoleComponent,
+  createCheckpointComponent
 } from "../factories/levelElementFactory"
 import { TILE_SIZE } from "../constants"
 import { HUDController } from "../ui/HUDController"
@@ -24,6 +25,7 @@ import { GoalComponent } from "../entities/GoalComponent"
 import { WinScene } from "./WinScene"
 import { TurtleEnemyComponent } from "../entities/TurtleEnemyComponent"
 import { LoadingScene } from "./LoadingScene";
+import { CheckpointComponent } from "../entities/CheckpointComponent";
 
 export class MainScene extends Scene {
   private player!: PlayerComponent
@@ -33,6 +35,7 @@ export class MainScene extends Scene {
   private goalComponent: GoalComponent | null = null
   private currentMapUrl!: string
   private mapName: string = ""
+  private checkpoints: CheckpointComponent[] = []
 
   private score = 0
   private lives = 3
@@ -48,15 +51,21 @@ export class MainScene extends Scene {
     super()
   }
 
-  public static async create(mapUrl: string, initialScore: number = 0, initialLives: number = 3): Promise<MainScene> {
+  public static async create(
+    mapUrl: string, 
+    initialScore: number = 0, 
+    initialLives: number = 3,
+    playerStartX?: number,
+    playerStartY?: number
+  ): Promise<MainScene> {
     const scene = new MainScene()
     scene.currentMapUrl = mapUrl
     try {
       const mapData = await AssetLoader.loadJson<MapData>(mapUrl)
-      scene.initializeScene(mapData, initialScore, initialLives)
+      scene.initializeScene(mapData, initialScore, initialLives, false, playerStartX, playerStartY)
     } catch (error) {
       console.error(`Failed to load or parse map data from ${mapUrl}:`, error)
-      scene.initializeScene(scene.getDefaultFallbackMapData(), initialScore, initialLives, true)
+      scene.initializeScene(scene.getDefaultFallbackMapData(), initialScore, initialLives, true, playerStartX, playerStartY)
     }
     return scene
   }
@@ -76,19 +85,28 @@ export class MainScene extends Scene {
         pipes: [],
         floatingPlatforms: []
       },
-      enemies: { yOffsetFromGround: -32, positions: [{ "xTile": 5, "type": "goomba" }] }
+      enemies: { yOffsetFromGround: -32, positions: [{ "xTile": 5, "type": "goomba" }] },
+      checkpoints: []
     }
   }
 
-  private initializeScene(mapData: MapData, initialScore: number, initialLives: number, isFallback: boolean = false) {
+  private initializeScene(
+    mapData: MapData, 
+    initialScore: number, 
+    initialLives: number, 
+    isFallback: boolean = false,
+    playerInitialXOverride?: number,
+    playerInitialYOverride?: number
+  ) {
     this.score = initialScore
     this.lives = initialLives
     this.mapName = mapData.name
 
     this.gameOverY = mapData.level.gameOverY
     this.newGroundLevelY = mapData.level.groundLevelY
-    this.initialPlayerX = mapData.player.initialX
-    this.initialPlayerY = mapData.player.initialY
+
+    this.initialPlayerX = playerInitialXOverride ?? mapData.player.initialX
+    this.initialPlayerY = playerInitialYOverride ?? mapData.player.initialY
 
     this.hudController = new HUDController()
     this.add(this.hudController.getScoreTextComponent())
@@ -138,6 +156,16 @@ export class MainScene extends Scene {
 
     this.populateEnemies(mapData)
 
+    this.checkpoints = []
+    if (mapData.checkpoints) {
+      const gameHeight = 600
+      for (const cpConfig of mapData.checkpoints) {
+        const checkpoint = createCheckpointComponent(cpConfig, gameHeight)
+        this.add(checkpoint)
+        this.checkpoints.push(checkpoint)
+      }
+    }
+
     if (mapData.goal) {
       this.goalComponent = createGoal(mapData.goal)
       if (this.goalComponent) {
@@ -165,7 +193,7 @@ export class MainScene extends Scene {
   }
 
   private resetPlayerAndLevel() {
-    this.player.resetState(this.initialPlayerX, this.initialPlayerY)
+    this.player.resetToLastCheckpoint()
 
     for (const enemy of this.enemies) {
       if ('resetState' in enemy && typeof enemy.resetState === 'function') {
@@ -202,7 +230,7 @@ export class MainScene extends Scene {
   }
 
   override update(dt: number) {
-    if (!this.player) return
+    if (!this.enabled || !this.player) return
 
     if (this.playerIsCurrentlyDying) {
       this.player.update(dt)
@@ -210,9 +238,10 @@ export class MainScene extends Scene {
       if (this.player.isDeathAnimationComplete()) {
         this.playerIsCurrentlyDying = false
         this.lives--
+        const playerRespawnPoint = this.player.getRespawnPoint()
 
         Camera.resetViewport()
-        SceneManager.setScene(new DeathScene(this.lives, this.score, this.lastDeathReason, this.currentMapUrl, this.mapName))
+        SceneManager.setScene(new DeathScene(this.lives, this.score, this.lastDeathReason, this.currentMapUrl, this.mapName, playerRespawnPoint.x, playerRespawnPoint.y))
         return
       }
 
@@ -247,9 +276,27 @@ export class MainScene extends Scene {
 
     this.checkEnemyCollisions(playerVelocityYBeforeCollisionResolution)
     this.checkGoalCollision()
+    this.checkCheckpointCollisions()
 
     if (this.player.y > this.gameOverY && !this.player.isDying) {
       this.handlePlayerDeath("You fell into a pit!")
+    }
+  }
+
+  private checkCheckpointCollisions() {
+    if (!this.player || this.player.isDying) return
+
+    for (const checkpoint of this.checkpoints) {
+      if (checkpoint.activated) continue
+
+      const playerCenterX = this.player.x + this.player.width / 2
+
+      if (playerCenterX >= checkpoint.x && playerCenterX < checkpoint.x + checkpoint.width) {
+        checkpoint.activate()
+        const respawnX = checkpoint.x + checkpoint.width / 2 - this.player.width / 2
+        const respawnY = this.newGroundLevelY - this.player.height
+        this.player.setRespawnPoint(respawnX, respawnY)
+      }
     }
   }
 

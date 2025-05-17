@@ -9,7 +9,8 @@ import { TurtleEnemyComponent } from "../entities/TurtleEnemyComponent";
 import { GoalComponent } from "../entities/GoalComponent";
 import { TILE_SIZE } from "../constants";
 import { Component } from "../../core/component";
-import { FlagPoleComponent } from "../entities/FlagPoleComponent"; // Added
+import { FlagPoleComponent } from "../entities/FlagPoleComponent";
+import { CheckpointComponent } from "../entities/CheckpointComponent"; // Added
 
 export function createCloudComponent(cloudConfig: MapData['decorations']['clouds'][0]): CloudClusterComponent {
   return new CloudClusterComponent(cloudConfig.x, cloudConfig.y, cloudConfig.size);
@@ -65,4 +66,8 @@ export function createGoal(goalConfig: MapData['goal']): GoalComponent | null {
 export function createFlagPoleComponent(flagPoleConfig: MapData['decorations']['flagPole']): FlagPoleComponent | null {
   if (!flagPoleConfig) return null;
   return new FlagPoleComponent(flagPoleConfig.xTile, flagPoleConfig.yTile);
+}
+
+export function createCheckpointComponent(checkpointConfig: { xTile: number }, gameHeight: number): CheckpointComponent {
+  return new CheckpointComponent(checkpointConfig.xTile, gameHeight);
 }

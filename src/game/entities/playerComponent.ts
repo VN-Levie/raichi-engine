@@ -1,6 +1,5 @@
 import { Component } from "../../core/component"
 import { Input } from "../../core/input"
-import { EnemyComponent } from "./enemyComponent"
 
 export class PlayerComponent extends Component {
   velocityY = 0
@@ -17,13 +16,18 @@ export class PlayerComponent extends Component {
 
   isDying = false;
   private deathAnimTimer = 0;
-  private readonly DEATH_ANIM_DURATION = 1.5; // seconds for death animation
+  private readonly DEATH_ANIM_DURATION = 1.5;
   private readonly DEATH_BOUNCE_FORCE = -7;
-  
+
+  respawnX: number;
+  respawnY: number;
+
   constructor(x: number, y: number) {
     super()
     this.x = x
     this.y = y
+    this.respawnX = x;
+    this.respawnY = y;
     this.width = 32
     this.height = 46
     this.zIndex = 10
@@ -31,19 +35,29 @@ export class PlayerComponent extends Component {
     this.velocityY = 0
   }
 
+  setRespawnPoint(x: number, y: number) {
+    this.respawnX = x;
+    this.respawnY = y;
+
+  }
+
+  getRespawnPoint(): { x: number, y: number } {
+    return { x: this.respawnX, y: this.respawnY };
+  }
+
   startDeathSequence(deathType: 'enemy' | 'pit') {
-    if (this.isDying) return; // Already dying
+    if (this.isDying) return;
 
     this.isDying = true;
     this.deathAnimTimer = this.DEATH_ANIM_DURATION;
-    this.isGrounded = false; // Player is airborne during death
-    this.solid = false;      // Player passes through objects when dying
+    this.isGrounded = false;
+    this.solid = false;
 
     if (deathType === 'enemy') {
-      this.velocityY = this.DEATH_BOUNCE_FORCE; // Bounce up for enemy death
+      this.velocityY = this.DEATH_BOUNCE_FORCE;
     } else if (deathType === 'pit') {
-      // For pit fall, no upward bounce, just continue falling.
-      // Gravity will continue to apply in the update method.
+
+
     }
   }
 
@@ -51,14 +65,31 @@ export class PlayerComponent extends Component {
     return this.isDying && this.deathAnimTimer <= 0;
   }
 
-  resetState(initialX: number, initialY: number) {
-    this.x = initialX;
-    this.y = initialY;
+  resetToLastCheckpoint() {
+    this.x = this.respawnX;
+    this.y = this.respawnY;
     this.velocityY = 0;
     this.isGrounded = false;
     this.isDying = false;
     this.deathAnimTimer = 0;
     this.solid = true;
+    this.enabled = true;
+    this.direction = 1;
+    this.animFrame = 0;
+    this.isMoving = false;
+  }
+
+  resetToMapStart(mapInitialX: number, mapInitialY: number) {
+    this.x = mapInitialX;
+    this.y = mapInitialY;
+    this.respawnX = mapInitialX;
+    this.respawnY = mapInitialY;
+    this.velocityY = 0;
+    this.isGrounded = false;
+    this.isDying = false;
+    this.deathAnimTimer = 0;
+    this.solid = true;
+    this.enabled = true;
     this.direction = 1;
     this.animFrame = 0;
     this.isMoving = false;
@@ -66,17 +97,17 @@ export class PlayerComponent extends Component {
 
   update(dt: number) {
     if (this.isDying) {
-      this.velocityY += this.gravity; // Apply gravity
-      this.y += this.velocityY;       // Fall
+      this.velocityY += this.gravity;
+      this.y += this.velocityY;
       this.deathAnimTimer -= dt;
-      // Animation frame can be set to jumping or a specific death frame
-      this.animFrame = 1; // Use jumping pose for falling
-      return; // Skip normal input and movement
+
+      this.animFrame = 1;
+      return;
     }
 
-    // Handle horizontal movement - should work regardless of grounded state
+
     this.isMoving = false
-    
+
     if (Input.isKeyDown("ArrowLeft")) {
       this.x -= this.speed
       this.direction = -1
@@ -85,16 +116,16 @@ export class PlayerComponent extends Component {
         this.x = 0
       }
     }
-    
+
     if (Input.isKeyDown("ArrowRight")) {
       this.x += this.speed
       this.direction = 1
       this.isMoving = true
     }
 
-    // Handle jumping - only when grounded and jump key is pressed
+
     if (Input.isKeyDown("ArrowUp")) {
-      if (this.isGrounded && !this.jumpPressed && !this.isDying) { // Prevent jumping if dying
+      if (this.isGrounded && !this.jumpPressed && !this.isDying) {
         this.velocityY = this.jumpForce
         this.isGrounded = false
         this.jumpPressed = true;
@@ -103,13 +134,13 @@ export class PlayerComponent extends Component {
       this.jumpPressed = false;
     }
 
-    // Apply gravity and vertical movement
+
     if (!this.isGrounded) {
       this.velocityY += this.gravity;
       this.y += this.velocityY;
     }
-    
-    // Handle animation
+
+
     if (this.isMoving && this.isGrounded) {
       this.animTimer += dt
       if (this.animTimer > 0.1) {
@@ -127,33 +158,33 @@ export class PlayerComponent extends Component {
   render(ctx: CanvasRenderingContext2D) {
     this.drawMarioCharacter(ctx)
   }
-  
+
   private drawMarioCharacter(ctx: CanvasRenderingContext2D) {
-    const redColor = "#FF0000"          // Bright red for hat and shirt
-    const darkRedColor = "#CC0000"      // Darker red for shading
-    const skinColor = "#FFC88A"         // Warm skin tone
-    const skinShadow = "#EAA66B"        // Skin shadow
-    const blueColor = "#0000CC"         // Richer blue for overalls
-    const blueShadow = "#000099"        // Blue shadow
-    const brownColor = "#8B4513"        // Brown for hair and shoes
-    const brownShadow = "#5C2E0D"       // Darker brown for shoe details
-    const whiteColor = "#FFFFFF"        // White for gloves and eyes
-    const blackColor = "#000000"        // Black for outlines and details
-    
+    const redColor = "#FF0000"
+    const darkRedColor = "#CC0000"
+    const skinColor = "#FFC88A"
+    const skinShadow = "#EAA66B"
+    const blueColor = "#0000CC"
+    const blueShadow = "#000099"
+    const brownColor = "#8B4513"
+    const brownShadow = "#5C2E0D"
+    const whiteColor = "#FFFFFF"
+    const blackColor = "#000000"
+
     ctx.save()
-    
+
     if (this.direction === -1) {
       ctx.translate(this.x + this.width, this.y)
       ctx.scale(-1, 1)
     } else {
       ctx.translate(this.x, this.y)
     }
-    
-    // Mario body based on animation state
+
+
     if (!this.isGrounded) {
       this.drawJumpingPose(ctx, redColor, darkRedColor, blueColor, blueShadow, skinColor, skinShadow, brownColor, brownShadow, whiteColor, blackColor)
     } else if (this.isMoving) {
-      switch(this.animFrame) {
+      switch (this.animFrame) {
         case 0:
           this.drawRunningPose1(ctx, redColor, darkRedColor, blueColor, blueShadow, skinColor, skinShadow, brownColor, brownShadow, whiteColor, blackColor)
           break
@@ -167,28 +198,28 @@ export class PlayerComponent extends Component {
     } else {
       this.drawStandingPose(ctx, redColor, darkRedColor, blueColor, blueShadow, skinColor, skinShadow, brownColor, brownShadow, whiteColor, blackColor)
     }
-    
+
     ctx.restore()
   }
-  
+
   private drawStandingPose(
-    ctx: CanvasRenderingContext2D, 
-    redColor: string, 
+    ctx: CanvasRenderingContext2D,
+    redColor: string,
     darkRedColor: string,
-    blueColor: string, 
+    blueColor: string,
     blueShadow: string,
-    skinColor: string, 
+    skinColor: string,
     skinShadow: string,
-    brownColor: string, 
+    brownColor: string,
     brownShadow: string,
     whiteColor: string,
     blackColor: string
   ) {
-    // Draw outline
+
     ctx.lineWidth = 1
     ctx.strokeStyle = blackColor
-    
-    // Cap (hat)
+
+
     ctx.fillStyle = redColor
     ctx.beginPath()
     ctx.moveTo(5, 10)
@@ -198,8 +229,8 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Cap visor
+
+
     ctx.fillStyle = redColor
     ctx.beginPath()
     ctx.moveTo(2, 10)
@@ -209,12 +240,12 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Cap shading
+
+
     ctx.fillStyle = darkRedColor
     ctx.fillRect(24, 3, 4, 7)
-    
-    // Face
+
+
     ctx.fillStyle = skinColor
     ctx.beginPath()
     ctx.moveTo(8, 10)
@@ -224,8 +255,8 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Hair
+
+
     ctx.fillStyle = brownColor
     ctx.beginPath()
     ctx.moveTo(8, 10)
@@ -234,21 +265,21 @@ export class PlayerComponent extends Component {
     ctx.lineTo(12, 10)
     ctx.closePath()
     ctx.fill()
-    
-    // Eyes
+
+
     ctx.fillStyle = whiteColor
     ctx.beginPath()
     ctx.arc(16, 15, 3, 0, Math.PI * 2)
     ctx.fill()
     ctx.stroke()
-    
-    // Pupils
+
+
     ctx.fillStyle = blackColor
     ctx.beginPath()
     ctx.arc(17, 15, 1.5, 0, Math.PI * 2)
     ctx.fill()
-    
-    // Nose
+
+
     ctx.fillStyle = skinShadow
     ctx.beginPath()
     ctx.moveTo(20, 17)
@@ -257,8 +288,8 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Mustache
+
+
     ctx.fillStyle = brownColor
     ctx.beginPath()
     ctx.moveTo(15, 19)
@@ -268,8 +299,8 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Body - Shirt
+
+
     ctx.fillStyle = redColor
     ctx.beginPath()
     ctx.moveTo(8, 22)
@@ -279,19 +310,19 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Body - Overalls
+
+
     ctx.fillStyle = blueColor
     ctx.fillRect(8, 28, 18, 12)
     ctx.strokeRect(8, 28, 18, 12)
-    
-    // Overall straps
+
+
     ctx.fillRect(10, 22, 4, 8)
     ctx.strokeRect(10, 22, 4, 8)
     ctx.fillRect(20, 22, 4, 8)
     ctx.strokeRect(20, 22, 4, 8)
-    
-    // Overall buttons
+
+
     ctx.fillStyle = whiteColor
     ctx.beginPath()
     ctx.arc(12, 28, 1.5, 0, Math.PI * 2)
@@ -301,33 +332,33 @@ export class PlayerComponent extends Component {
     ctx.arc(22, 28, 1.5, 0, Math.PI * 2)
     ctx.fill()
     ctx.stroke()
-    
-    // Blue shading
+
+
     ctx.fillStyle = blueShadow
     ctx.fillRect(22, 28, 4, 12)
-    
-    // Arms
+
+
     ctx.fillStyle = skinColor
     ctx.fillRect(4, 22, 4, 12)
     ctx.strokeRect(4, 22, 4, 12)
     ctx.fillRect(26, 22, 4, 12)
     ctx.strokeRect(26, 22, 4, 12)
-    
-    // Gloves
+
+
     ctx.fillStyle = whiteColor
     ctx.fillRect(2, 32, 6, 4)
     ctx.strokeRect(2, 32, 6, 4)
     ctx.fillRect(26, 32, 6, 4)
     ctx.strokeRect(26, 32, 6, 4)
-    
-    // Legs
+
+
     ctx.fillStyle = blueColor
     ctx.fillRect(10, 40, 6, 6)
     ctx.strokeRect(10, 40, 6, 6)
     ctx.fillRect(18, 40, 6, 6)
     ctx.strokeRect(18, 40, 6, 6)
-    
-    // Shoes
+
+
     ctx.fillStyle = brownColor
     ctx.beginPath()
     ctx.moveTo(8, 46)
@@ -337,7 +368,7 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
+
     ctx.beginPath()
     ctx.moveTo(16, 46)
     ctx.lineTo(26, 46)
@@ -346,48 +377,48 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Shoe shadow
+
+
     ctx.fillStyle = brownShadow
     ctx.fillRect(8, 44, 10, 2)
     ctx.fillRect(16, 44, 10, 2)
   }
-  
+
   private drawRunningPose1(
-    ctx: CanvasRenderingContext2D, 
-    redColor: string, 
+    ctx: CanvasRenderingContext2D,
+    redColor: string,
     darkRedColor: string,
-    blueColor: string, 
+    blueColor: string,
     blueShadow: string,
-    skinColor: string, 
+    skinColor: string,
     skinShadow: string,
-    brownColor: string, 
+    brownColor: string,
     brownShadow: string,
     whiteColor: string,
     blackColor: string
   ) {
-    // Draw the same hat and face as standing pose
+
     this.drawStandingPose(ctx, redColor, darkRedColor, blueColor, blueShadow, skinColor, skinShadow, brownColor, brownShadow, whiteColor, blackColor)
-    
-    // Override the body parts for animation
+
+
     ctx.fillStyle = blueColor
     ctx.clearRect(8, 40, 16, 6)
-    
-    // Running leg positions
+
+
     ctx.fillStyle = blueColor
-    
-    // Left leg forward
+
+
     ctx.fillRect(14, 35, 6, 8)
     ctx.strokeRect(14, 35, 6, 8)
-    
-    // Right leg back
+
+
     ctx.fillRect(10, 40, 6, 6)
     ctx.strokeRect(10, 40, 6, 6)
-    
-    // Shoes
+
+
     ctx.fillStyle = brownColor
-    
-    // Forward shoe
+
+
     ctx.beginPath()
     ctx.moveTo(12, 43)
     ctx.lineTo(22, 43)
@@ -396,8 +427,8 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Back shoe
+
+
     ctx.beginPath()
     ctx.moveTo(8, 46)
     ctx.lineTo(18, 46)
@@ -406,12 +437,12 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Running arm positions
+
+
     ctx.clearRect(2, 22, 8, 14)
     ctx.clearRect(24, 22, 8, 14)
-    
-    // Left arm forward and up
+
+
     ctx.fillStyle = skinColor
     ctx.beginPath()
     ctx.moveTo(6, 18)
@@ -421,8 +452,8 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Right arm back
+
+
     ctx.beginPath()
     ctx.moveTo(26, 24)
     ctx.lineTo(30, 30)
@@ -431,48 +462,48 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Gloves
+
+
     ctx.fillStyle = whiteColor
     ctx.beginPath()
     ctx.arc(4, 19, 3, 0, Math.PI * 2)
     ctx.fill()
     ctx.stroke()
-    
+
     ctx.beginPath()
     ctx.arc(28, 31, 3, 0, Math.PI * 2)
     ctx.fill()
     ctx.stroke()
   }
-  
+
   private drawRunningPose2(
-    ctx: CanvasRenderingContext2D, 
-    redColor: string, 
+    ctx: CanvasRenderingContext2D,
+    redColor: string,
     darkRedColor: string,
-    blueColor: string, 
+    blueColor: string,
     blueShadow: string,
-    skinColor: string, 
+    skinColor: string,
     skinShadow: string,
-    brownColor: string, 
+    brownColor: string,
     brownShadow: string,
     whiteColor: string,
     blackColor: string
   ) {
-    // Draw the same hat and face as standing pose
+
     this.drawStandingPose(ctx, redColor, darkRedColor, blueColor, blueShadow, skinColor, skinShadow, brownColor, brownShadow, whiteColor, blackColor)
-    
-    // Override the body parts for animation
+
+
     ctx.fillStyle = blueColor
     ctx.clearRect(8, 40, 16, 6)
-    
-    // Both legs in middle stride position
+
+
     ctx.fillStyle = blueColor
     ctx.fillRect(12, 38, 5, 8)
     ctx.strokeRect(12, 38, 5, 8)
     ctx.fillRect(17, 38, 5, 8)
     ctx.strokeRect(17, 38, 5, 8)
-    
-    // Shoes
+
+
     ctx.fillStyle = brownColor
     ctx.beginPath()
     ctx.moveTo(10, 46)
@@ -482,7 +513,7 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
+
     ctx.beginPath()
     ctx.moveTo(17, 46)
     ctx.lineTo(24, 46)
@@ -491,11 +522,11 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Middle position arms
+
+
     ctx.clearRect(2, 22, 8, 14)
     ctx.clearRect(24, 22, 8, 14)
-    
+
     ctx.fillStyle = skinColor
     ctx.beginPath()
     ctx.moveTo(8, 22)
@@ -505,7 +536,7 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
+
     ctx.beginPath()
     ctx.moveTo(24, 22)
     ctx.lineTo(28, 28)
@@ -514,55 +545,55 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Gloves
+
+
     ctx.fillStyle = whiteColor
     ctx.beginPath()
     ctx.arc(8, 32, 3, 0, Math.PI * 2)
     ctx.fill()
     ctx.stroke()
-    
+
     ctx.beginPath()
     ctx.arc(24, 32, 3, 0, Math.PI * 2)
     ctx.fill()
     ctx.stroke()
   }
-  
+
   private drawRunningPose3(
-    ctx: CanvasRenderingContext2D, 
-    redColor: string, 
+    ctx: CanvasRenderingContext2D,
+    redColor: string,
     darkRedColor: string,
-    blueColor: string, 
+    blueColor: string,
     blueShadow: string,
-    skinColor: string, 
+    skinColor: string,
     skinShadow: string,
-    brownColor: string, 
+    brownColor: string,
     brownShadow: string,
     whiteColor: string,
     blackColor: string
   ) {
-    // Draw the same hat and face as standing pose
+
     this.drawStandingPose(ctx, redColor, darkRedColor, blueColor, blueShadow, skinColor, skinShadow, brownColor, brownShadow, whiteColor, blackColor)
-    
-    // Override the body parts for animation
+
+
     ctx.fillStyle = blueColor
     ctx.clearRect(8, 40, 16, 6)
-    
-    // Right leg forward, left leg back (opposite of pose 1)
+
+
     ctx.fillStyle = blueColor
-    
-    // Right leg forward
+
+
     ctx.fillRect(18, 35, 6, 8)
     ctx.strokeRect(18, 35, 6, 8)
-    
-    // Left leg back
+
+
     ctx.fillRect(14, 40, 6, 6)
     ctx.strokeRect(14, 40, 6, 6)
-    
-    // Shoes
+
+
     ctx.fillStyle = brownColor
-    
-    // Forward shoe
+
+
     ctx.beginPath()
     ctx.moveTo(16, 43)
     ctx.lineTo(26, 43)
@@ -571,8 +602,8 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Back shoe
+
+
     ctx.beginPath()
     ctx.moveTo(12, 46)
     ctx.lineTo(22, 46)
@@ -581,12 +612,12 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Running arm positions (opposite of pose 1)
+
+
     ctx.clearRect(2, 22, 8, 14)
     ctx.clearRect(24, 22, 8, 14)
-    
-    // Right arm forward and up
+
+
     ctx.fillStyle = skinColor
     ctx.beginPath()
     ctx.moveTo(26, 18)
@@ -596,8 +627,8 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Left arm back
+
+
     ctx.beginPath()
     ctx.moveTo(6, 24)
     ctx.lineTo(2, 30)
@@ -606,55 +637,55 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Gloves
+
+
     ctx.fillStyle = whiteColor
     ctx.beginPath()
     ctx.arc(28, 19, 3, 0, Math.PI * 2)
     ctx.fill()
     ctx.stroke()
-    
+
     ctx.beginPath()
     ctx.arc(4, 31, 3, 0, Math.PI * 2)
     ctx.fill()
     ctx.stroke()
   }
-  
+
   private drawJumpingPose(
-    ctx: CanvasRenderingContext2D, 
-    redColor: string, 
+    ctx: CanvasRenderingContext2D,
+    redColor: string,
     darkRedColor: string,
-    blueColor: string, 
+    blueColor: string,
     blueShadow: string,
-    skinColor: string, 
+    skinColor: string,
     skinShadow: string,
-    brownColor: string, 
+    brownColor: string,
     brownShadow: string,
     whiteColor: string,
     blackColor: string
   ) {
-    // Draw the same hat and face as standing pose
+
     this.drawStandingPose(ctx, redColor, darkRedColor, blueColor, blueShadow, skinColor, skinShadow, brownColor, brownShadow, whiteColor, blackColor)
-    
-    // Override the body parts for jump animation
+
+
     ctx.fillStyle = blueColor
     ctx.clearRect(8, 40, 16, 6)
-    
-    // Legs - bent and spread for jumping
+
+
     ctx.fillStyle = blueColor
-    
-    // Left leg bent
+
+
     ctx.fillRect(8, 35, 6, 8)
     ctx.strokeRect(8, 35, 6, 8)
-    
-    // Right leg bent
+
+
     ctx.fillRect(20, 35, 6, 8)
     ctx.strokeRect(20, 35, 6, 8)
-    
-    // Shoes
+
+
     ctx.fillStyle = brownColor
-    
-    // Left shoe
+
+
     ctx.beginPath()
     ctx.moveTo(6, 43)
     ctx.lineTo(16, 43)
@@ -663,8 +694,8 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Right shoe
+
+
     ctx.beginPath()
     ctx.moveTo(18, 43)
     ctx.lineTo(28, 43)
@@ -673,12 +704,12 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Arms - both up and out to sides
+
+
     ctx.clearRect(2, 22, 8, 14)
     ctx.clearRect(24, 22, 8, 14)
-    
-    // Left arm up
+
+
     ctx.fillStyle = skinColor
     ctx.beginPath()
     ctx.moveTo(8, 18)
@@ -688,8 +719,8 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Right arm up
+
+
     ctx.beginPath()
     ctx.moveTo(24, 18)
     ctx.lineTo(30, 16)
@@ -698,14 +729,14 @@ export class PlayerComponent extends Component {
     ctx.closePath()
     ctx.fill()
     ctx.stroke()
-    
-    // Gloves
+
+
     ctx.fillStyle = whiteColor
     ctx.beginPath()
     ctx.arc(0, 20, 3, 0, Math.PI * 2)
     ctx.fill()
     ctx.stroke()
-    
+
     ctx.beginPath()
     ctx.arc(32, 20, 3, 0, Math.PI * 2)
     ctx.fill()
@@ -713,11 +744,11 @@ export class PlayerComponent extends Component {
   }
 
   setGrounded(isGrounded: boolean, groundY?: number) {
-    if (this.isDying) return; // Don't change grounded state if dying
+    if (this.isDying) return;
 
     if (groundY !== undefined) {
       this.groundY = groundY;
-      // Position player exactly on ground to prevent sinking
+
       if (isGrounded) {
         this.y = this.groundY - this.height;
       }
@@ -726,31 +757,12 @@ export class PlayerComponent extends Component {
   }
 
   stopVerticalMovement() {
-    if (this.isDying) return; // Don't stop if dying
+    if (this.isDying) return;
     this.velocityY = 0;
   }
 
   bounceOffEnemy() {
-    if (this.isDying) return; // Don't bounce if dying
+    if (this.isDying) return;
     this.velocityY = -5;
-  }
-
-  checkEnemyCollision(enemy: EnemyComponent): boolean {
-    if (this.isDying) return false; // No collision checks if dying
-
-    const playerBottom = this.y + this.height;
-    const playerTop = this.y;
-    const enemyTop = enemy.y;
-    
-    const landingOnTop = playerBottom >= enemyTop - 5 && 
-                      playerBottom <= enemyTop + 10 && 
-                      playerTop < enemyTop && 
-                      this.velocityY >= 0;
-    
-    if (landingOnTop) {
-      return true;
-    }
-    
-    return false;
   }
 }

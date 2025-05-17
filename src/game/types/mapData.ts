@@ -29,4 +29,5 @@ export interface MapData {
     nextMapUrl?: string;
     isWinGoal?: boolean;
   };
+  checkpoints?: Array<{ xTile: number }>; // Added checkpoints
 }

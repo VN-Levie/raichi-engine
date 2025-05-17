@@ -87,5 +87,9 @@
     "widthTiles": 2,
     "heightTiles": 3,
     "nextMapUrl": "/data/maps/map-1-2.json"
-  }
+  },
+  "checkpoints": [
+    { "xTile": 30 },
+    { "xTile": 60 }
+  ]
 }

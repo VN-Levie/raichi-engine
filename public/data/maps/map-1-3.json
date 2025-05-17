@@ -47,5 +47,9 @@
     "widthTiles": 3,
     "heightTiles": 5,
     "isWinGoal": true 
-  }
+  },
+  "checkpoints": [
+    { "xTile": 20 },
+    { "xTile": 40 }
+  ]
 }
