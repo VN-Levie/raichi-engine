@@ -515,30 +515,44 @@ export class MainScene extends Scene {
       if (
         playerRight > blockLeft &&
         playerLeft < blockRight &&
-        playerBottom > blockTop &&
-        playerTop < blockBottom
+        playerBottom >= blockTop && 
+        playerTop < blockBottom    
       ) {
-        collided = true;
+        // Initial collision detected
+        let performHorizontalResolution = true;
 
         if (direction === 'horizontal') {
-          if (originalX + this.player.width <= blockLeft) {
-            this.player.x = blockLeft - this.player.width;
-          } else if (originalX >= blockRight) {
-            this.player.x = blockRight;
+          // Check if player is essentially walking on top of this block,
+          // rather than hitting its side as a wall.
+          // Condition for walking on top: player's feet are at/near block's top AND player's head is above block's top.
+          const playerIsWalkingOnTopOfThisBlock = (playerBottom <= blockTop + 0.1 && playerTop < blockTop);
+          
+          if (playerIsWalkingOnTopOfThisBlock) {
+            performHorizontalResolution = false; // Don't push back horizontally if just walking over.
+          }
+
+          if (performHorizontalResolution) {
+            collided = true; // Mark as collided for horizontal if resolution is performed
+            if (originalX + this.player.width <= blockLeft) { // Player was to the left, moving right
+              this.player.x = blockLeft - this.player.width;
+            } else if (originalX >= blockRight) { // Player was to the right, moving left
+              this.player.x = blockRight;
+            }
           }
         } else if (direction === 'vertical') {
+          collided = true; // Mark as collided for vertical
           if (originalY !== undefined) {
-            if (originalY + this.player.height <= blockTop) { // Player was above the block, hit its top (ground)
+            if (originalY + this.player.height <= blockTop + 0.01) { 
               this.player.y = blockTop - this.player.height;
               this.player.stopVerticalMovement();
               isGrounded = true;
               groundY = blockTop;
-            } else if (originalY >= blockBottom) { // Player was below the block, hit its bottom (ceiling)
+            } else if (originalY >= blockBottom - 0.01) { 
               this.player.y = blockBottom;
-              if (this.isUnderwater && this.player.velocityY < 0) { // Underwater and moving up
-                this.player.velocityY = 0; // Stop upward movement
+              if (this.isUnderwater && this.player.velocityY < 0) { 
+                this.player.velocityY = 0; 
               } else {
-                this.player.velocityY = 0.1; // Default behavior (e.g., slight bounce down for non-underwater)
+                this.player.velocityY = 0.1; 
               }
             }
           }
@@ -550,6 +564,8 @@ export class MainScene extends Scene {
       this.player.setGrounded(isGrounded, isGrounded ? groundY : undefined);
     }
 
+    // For horizontal, 'collided' is true if a push-back occurred.
+    // For vertical, 'isGrounded' indicates a specific type of vertical collision (landing).
     return direction === 'vertical' ? isGrounded : collided;
   }
 
@@ -636,8 +652,7 @@ export class MainScene extends Scene {
     const playerVelocityYBeforeCollisionResolution = this.player.velocityY
 
     this.checkAndResolveCollisions('horizontal', originalX)
-    const isGrounded = this.checkAndResolveCollisions('vertical', originalX, originalY)
-    this.player.setGrounded(isGrounded)
+    this.checkAndResolveCollisions('vertical', originalX, originalY); // This call now correctly sets isGrounded via player.setGrounded internally.
 
     for (const enemy of this.enemies) {
       if (enemy.enabled) {

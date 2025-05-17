@@ -59,9 +59,9 @@ export class PlayerComponent extends Component {
 
   // Animation frame definitions
   private readonly IDLE_FRAMES = [0, 1];
-  private readonly IDLE_ANIM_FPS = 2;
+  private readonly IDLE_ANIM_FPS = 4;
   private readonly RUN_FRAMES = [2, 3, 4, 5];
-  private readonly RUN_ANIM_FPS = 10;
+  private readonly RUN_ANIM_FPS = 15;
   private readonly JUMP_UP_FRAME = 4; 
   private readonly FALL_FRAME = 5;
   private readonly DEATH_FRAME = 5;
@@ -91,7 +91,7 @@ export class PlayerComponent extends Component {
       this.spritesheet = await AssetLoader.loadImage(this.SPRITESHEET_PATH);
       const frameWidth = this.SPRITE_FRAME_WIDTH;
       const frameHeight = this.SPRITE_FRAME_HEIGHT;
-      const calculatedFrameCount = Math.floor(this.spritesheet.height / frameWidth);
+      const calculatedFrameCount = Math.floor(this.spritesheet.height / frameHeight);
 
       if (calculatedFrameCount < this.SPRITESHEET_TOTAL_FRAMES) {
         console.warn(`Player spritesheet ${this.SPRITESHEET_PATH} has only ${calculatedFrameCount} frames of ${frameWidth}px width, but SPRITESHEET_TOTAL_FRAMES is ${this.SPRITESHEET_TOTAL_FRAMES}. Animations might be incorrect.`);
@@ -244,17 +244,12 @@ export class PlayerComponent extends Component {
     this.animTimer += dt;
     switch (this.state) {
       case PlayerState.JUMPING:
-        console.log("Jumping");
-        
         this.animator.currentFrame = Math.min(this.JUMP_UP_FRAME, this.animator.frameCount - 1);
         break;
       case PlayerState.FALLING:
-        console.log("Falling");
         this.animator.currentFrame = Math.min(this.FALL_FRAME, this.animator.frameCount - 1);
         break;
       case PlayerState.RUNNING:
-        console.log("Running");
-        
         const runFrameDuration = 1 / this.RUN_ANIM_FPS;
         if (this.animTimer >= runFrameDuration) {
           this.animTimer -= runFrameDuration;
@@ -273,7 +268,6 @@ export class PlayerComponent extends Component {
         }
         break;
       case PlayerState.IDLE:
-        console.log("Idle");
         const idleFrameDuration = 1 / this.IDLE_ANIM_FPS;
         if (this.animTimer >= idleFrameDuration) {
           this.animTimer -= idleFrameDuration;
