@@ -41,7 +41,7 @@ export class Scene {
     Camera.reset(ctx)
   }
   
-  private sortComponents() {
+  public sortComponents() {
     this.components.sort((a, b) => a.zIndex - b.zIndex)
   }
 }

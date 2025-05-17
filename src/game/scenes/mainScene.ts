@@ -152,6 +152,11 @@ export class MainScene extends Scene {
     }
 
     this.hudController = new HUDController()
+
+    this.hudController.getBackToCheckpointButton().onClick = () => this.handleBackToLastCheckpointClick()
+    this.hudController.getRestartLevelButton().onClick = () => this.handleRestartLevelClick()
+    this.hudController.getRestartGameButton().onClick = () => this.handleRestartGameClick()
+
     this.add(this.hudController.getScoreTextComponent())
     this.add(this.hudController.getLivesTextComponent())
     this.add(this.hudController.getCoinsTextComponent())
@@ -159,9 +164,6 @@ export class MainScene extends Scene {
     this.add(this.hudController.getRestartLevelButton())
     this.add(this.hudController.getRestartGameButton())
 
-    this.hudController.getBackToCheckpointButton().onClick = () => this.handleBackToLastCheckpointClick()
-    this.hudController.getRestartLevelButton().onClick = () => this.handleRestartLevelClick()
-    this.hudController.getRestartGameButton().onClick = () => this.handleRestartGameClick()
 
     this.hudController.updateScore(this.score)
     this.hudController.updateLives(this.lives)
@@ -278,10 +280,10 @@ export class MainScene extends Scene {
 
   private spawnDynamicCloud(): void {
     const canvasWidth = SceneManager.getScene().components.find(c => c instanceof BoxComponent && c.zIndex === -10)?.width || 800; // A way to get canvas width, or use a constant
-    
-    const y = Math.random() * 200 + 30; 
-    const size = Math.random() * 1.0 + 0.8; 
-    const speed = -(Math.random() * 25 + 25); 
+
+    const y = Math.random() * 200 + 30;
+    const size = Math.random() * 1.0 + 0.8;
+    const speed = -(Math.random() * 25 + 25);
 
     const startX = Camera.x + canvasWidth + Math.random() * 50 + 50; // Start further off-screen and randomized
 
@@ -515,8 +517,8 @@ export class MainScene extends Scene {
       if (
         playerRight > blockLeft &&
         playerLeft < blockRight &&
-        playerBottom >= blockTop && 
-        playerTop < blockBottom    
+        playerBottom >= blockTop &&
+        playerTop < blockBottom
       ) {
         // Initial collision detected
         let performHorizontalResolution = true;
@@ -526,7 +528,7 @@ export class MainScene extends Scene {
           // rather than hitting its side as a wall.
           // Condition for walking on top: player's feet are at/near block's top AND player's head is above block's top.
           const playerIsWalkingOnTopOfThisBlock = (playerBottom <= blockTop + 0.1 && playerTop < blockTop);
-          
+
           if (playerIsWalkingOnTopOfThisBlock) {
             performHorizontalResolution = false; // Don't push back horizontally if just walking over.
           }
@@ -542,17 +544,17 @@ export class MainScene extends Scene {
         } else if (direction === 'vertical') {
           collided = true; // Mark as collided for vertical
           if (originalY !== undefined) {
-            if (originalY + this.player.height <= blockTop + 0.01) { 
+            if (originalY + this.player.height <= blockTop + 0.01) {
               this.player.y = blockTop - this.player.height;
               this.player.stopVerticalMovement();
               isGrounded = true;
               groundY = blockTop;
-            } else if (originalY >= blockBottom - 0.01) { 
+            } else if (originalY >= blockBottom - 0.01) {
               this.player.y = blockBottom;
-              if (this.isUnderwater && this.player.velocityY < 0) { 
-                this.player.velocityY = 0; 
+              if (this.isUnderwater && this.player.velocityY < 0) {
+                this.player.velocityY = 0;
               } else {
-                this.player.velocityY = 0.1; 
+                this.player.velocityY = 0.1;
               }
             }
           }
@@ -614,7 +616,7 @@ export class MainScene extends Scene {
     if (this.dynamicCloudsEnabled) {
       this.dynamicCloudSpawnTimer += dt;
       if (this.dynamicCloudSpawnTimer >= this.nextDynamicCloudSpawnTime) {
-        this.spawnDynamicCloud(); 
+        this.spawnDynamicCloud();
         this.dynamicCloudSpawnTimer = 0;
         this.setNextDynamicCloudSpawnTime();
       }
@@ -724,12 +726,12 @@ export class MainScene extends Scene {
 
     for (let i = 0; i < this.components.length; i++) {
       const c = this.components[i]
-      if (c === this.hudController.getScoreTextComponent() || 
-          c === this.hudController.getLivesTextComponent() ||
-          c === this.hudController.getCoinsTextComponent() ||
-          c === this.hudController.getBackToCheckpointButton() ||
-          c === this.hudController.getRestartLevelButton() ||
-          c === this.hudController.getRestartGameButton()) {
+      if (c === this.hudController.getScoreTextComponent() ||
+        c === this.hudController.getLivesTextComponent() ||
+        c === this.hudController.getCoinsTextComponent() ||
+        c === this.hudController.getBackToCheckpointButton() ||
+        c === this.hudController.getRestartLevelButton() ||
+        c === this.hudController.getRestartGameButton()) {
         continue
       }
 
@@ -787,7 +789,7 @@ export class MainScene extends Scene {
 
   private handleRestartLevelClick(): void {
     console.log("Restarting level:", this.currentMapUrl)
-    SceneManager.setScene(new LoadingScene(async () => 
+    SceneManager.setScene(new LoadingScene(async () =>
       MainScene.create(this.currentMapUrl, this.score, this.lives, undefined, undefined, this.totalCoinsCollected)
     ))
   }
@@ -810,7 +812,7 @@ export class MainScene extends Scene {
   private handleRestartGameClick(): void {
     console.log("Restarting game from beginning.")
     clearGameState()
-    SceneManager.setScene(new LoadingScene(async () => 
+    SceneManager.setScene(new LoadingScene(async () =>
       MainScene.create('/data/maps/map-1-1.json', 0, INITIAL_LIVES, undefined, undefined, 0)
     ))
   }
