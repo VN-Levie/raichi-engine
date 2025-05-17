@@ -36,7 +36,7 @@ export class GoombaEnemyComponent extends BaseEnemyComponent {
         } else {
           this.direction = 1;
         }
-      } else if (this.x + this.width >= 3200 && this.direction === 1) { // Assuming world width
+      } else if (this.x + this.width >= 3200 && this.direction === 1) { 
         if (oldX + this.width < 3200) {
           this.x = 3200 - this.width;
           this.direction = -1;
@@ -48,14 +48,14 @@ export class GoombaEnemyComponent extends BaseEnemyComponent {
       if (this.stompAnimationTime > 0) {
         this.stompAnimationTime -= dt;
         if (this.stompAnimationTime <= 0) {
-          // Transition to falling/disappearing after stomp animation
-          this.deathSpeed = -8; // Make it bounce up slightly then fall
+          
+          this.deathSpeed = -8; 
         }
       } else {
         this.y += this.deathSpeed;
         this.deathSpeed += this.gravity;
 
-        if (this.y > 800) { // Assuming off-screen Y
+        if (this.y > 800) { 
           this.visible = false;
           this.enabled = false;
         }
@@ -188,10 +188,10 @@ export class GoombaEnemyComponent extends BaseEnemyComponent {
     if (!this.isAlive) return;
     this.isAlive = false;
     this.stompAnimationTime = this.stompDuration;
-    // No vertical movement change here, handled by death animation logic
+    
   }
 
-  // kill() is inherited from BaseEnemyComponent
+  
 
   resetState() {
     super.resetState();

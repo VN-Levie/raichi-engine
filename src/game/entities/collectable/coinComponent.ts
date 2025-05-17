@@ -1,25 +1,25 @@
 import { Component } from "../../../core/component";
 import { TILE_SIZE } from "../../constants";
-import { CollectableComponent } from "./collectableComponent"; // Import the base class
+import { CollectableComponent } from "./collectableComponent";
 
 export class CoinComponent extends CollectableComponent {
-    public readonly value = 10; // Coins give 10 points (or 1 for totalCoinsCollected logic)
+    public readonly value = 10;
 
-    // Sprite configuration
+
     protected readonly spritesheetAssetPath: string = '/assets/coin.png';
     protected readonly spritesheetOrientation: 'horizontal' | 'vertical' = 'vertical';
-    protected readonly animationFrameRate: number = 10; // Frames per second
+    protected readonly animationFrameRate: number = 10;
 
     constructor(xTile: number, yTile: number) {
-        // Call the base class constructor
-        // Coin size ratio can be adjusted if needed, defaults are 0.75
-        super(xTile, yTile, 0.75, 0.75); 
 
-        // Set specific bobbing parameters if different from base defaults
-        // this.bobSpeed = 0.8; (already default)
-        // this.bobHeight = 4; (already default)
 
-        // Fallback rendering specific to Coin (optional, base provides a magenta square)
+        super(xTile, yTile, 0.75, 0.75);
+
+
+
+
+
+
         this.renderFallback = (ctx: CanvasRenderingContext2D) => {
             ctx.save();
             ctx.fillStyle = "yellow";
@@ -30,10 +30,10 @@ export class CoinComponent extends CollectableComponent {
             ctx.stroke();
             ctx.restore();
         };
-        
-        this.loadSprite(); // Load the sprite using base class method
+
+        this.loadSprite();
     }
 
-    // The collect(), update(), and render() methods are inherited from CollectableComponent.
-    // No need to redefine them unless specific overrides are needed.
+
+
 }

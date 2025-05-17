@@ -3,12 +3,12 @@ import { PlayerComponent } from "../playerComponent";
 import { BaseEnemyComponent } from "./baseEnemyComponent";
 
 export class TurtleEnemyComponent extends BaseEnemyComponent {
-    // Turtle-specific states
+
     isShelled = false;
     isMovingInShell = false;
-    private shellSpeed = 4; // Speed when moving in shell
+    private shellSpeed = 4;
     private timeInShell = 0;
-    private readonly shellRecoverTime = 5; // Time in seconds before recovering from shell state
+    private readonly shellRecoverTime = 5;
 
     constructor(x: number, y: number, width: number, height: number) {
         super(x, y, width, height);
@@ -23,7 +23,7 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
         if (!this.isAlive) {
             this.y += this.deathSpeed;
             this.deathSpeed += this.gravity;
-            if (this.y > 800) { // Assuming off-screen Y
+            if (this.y > 800) {
                 this.visible = false;
                 this.enabled = false;
             }
@@ -37,13 +37,13 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
                 this.isMovingInShell = false;
                 this.timeInShell = 0;
             }
-            return; // No movement if shelled and not moving
+            return;
         }
 
         const oldX = this.x;
         const currentSpeed = this.isMovingInShell ? this.shellSpeed : this.speed;
 
-        // Turtles in shells fall off ledges, others turn around.
+
         if (!this.isMovingInShell && this.isLedgeAhead()) {
             this.direction *= -1;
         } else {
@@ -51,14 +51,14 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
             if (this.checkObstacleCollision()) {
                 this.x = oldX;
                 this.direction *= -1;
-                // If moving in shell and hits obstacle, it might interact (e.g. break block or kill other enemies)
-                // For now, just reverses direction.
+
+
             }
         }
 
         if (this.x <= 0 && this.direction === -1) { this.x = 0; this.direction = 1; }
-        
-        const worldWidth = 3200; // Assuming world width
+
+        const worldWidth = 3200;
         if (this.x + this.width >= worldWidth && this.direction === 1) { this.x = worldWidth - this.width; this.direction = -1; }
     }
 
@@ -67,10 +67,10 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
 
         if (this.isShelled && !this.isMovingInShell) {
             this.isMovingInShell = true;
-            this.timeInShell = 0; 
+            this.timeInShell = 0;
         } else if (this.isShelled && this.isMovingInShell) {
             this.isMovingInShell = false;
-            this.timeInShell = 0; 
+            this.timeInShell = 0;
         } else {
             this.isShelled = true;
             this.isMovingInShell = false;
@@ -82,18 +82,18 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
         if (!this.isAlive) return false;
 
         if (this.isShelled && !this.isMovingInShell) {
-            // Player kicks the non-moving shell
+
             this.isMovingInShell = true;
-            this.timeInShell = 0; // Reset recovery timer
-            // Determine direction based on player's approach if desired, for now, keeps current direction or picks one
-            // this.direction = (player.x < this.x) ? 1 : -1; // Example
-            return false; // Player doesn't die
+            this.timeInShell = 0;
+
+
+            return false;
         }
-        // If turtle is not shelled, or is shelled and moving, player dies
+
         return true;
     }
 
-    // kill() is inherited
+
 
     resetState() {
         super.resetState();

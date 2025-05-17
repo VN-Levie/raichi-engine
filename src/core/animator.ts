@@ -6,33 +6,33 @@ export class Animator {
   frameRate: number;
   loop: boolean;
   orientation: 'horizontal' | 'vertical';
-  
+
   playing = true;
   currentFrame = 0;
   private timer = 0;
 
   constructor(
-    spritesheet: HTMLImageElement, 
-    orientation: 'horizontal' | 'vertical' = 'vertical', 
-    frameRate = 8, 
+    spritesheet: HTMLImageElement,
+    orientation: 'horizontal' | 'vertical' = 'vertical',
+    frameRate = 8,
     loop = true
   ) {
     this.spritesheet = spritesheet;
     this.orientation = orientation;
-    this.frameRate = frameRate > 0 ? frameRate : 1; // Ensure frameRate is positive
+    this.frameRate = frameRate > 0 ? frameRate : 1;
     this.loop = loop;
 
     if (this.orientation === 'vertical') {
       this.frameWidth = spritesheet.width;
-      this.frameHeight = spritesheet.width; // Assuming square frames based on width
+      this.frameHeight = spritesheet.width;
       if (this.frameHeight === 0) {
         this.frameCount = 0;
       } else {
         this.frameCount = Math.floor(spritesheet.height / this.frameHeight);
       }
-    } else { // Horizontal
+    } else {
       this.frameHeight = spritesheet.height;
-      this.frameWidth = spritesheet.height; // Assuming square frames based on height
+      this.frameWidth = spritesheet.height;
       if (this.frameWidth === 0) {
         this.frameCount = 0;
       } else {
@@ -42,8 +42,8 @@ export class Animator {
   }
 
   update(dt: number) {
-    if (!this.playing || this.frameCount === 0 || this.frameRate <= 0) return; 
-    
+    if (!this.playing || this.frameCount === 0 || this.frameRate <= 0) return;
+
     this.timer += dt;
     const frameTime = 1 / this.frameRate;
 
@@ -72,7 +72,7 @@ export class Animator {
     if (this.orientation === 'vertical') {
       sx = 0;
       sy = this.currentFrame * this.frameHeight;
-    } else { // Horizontal
+    } else {
       sx = this.currentFrame * this.frameWidth;
       sy = 0;
     }

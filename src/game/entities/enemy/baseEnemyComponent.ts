@@ -21,7 +21,7 @@ export abstract class BaseEnemyComponent extends Component {
     this.initialY = y;
     this.width = width;
     this.height = height;
-    this.solid = false; // Player should not be "blocked" by enemies via generic collision.
+    this.solid = false; 
     this.zIndex = 5;
     this.initialDirection = 1;
     this.direction = this.initialDirection;
@@ -48,21 +48,21 @@ export abstract class BaseEnemyComponent extends Component {
 
   protected isLedgeAhead(): boolean {
     const probeX = this.x + (this.direction === 1 ? this.width : -1);
-    const probeY = this.y + this.height + 1; // Check slightly below the enemy
+    const probeY = this.y + this.height + 1; 
     for (const c of this.scene) {
       if (c === this || !c.solid || c instanceof PlayerComponent) continue;
       if (probeX >= c.x && probeX < c.x + c.width && probeY >= c.y && probeY < c.y + c.height) {
-        return false; // Ground detected
+        return false; 
       }
     }
-    return true; // No ground, it's a ledge
+    return true; 
   }
 
   public kill(): void {
     if (!this.isAlive) return;
     this.isAlive = false;
-    this.solid = false; // Ensure it's not solid when killed
-    this.deathSpeed = -8; // Initial upward bounce when killed by means other than stomp
+    this.solid = false; 
+    this.deathSpeed = -8; 
   }
 
   public resetState(): void {

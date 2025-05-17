@@ -2,7 +2,7 @@ import { Component } from "../core/component"
 import { Animator } from "../core/animator"
 
 export class SpriteComponent extends Component {
-  image?: HTMLImageElement // This will be the spritesheet if animator is used
+  image?: HTMLImageElement
   animator?: Animator
 
   constructor(image: HTMLImageElement | null = null, animator: Animator | null = null) {
@@ -20,19 +20,19 @@ export class SpriteComponent extends Component {
       const sourceRect = this.animator.getFrameSourceRect();
       if (sourceRect) {
         ctx.drawImage(
-          this.image, // The spritesheet
+          this.image,
           sourceRect.sx,
           sourceRect.sy,
           sourceRect.sWidth,
           sourceRect.sHeight,
           this.x,
           this.y,
-          this.width,  // Destination width
-          this.height  // Destination height
+          this.width,
+          this.height
         );
       }
     } else if (this.image) {
-      // Draw static image (no animation)
+
       ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
   }

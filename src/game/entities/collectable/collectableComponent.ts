@@ -6,22 +6,22 @@ import { Animator } from "../../../core/animator";
 
 export abstract class CollectableComponent extends Component {
     public collected = false;
-    public abstract readonly value: number; // To be implemented by subclasses
+    public abstract readonly value: number;
 
     protected initialY: number;
-    protected bobSpeed: number = 0.8; // Default, can be overridden
-    protected bobHeight: number = 4;  // Default, can be overridden
+    protected bobSpeed: number = 0.8;
+    protected bobHeight: number = 4;
     protected bobAngle: number = Math.random() * Math.PI * 2;
 
     protected spriteComponent?: SpriteComponent;
     protected imageLoaded = false;
-    
-    // Abstract properties for sprite configuration
+
+
     protected abstract readonly spritesheetAssetPath: string;
     protected abstract readonly spritesheetOrientation: 'horizontal' | 'vertical';
     protected abstract readonly animationFrameRate: number;
 
-    // Fallback rendering if image fails to load
+
     protected renderFallback?: (ctx: CanvasRenderingContext2D) => void;
 
     constructor(xTile: number, yTile: number, widthRatio: number = 0.75, heightRatio: number = 0.75) {
@@ -33,8 +33,8 @@ export abstract class CollectableComponent extends Component {
         this.x = xTile * TILE_SIZE + (TILE_SIZE - this.width) / 2;
         this.initialY = yTile * TILE_SIZE + (TILE_SIZE - this.height) / 2;
         this.y = this.initialY;
-        this.zIndex = 0; // Collectables are usually behind player/enemies but above background
-        this.solid = false; // Collectables are not solid
+        this.zIndex = 0;
+        this.solid = false;
     }
 
     protected async loadSprite() {
@@ -51,11 +51,11 @@ export abstract class CollectableComponent extends Component {
             this.imageLoaded = true;
         } catch (error) {
             console.error(`Failed to load sprite from ${this.spritesheetAssetPath}:`, error);
-            // Setup a default fallback if specific one isn't provided by subclass
+
             if (!this.renderFallback) {
                 this.renderFallback = (ctx: CanvasRenderingContext2D) => {
                     ctx.save();
-                    ctx.fillStyle = "magenta"; // Default fallback color
+                    ctx.fillStyle = "magenta";
                     ctx.fillRect(this.x, this.y, this.width, this.height);
                     ctx.strokeStyle = "black";
                     ctx.strokeRect(this.x, this.y, this.width, this.height);
@@ -73,12 +73,12 @@ export abstract class CollectableComponent extends Component {
         }
 
         if (!this.imageLoaded && !this.renderFallback) return;
-        
-        // Bobbing animation
+
+
         this.bobAngle += this.bobSpeed * dt;
         this.y = this.initialY + Math.sin(this.bobAngle) * this.bobHeight;
 
-        // Update animator if sprite is loaded
+
         if (this.imageLoaded && this.spriteComponent) {
             this.spriteComponent.animator?.update(dt);
         }
@@ -91,7 +91,7 @@ export abstract class CollectableComponent extends Component {
             this.renderFallback(ctx);
             return;
         }
-        
+
         if (this.imageLoaded && this.spriteComponent) {
             this.spriteComponent.x = this.x;
             this.spriteComponent.y = this.y;
@@ -102,7 +102,7 @@ export abstract class CollectableComponent extends Component {
     collect() {
         if (!this.collected) {
             this.collected = true;
-            // Sound effect or particle effect could be triggered here or in subclass
+
         }
     }
 }
