@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "tsc --watch",
+    "start": "node dist/server.js",
+    "dev": "concurrently \"npm run watch\" \"nodemon dist/server.js\""
   },
   "keywords": [],
   "author": "",
@@ -15,6 +17,9 @@
     "ws": "^8.18.2"
   },
   "devDependencies": {
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.18",
+    "@types/ws": "^8.18.1",
     "concurrently": "^9.1.2",
     "nodemon": "^3.1.10",
     "typescript": "^5.8.3"

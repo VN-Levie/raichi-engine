@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dev Engine</title>
+</head>
+<body>
+  <canvas id="game" width="800" height="600"></canvas>
+  <script>
+    function connectWS() {
+      const ws = new WebSocket("ws://localhost:3000");
+      ws.onmessage = (event) => {
+        if (event.data === "reload") location.reload();
+      };
+      ws.onclose = () => setTimeout(connectWS, 500);
+    }
+    connectWS();
+  </script>
+  <script src="/main.js" type="module"></script>
+</body>
+</html>
