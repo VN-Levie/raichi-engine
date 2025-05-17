@@ -6,13 +6,13 @@ export interface MapData {
     gameOverY: number;
     backgroundColor: string;
     worldWidthTiles: number;
-    type?: "ground" | "underwater"; // Added level type
+    type?: "ground" | "underwater"; 
   };
   decorations: {
     clouds: Array<{ x: number; y: number; size: number }>;
     bushes: Array<{ xTile: number; size: number }>;
     flagPole?: { xTile: number; yTile: number };
-    dynamicClouds?: boolean; // Added for dynamic clouds
+    dynamicClouds?: boolean; 
   };
   terrain: {
     ground: {
@@ -23,7 +23,7 @@ export interface MapData {
     };
     pipes: Array<{ xTile: number; heightMultiplier: number }>;
     floatingPlatforms: Array<{ xTile: number; yTile: number; widthTiles: number; style: string }>;
-    tornadoes?: Array<TornadoConfigType>; // Ensure this exists
+    tornadoes?: Array<TornadoConfigType>; 
   };
   enemies: {
     yOffsetFromGround: number;
@@ -31,7 +31,7 @@ export interface MapData {
       xTile: number;
       yTile?: number;
       type?: "goomba" | "turtle" | "bat";
-      patrolRangeXTiles?: [number, number]; // Optional: [startXTile, endXTile] for bat patrol
+      patrolRangeXTiles?: [number, number]; 
     }>;
   };
   goal?: {
@@ -41,19 +41,19 @@ export interface MapData {
     heightTiles: number;
     nextMapUrl?: string;
     isWinGoal?: boolean;
-    style?: "flagpole" | "gate"; // Added goal style
+    style?: "flagpole" | "gate"; 
   };
-  checkpoints?: Array<{ xTile: number }>; // Added checkpoints
-  coins?: Array<{ xTile: number; yTile: number }>; // Added coins
-  lifeItems?: Array<{ xTile: number; yTile: number }>; // Added life items
+  checkpoints?: Array<{ xTile: number }>; 
+  coins?: Array<{ xTile: number; yTile: number }>; 
+  lifeItems?: Array<{ xTile: number; yTile: number }>; 
 }
 
 export type TornadoConfigType = {
   xTile: number;
   yTile: number;
   patrolRangeXTiles?: [number, number];
-  canToggle?: boolean; // If true, tornado will toggle active/inactive state
-  toggleIntervalSeconds?: [min: number, max: number]; // Time range for each state
-  baseSpeedMultiplier?: number; // Multiplier for default patrol speed
-  speedRandomnessFactor?: number; // 0-1, e.g., 0.2 for +/- 20% speed variation
+  canToggle?: boolean; 
+  toggleIntervalSeconds?: [min: number, max: number]; 
+  baseSpeedMultiplier?: number; 
+  speedRandomnessFactor?: number; 
 };

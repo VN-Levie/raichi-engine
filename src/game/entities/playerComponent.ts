@@ -48,7 +48,7 @@ export class PlayerComponent extends Component {
   respawnX: number;
   respawnY: number;
 
-  // Spritesheet and animation properties
+  
   private animator: Animator | null = null;
   private spritesheet: HTMLImageElement | null = null;
   private assetsLoaded: boolean = false;
@@ -57,7 +57,7 @@ export class PlayerComponent extends Component {
   private readonly SPRITE_FRAME_WIDTH = 50;
   private readonly SPRITE_FRAME_HEIGHT = 52;
 
-  // Animation frame definitions
+  
   private readonly IDLE_FRAMES = [0, 1];
   private readonly IDLE_ANIM_FPS = 4;
   private readonly RUN_FRAMES = [2, 3, 4, 5];

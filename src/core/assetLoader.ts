@@ -21,7 +21,7 @@ export class AssetLoader {
       return await response.json() as T;
     } catch (error) {
       console.error(`Failed to load JSON from ${src}:`, error);
-      throw error; // Re-throw the error to be caught by the caller
+      throw error; 
     }
   }
 }

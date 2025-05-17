@@ -9,7 +9,7 @@ enum BatState {
     HIT
 }
 
-const BAT_FRAME_HEIGHT = 68; // User-defined constant for frame height
+const BAT_FRAME_HEIGHT = 68; 
 
 const TURN_FRAMES_START = 0;
 const TURN_FRAMES_END = 1;
@@ -67,7 +67,7 @@ export class BatEnemyComponent extends BaseEnemyComponent {
 
             this.animator = new Animator(batImage, 'vertical', 1, false);
             this.animator.frameWidth = frameSideLength;
-            this.animator.frameHeight = BAT_FRAME_HEIGHT; // Use the constant for frame height
+            this.animator.frameHeight = BAT_FRAME_HEIGHT; 
             this.animator.frameCount = Math.floor(batImage.height / BAT_FRAME_HEIGHT);
 
             if (this.animator.frameCount < 6) {
@@ -106,7 +106,7 @@ export class BatEnemyComponent extends BaseEnemyComponent {
         }
 
         if (this.currentState !== BatState.HIT) {
-            // Time-based sinusoidal vertical movement for smoother oscillation independent of horizontal speed/direction
+            
             this.y = this.initialFlyY + this.amplitudeY * Math.sin(this.frequencyY * Date.now() * 0.1);
         }
     }
@@ -196,8 +196,8 @@ export class BatEnemyComponent extends BaseEnemyComponent {
         const sourceRect = this.animator.getFrameSourceRect();
         if (sourceRect) {
             ctx.save();
-            // The original sprite faces left (for direction = -1)
-            // If direction is 1 (moving right), we need to flip it.
+            
+            
             if (this.direction === 1) {
                 ctx.translate(this.x + this.width, this.y);
                 ctx.scale(-1, 1);
@@ -207,13 +207,13 @@ export class BatEnemyComponent extends BaseEnemyComponent {
                     sourceRect.sy,
                     sourceRect.sWidth,
                     sourceRect.sHeight,
-                    0, // Draw at the new (0,0) of the transformed context
+                    0, 
                     0,
                     this.width,
                     this.height
                 );
             } else {
-                // No flip needed, draw normally
+                
                 ctx.translate(this.x, this.y);
                 ctx.drawImage(
                     this.animator.spritesheet,
@@ -221,7 +221,7 @@ export class BatEnemyComponent extends BaseEnemyComponent {
                     sourceRect.sy,
                     sourceRect.sWidth,
                     sourceRect.sHeight,
-                    0, // Draw at the new (0,0) of the transformed context
+                    0, 
                     0,
                     this.width,
                     this.height

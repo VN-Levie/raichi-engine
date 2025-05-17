@@ -11,7 +11,7 @@ export class BoxComponent extends Component {
     this.width = size
     this.height = size
     this.color = color
-    this.solid = true; // Default to solid unless explicitly changed
+    this.solid = true; 
   }
 
   update(dt: number) {}

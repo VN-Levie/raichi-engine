@@ -8,7 +8,7 @@ export class HUDController {
 
   private restartLevelButton: ButtonComponent;
   private backToCheckpointButton: ButtonComponent;
-  public restartGameButton: ButtonComponent;
+  public backToMenuButton: ButtonComponent;
 
   constructor() {
     this.scoreText = new TextComponent("Score: 0", 20, 20, "20px Arial", "white");
@@ -23,7 +23,7 @@ export class HUDController {
     this.coinsText.zIndex = 100;
     this.coinsText.align = "center";
 
-    // Position new buttons at the bottom
+    
     const buttonY = 40;
     const buttonHeight = 30;
     const buttonWidth = 180;
@@ -33,7 +33,7 @@ export class HUDController {
     this.backToCheckpointButton.text = "Last Checkpoint";
     this.backToCheckpointButton.width = buttonWidth;
     this.backToCheckpointButton.height = buttonHeight;
-    this.backToCheckpointButton.x = 20; // Left
+    this.backToCheckpointButton.x = 20; 
     this.backToCheckpointButton.y = buttonY;
     this.backToCheckpointButton.font = buttonFontSize;
     this.backToCheckpointButton.zIndex = 101;
@@ -42,30 +42,22 @@ export class HUDController {
     this.restartLevelButton.text = "Restart Level";
     this.restartLevelButton.width = buttonWidth;
     this.restartLevelButton.height = buttonHeight;
-    this.restartLevelButton.x = (800 - buttonWidth) / 2; // Center
+    this.restartLevelButton.x = (800 - buttonWidth) / 2; 
     this.restartLevelButton.y = buttonY;
     this.restartLevelButton.font = buttonFontSize;
     this.restartLevelButton.zIndex = 101;
     
-    this.restartGameButton = new ButtonComponent();
-    this.restartGameButton.text = "Restart Game (Menu)";
-    this.restartGameButton.width = buttonWidth + 40;
-    this.restartGameButton.height = buttonHeight;
-    this.restartGameButton.x = 800 - (buttonWidth + 40) - 20; // Right
-    this.restartGameButton.y = buttonY;
-    this.restartGameButton.font = buttonFontSize;
-    this.restartGameButton.zIndex = 101;
-    this.restartGameButton.color = "#FF0000"; // Red color for restart game button
-    this.restartGameButton.hoverColor = "#FF4444"; // Slightly lighter red for hover
-    this.restartGameButton.onClick = () => {
-        console.log("Restarting game and returning to main menu...");
-        
-      // Logic to restart the game and return to the main menu
-      // This should clear the game state and redirect to the start scene
-      // For example:
-      // clearGameState();
-      // SceneManager.setScene(new StartScene());
-    }
+    this.backToMenuButton = new ButtonComponent();
+    this.backToMenuButton.text = "Restart Game (Menu)";
+    this.backToMenuButton.width = buttonWidth + 40;
+    this.backToMenuButton.height = buttonHeight;
+    this.backToMenuButton.x = 800 - (buttonWidth + 40) - 20; 
+    this.backToMenuButton.y = buttonY;
+    this.backToMenuButton.font = buttonFontSize;
+    this.backToMenuButton.zIndex = 101;
+    this.backToMenuButton.color = "#FF0000"; 
+    this.backToMenuButton.hoverColor = "#FF4444"; 
+    
 
   }
 
@@ -89,8 +81,8 @@ export class HUDController {
     return this.backToCheckpointButton;
   }
 
-  public getRestartGameButton(): ButtonComponent {
-    return this.restartGameButton;
+  public getBackToMenuButton(): ButtonComponent {
+    return this.backToMenuButton;
   }
 
   public updateScore(newScore: number): void {

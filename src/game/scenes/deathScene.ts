@@ -17,7 +17,7 @@ export class DeathScene extends Scene {
     private mapName: string;
     private playerRespawnX: number; 
     private playerRespawnY: number; 
-    private totalCoinsCollected: number; // Added
+    private totalCoinsCollected: number; 
 
     private playerSprite: PlayerComponent;
 
@@ -29,7 +29,7 @@ export class DeathScene extends Scene {
         mapName: string,
         playerRespawnX: number, 
         playerRespawnY: number,
-        totalCoinsCollected: number = 0 // Added
+        totalCoinsCollected: number = 0 
         ) {
         super();
         this.remainingLives = remainingLives;
@@ -39,7 +39,7 @@ export class DeathScene extends Scene {
         this.mapName = mapName;
         this.playerRespawnX = playerRespawnX; 
         this.playerRespawnY = playerRespawnY;
-        this.totalCoinsCollected = totalCoinsCollected; // Store total coins
+        this.totalCoinsCollected = totalCoinsCollected; 
 
         Camera.resetViewport();
         Camera.setPosition(0, 0);

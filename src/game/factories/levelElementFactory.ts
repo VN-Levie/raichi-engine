@@ -19,12 +19,12 @@ import { TornadoComponent } from "../entities/effects/TornadoComponent";
 
 export function createCloudComponent(
   cloudConfig: MapData['decorations']['clouds'][0],
-  speedX: number = 0 // Optional speed for dynamic clouds
+  speedX: number = 0 
 ): CloudClusterComponent {
   const cloud = new CloudClusterComponent(cloudConfig.x, cloudConfig.y, cloudConfig.size, speedX);
-  // If speedX is non-zero, it's a dynamic cloud, potentially different zIndex or properties
+  
   if (speedX !== 0) {
-    cloud.zIndex = -6; // Ensure dynamic clouds are also far back
+    cloud.zIndex = -6; 
   }
   return cloud;
 }
@@ -76,8 +76,8 @@ export function createTornadoComponent(tornadoConfig: TornadoConfigType): Tornad
     const xPos = tornadoConfig.xTile * TILE_SIZE;
     const yPos = tornadoConfig.yTile * TILE_SIZE;
     
-    // Prepare a config object for the TornadoComponent constructor
-    const componentConfig: Partial<TornadoConfigType> & { patrolRangeXTiles?: [number, number] } = { // Ensure patrolRangeXTiles is correctly typed for component
+    
+    const componentConfig: Partial<TornadoConfigType> & { patrolRangeXTiles?: [number, number] } = { 
         canToggle: tornadoConfig.canToggle,
         toggleIntervalSeconds: tornadoConfig.toggleIntervalSeconds,
         baseSpeedMultiplier: tornadoConfig.baseSpeedMultiplier,
@@ -93,7 +93,7 @@ export function createTornadoComponent(tornadoConfig: TornadoConfigType): Tornad
             tornadoConfig.patrolRangeXTiles[1] * TILE_SIZE
         ];
     }
-    // Pass xPos, yPos, and the structured config
+    
     return new TornadoComponent(xPos, yPos, componentConfig);
 }
 

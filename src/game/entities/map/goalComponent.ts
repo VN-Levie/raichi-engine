@@ -22,12 +22,12 @@ export class GoalComponent extends Component {
     super();
     this.x = x;
     this.y = y;
-    this.width = width; // This will be the rendered width
-    this.height = height; // This will be the rendered height
+    this.width = width; 
+    this.height = height; 
     this.nextMapUrl = nextMapUrl;
     this.isWinGoal = isWinGoal;
     this.style = style;
-    this.solid = false; // Goal is a trigger, not solid
+    this.solid = false; 
     this.zIndex = 0;
 
     if (this.style === "gate") {
@@ -38,18 +38,18 @@ export class GoalComponent extends Component {
   private async loadGateAssets() {
     try {
       this.image = await AssetLoader.loadImage("/assets/images/map/gate.png");
-      // Gate: 3 frames, each 126px high. Spritesheet is vertical.
-      // Frame width will be image.width. Frame height is 126.
-      this.animator = new Animator(this.image, 'vertical', 5, true); // 5 FPS for gate animation
-      this.animator.frameHeight = 126; // Explicit frame height for gate
-      this.animator.frameWidth = this.image.width; // Frame width is full image width
+      
+      
+      this.animator = new Animator(this.image, 'vertical', 5, true); 
+      this.animator.frameHeight = 126; 
+      this.animator.frameWidth = this.image.width; 
       this.animator.frameCount = Math.floor(this.image.height / 126);
 
-      // Adjust component width/height if not set by map data to match sprite aspect ratio
-      // For example, if map data gives widthTiles=2, heightTiles=4 (for a 126px tall frame)
-      // this.width = 2 * TILE_SIZE; // 64
-      // this.height = 4 * TILE_SIZE; // 128
-      // The actual drawing will scale the 126px frame to this.height.
+      
+      
+      
+      
+      
     } catch (error) {
       console.error("Failed to load gate assets:", error);
     }
@@ -69,25 +69,25 @@ export class GoalComponent extends Component {
           this.image,
           sourceRect.sx,
           sourceRect.sy,
-          sourceRect.sWidth, // animator's frameWidth
-          sourceRect.sHeight, // animator's frameHeight
+          sourceRect.sWidth, 
+          sourceRect.sHeight, 
           this.x,
           this.y,
-          this.width,  // Rendered width from map data
-          this.height  // Rendered height from map data
+          this.width,  
+          this.height  
         );
       }
     } else if (this.style === "flagpole") {
-      // Existing flagpole rendering (or it's handled by FlagPoleComponent)
-      // For simplicity, if GoalComponent is just a trigger, it might not render anything itself
-      // and rely on a separate FlagPoleComponent for visuals.
-      // If it should render a simple box for flagpole goal:
-      // ctx.fillStyle = "rgba(0, 255, 0, 0.3)";
-      // ctx.fillRect(this.x, this.y, this.width, this.height);
+      
+      
+      
+      
+      
+      
     } else {
-        // Default trigger visualization (optional)
-        // ctx.fillStyle = "rgba(255, 215, 0, 0.3)"; // Gold, semi-transparent
-        // ctx.fillRect(this.x, this.y, this.width, this.height);
+        
+        
+        
     }
   }
 }

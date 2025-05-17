@@ -10,7 +10,7 @@ export class WinScene extends Scene {
   constructor() {
     super();
 
-    const background = new BoxComponent(0, 0, 800, "#33AA33"); // Greenish background
+    const background = new BoxComponent(0, 0, 800, "#33AA33"); 
     background.height = 600;
     background.zIndex = -1;
     background.solid = false;
@@ -42,7 +42,7 @@ export class WinScene extends Scene {
     menuButton.color = "#4CAF50";
     menuButton.hoverColor = "#45a049";
     menuButton.onClick = () => {
-      clearGameState(); // Clear save when finishing the game and returning to menu
+      clearGameState(); 
       SceneManager.setScene(new StartScene());
     };
     this.add(menuButton);

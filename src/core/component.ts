@@ -12,7 +12,7 @@ export abstract class Component {
   abstract render(ctx: CanvasRenderingContext2D): void
 }
 
-// ColliderComponent for flexible collision handling
+
 export class ColliderComponent extends Component {
   tag: string
   isTrigger: boolean
@@ -23,11 +23,11 @@ export class ColliderComponent extends Component {
     this.parent = parent
     this.tag = tag
     this.isTrigger = isTrigger
-    // Collider uses parent's position/size
+    
   }
 
   update(dt: number) {
-    // Collider itself does not move, follows parent
+    
     this.x = this.parent.x
     this.y = this.parent.y
     this.width = this.parent.width
@@ -35,10 +35,10 @@ export class ColliderComponent extends Component {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    // Optional: visualize collider for debugging
-    // ctx.save()
-    // ctx.strokeStyle = this.isTrigger ? "orange" : "red"
-    // ctx.strokeRect(this.x, this.y, this.width, this.height)
-    // ctx.restore()
+    
+    
+    
+    
+    
   }
 }

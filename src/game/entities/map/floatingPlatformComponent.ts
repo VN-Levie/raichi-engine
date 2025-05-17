@@ -11,7 +11,7 @@ export class FloatingPlatformComponent extends Component {
     this.y = yTile * TILE_SIZE;
     this.width = widthTiles * TILE_SIZE;
     this.height = TILE_SIZE;
-    this.solid = true; // The platform as a whole is solid
+    this.solid = true; 
     this.zIndex = 1;
 
     let colors = { base: "#8B4513", top: "#A0522D", side: "#654321" };
@@ -23,7 +23,7 @@ export class FloatingPlatformComponent extends Component {
       const blockX = this.x + (i * TILE_SIZE);
 
       const block = new BoxComponent(blockX, this.y, TILE_SIZE, colors.base);
-      block.solid = true; // Each segment contributes to solidity
+      block.solid = true; 
       block.zIndex = 1;
       this.segments.push(block);
 
@@ -51,15 +51,15 @@ export class FloatingPlatformComponent extends Component {
   }
 
   update(dt: number): void {
-    // Platforms are static
+    
   }
 
   render(ctx: CanvasRenderingContext2D): void {
     this.segments.forEach(segment => {
-        // Update segment positions relative to the FloatingPlatformComponent's position
-        // This is important if the FloatingPlatformComponent itself can move.
-        // For now, assuming static platforms, direct rendering is fine.
-        // If platform moves: segment.x = this.x + its_original_offset_x;
+        
+        
+        
+        
         segment.render(ctx);
     });
   }

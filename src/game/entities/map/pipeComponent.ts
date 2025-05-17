@@ -17,9 +17,9 @@ export class PipeComponent extends Component {
     const pipeHeight = heightMultiplier * TILE_SIZE;
 
     this.x = x;
-    this.y = groundLevelY - pipeHeight - 16; // Approximate y for the whole entity
-    this.width = pipeWidth + 16; // Approximate width
-    this.height = pipeHeight + 16; // Approximate height
+    this.y = groundLevelY - pipeHeight - 16; 
+    this.width = pipeWidth + 16; 
+    this.height = pipeHeight + 16; 
     this.solid = true;
     this.zIndex = 5;
 
@@ -43,12 +43,12 @@ export class PipeComponent extends Component {
   }
 
   update(dt: number): void {
-    // Pipes are static
+    
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    // Assuming x,y of PipeComponent is the top-left of the entire pipe structure for scene management
-    // The internal components will render relative to their own defined positions.
+    
+    
     this.pipeBody.render(ctx);
     this.pipeTop.render(ctx);
     this.highlight.render(ctx);

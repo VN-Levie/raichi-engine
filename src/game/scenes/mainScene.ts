@@ -63,12 +63,12 @@ export class MainScene extends Scene {
 
   private isUnderwater: boolean = false;
 
-  // Dynamic cloud properties
+  
   private dynamicCloudsEnabled: boolean = false;
   private dynamicCloudSpawnTimer: number = 0;
   private nextDynamicCloudSpawnTime: number = 0;
-  private readonly MIN_CLOUD_SPAWN_INTERVAL = 4; // seconds
-  private readonly MAX_CLOUD_SPAWN_INTERVAL = 8; // seconds
+  private readonly MIN_CLOUD_SPAWN_INTERVAL = 4; 
+  private readonly MAX_CLOUD_SPAWN_INTERVAL = 8; 
 
   private constructor() {
     super()
@@ -137,11 +137,11 @@ export class MainScene extends Scene {
     this.initialPlayerX = playerInitialXOverride ?? mapData.player.initialX
     this.initialPlayerY = playerInitialYOverride ?? mapData.player.initialY
 
-    // Dynamic clouds setup
+    
     this.dynamicCloudsEnabled = mapData.decorations.dynamicClouds || false;
     if (this.dynamicCloudsEnabled) {
       this.setNextDynamicCloudSpawnTime();
-      this.dynamicCloudSpawnTimer = 0; // Reset timer for the new scene
+      this.dynamicCloudSpawnTimer = 0; 
     }
 
     if (!playerInitialXOverride && !playerInitialYOverride) {
@@ -155,14 +155,14 @@ export class MainScene extends Scene {
 
     this.hudController.getBackToCheckpointButton().onClick = () => this.handleBackToLastCheckpointClick()
     this.hudController.getRestartLevelButton().onClick = () => this.handleRestartLevelClick()
-    this.hudController.getRestartGameButton().onClick = () => this.handleRestartGameClick()
+    this.hudController.getBackToMenuButton().onClick = () => this.handleBackToMenuButton()
 
     this.add(this.hudController.getScoreTextComponent())
     this.add(this.hudController.getLivesTextComponent())
     this.add(this.hudController.getCoinsTextComponent())
     this.add(this.hudController.getBackToCheckpointButton())
     this.add(this.hudController.getRestartLevelButton())
-    this.add(this.hudController.getRestartGameButton())
+    this.add(this.hudController.getBackToMenuButton())
 
 
     this.hudController.updateScore(this.score)
@@ -279,13 +279,13 @@ export class MainScene extends Scene {
   }
 
   private spawnDynamicCloud(): void {
-    const canvasWidth = SceneManager.getScene().components.find(c => c instanceof BoxComponent && c.zIndex === -10)?.width || 800; // A way to get canvas width, or use a constant
+    const canvasWidth = SceneManager.getScene().components.find(c => c instanceof BoxComponent && c.zIndex === -10)?.width || 800; 
 
     const y = Math.random() * 200 + 30;
     const size = Math.random() * 1.0 + 0.8;
     const speed = -(Math.random() * 25 + 25);
 
-    const startX = Camera.x + canvasWidth + Math.random() * 50 + 50; // Start further off-screen and randomized
+    const startX = Camera.x + canvasWidth + Math.random() * 50 + 50; 
 
     const cloud = createCloudComponent({ x: startX, y, size }, speed);
     this.add(cloud);
@@ -411,7 +411,7 @@ export class MainScene extends Scene {
     for (const tornado of this.tornadoes) {
       if (!tornado.enabled || !tornado.isHarmful) continue;
 
-      // Simple AABB collision check
+      
       if (
         this.player.x < tornado.x + tornado.width &&
         this.player.x + this.player.width > tornado.x &&
@@ -520,29 +520,29 @@ export class MainScene extends Scene {
         playerBottom >= blockTop &&
         playerTop < blockBottom
       ) {
-        // Initial collision detected
+        
         let performHorizontalResolution = true;
 
         if (direction === 'horizontal') {
-          // Check if player is essentially walking on top of this block,
-          // rather than hitting its side as a wall.
-          // Condition for walking on top: player's feet are at/near block's top AND player's head is above block's top.
+          
+          
+          
           const playerIsWalkingOnTopOfThisBlock = (playerBottom <= blockTop + 0.1 && playerTop < blockTop);
 
           if (playerIsWalkingOnTopOfThisBlock) {
-            performHorizontalResolution = false; // Don't push back horizontally if just walking over.
+            performHorizontalResolution = false; 
           }
 
           if (performHorizontalResolution) {
-            collided = true; // Mark as collided for horizontal if resolution is performed
-            if (originalX + this.player.width <= blockLeft) { // Player was to the left, moving right
+            collided = true; 
+            if (originalX + this.player.width <= blockLeft) { 
               this.player.x = blockLeft - this.player.width;
-            } else if (originalX >= blockRight) { // Player was to the right, moving left
+            } else if (originalX >= blockRight) { 
               this.player.x = blockRight;
             }
           }
         } else if (direction === 'vertical') {
-          collided = true; // Mark as collided for vertical
+          collided = true; 
           if (originalY !== undefined) {
             if (originalY + this.player.height <= blockTop + 0.01) {
               this.player.y = blockTop - this.player.height;
@@ -566,8 +566,8 @@ export class MainScene extends Scene {
       this.player.setGrounded(isGrounded, isGrounded ? groundY : undefined);
     }
 
-    // For horizontal, 'collided' is true if a push-back occurred.
-    // For vertical, 'isGrounded' indicates a specific type of vertical collision (landing).
+    
+    
     return direction === 'vertical' ? isGrounded : collided;
   }
 
@@ -610,9 +610,17 @@ export class MainScene extends Scene {
   }
 
   override update(dt: number) {
-    if (!this.enabled || !this.player) return
+    if (!this.enabled || !this.player) return;
 
-    // Dynamic cloud spawning
+    
+    
+    if (this.hudController) {
+        this.hudController.getBackToCheckpointButton().update(dt);
+        this.hudController.getRestartLevelButton().update(dt);
+        this.hudController.getBackToMenuButton().update(dt);
+    }
+
+    
     if (this.dynamicCloudsEnabled) {
       this.dynamicCloudSpawnTimer += dt;
       if (this.dynamicCloudSpawnTimer >= this.nextDynamicCloudSpawnTime) {
@@ -623,43 +631,43 @@ export class MainScene extends Scene {
     }
 
     if (this.playerIsCurrentlyDying) {
-      this.player.update(dt)
+      this.player.update(dt);
 
       if (this.player.isDeathAnimationComplete()) {
-        this.playerIsCurrentlyDying = false
-        this.lives--
-        const playerRespawnPoint = this.player.getRespawnPoint()
+        this.playerIsCurrentlyDying = false;
+        this.lives--;
+        const playerRespawnPoint = this.player.getRespawnPoint();
 
-        Camera.resetViewport()
-        SceneManager.setScene(new DeathScene(this.lives, 0, this.lastDeathReason, this.currentMapUrl, this.mapName, playerRespawnPoint.x, playerRespawnPoint.y, this.totalCoinsCollected))
-        return
+        Camera.resetViewport();
+        SceneManager.setScene(new DeathScene(this.lives, this.score, this.lastDeathReason, this.currentMapUrl, this.mapName, playerRespawnPoint.x, playerRespawnPoint.y, this.totalCoinsCollected));
+        return;
       }
 
       for (const enemy of this.enemies) {
         if (enemy.enabled) {
-          enemy.setScene(this.components)
-          enemy.update(dt)
+          enemy.setScene(this.components);
+          enemy.update(dt);
         }
       }
-      Camera.update()
-      return
+      Camera.update();
+      return;
     }
 
-    Camera.update()
+    Camera.update();
 
-    const originalX = this.player.x
-    const originalY = this.player.y
+    const originalX = this.player.x;
+    const originalY = this.player.y;
 
-    this.player.update(dt)
-    const playerVelocityYBeforeCollisionResolution = this.player.velocityY
+    this.player.update(dt);
+    const playerVelocityYBeforeCollisionResolution = this.player.velocityY;
 
-    this.checkAndResolveCollisions('horizontal', originalX)
-    this.checkAndResolveCollisions('vertical', originalX, originalY); // This call now correctly sets isGrounded via player.setGrounded internally.
+    this.checkAndResolveCollisions('horizontal', originalX);
+    this.checkAndResolveCollisions('vertical', originalX, originalY); 
 
     for (const enemy of this.enemies) {
       if (enemy.enabled) {
-        enemy.setScene(this.components)
-        enemy.update(dt)
+        enemy.setScene(this.components);
+        enemy.update(dt);
       }
     }
     for (const tornado of this.tornadoes) {
@@ -667,13 +675,10 @@ export class MainScene extends Scene {
         tornado.update(dt);
       }
     }
-    // Update and cull dynamic clouds
+    
     for (let i = this.components.length - 1; i >= 0; i--) {
       const component = this.components[i];
-      if (component instanceof CloudClusterComponent && component.speedX < 0) { // Check if it's a dynamic cloud
-        // component.x is the cloud's left edge.
-        // component.width is the cloud's width.
-        // Camera.x is the left edge of the viewport.
+      if (component instanceof CloudClusterComponent && component.speedX < 0) { 
         if (component.x + component.width < Camera.x) {
           this.remove(component);
         }
@@ -682,29 +687,29 @@ export class MainScene extends Scene {
 
     for (const coint of this.coins) {
       if (coint.enabled) {
-        coint.update(dt)
+        coint.update(dt);
       }
     }
     for (const lifeItem of this.lifeItems) {
       if (lifeItem.enabled) {
-        lifeItem.update(dt)
+        lifeItem.update(dt);
       }
     }
     for (const checkpoint of this.checkpoints) {
       if (checkpoint.enabled) {
-        checkpoint.update(dt)
+        checkpoint.update(dt);
       }
     }
 
-    this.checkEnemyCollisions(playerVelocityYBeforeCollisionResolution)
+    this.checkEnemyCollisions(playerVelocityYBeforeCollisionResolution);
     this.checkTornadoCollisions();
-    this.checkGoalCollision()
-    this.checkCoinCollisions()
-    this.checkLifeItemCollisions()
-    this.checkCheckpointCollisions()
+    this.checkGoalCollision();
+    this.checkCoinCollisions();
+    this.checkLifeItemCollisions();
+    this.checkCheckpointCollisions();
 
     if (this.player.y > this.gameOverY && !this.player.isDying) {
-      this.handlePlayerDeath("You fell into a pit!")
+      this.handlePlayerDeath("You fell into a pit!");
     }
   }
 
@@ -731,7 +736,7 @@ export class MainScene extends Scene {
         c === this.hudController.getCoinsTextComponent() ||
         c === this.hudController.getBackToCheckpointButton() ||
         c === this.hudController.getRestartLevelButton() ||
-        c === this.hudController.getRestartGameButton()) {
+        c === this.hudController.getBackToMenuButton()) {
         continue
       }
 
@@ -779,10 +784,10 @@ export class MainScene extends Scene {
       ctx.restore()
     }
 
-    const restartGameButton = this.hudController.getRestartGameButton()
-    if (restartGameButton.visible) {
+    const backToMenuButton = this.hudController.getBackToMenuButton()
+    if (backToMenuButton.visible) {
       ctx.save()
-      restartGameButton.render(ctx)
+      backToMenuButton.render(ctx)
       ctx.restore()
     }
   }
@@ -809,11 +814,15 @@ export class MainScene extends Scene {
     })
   }
 
-  private handleRestartGameClick(): void {
-    console.log("Restarting game from beginning.")
-    clearGameState()
-    SceneManager.setScene(new LoadingScene(async () =>
-      MainScene.create('/data/maps/map-1-1.json', 0, INITIAL_LIVES, undefined, undefined, 0)
-    ))
+  private handleBackToMenuButton(): void {
+    
+    
+    
+    
+    
+    console.log("Going back to start scene.")
+    
+    SceneManager.setScene(new StartScene())
+    
   }
 }

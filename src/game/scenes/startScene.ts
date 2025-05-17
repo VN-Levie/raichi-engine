@@ -18,17 +18,17 @@ export class StartScene extends Scene {
     constructor() {
         super();
 
-        Camera.resetViewport(); // Ensure camera is reset for menu scenes
+        Camera.resetViewport(); 
         Camera.setPosition(0, 0);
 
-        const background = new BoxComponent(0, 0, 800, "#1A1A2E"); // Dark blue background
+        const background = new BoxComponent(0, 0, 800, "#1A1A2E"); 
         background.height = 600;
         background.zIndex = -1;
         background.solid = false;
         const originalBgRender = background.render;
         background.render = (ctx) => {
             ctx.save();
-            ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform for full canvas draw
+            ctx.setTransform(1, 0, 0, 1, 0, 0); 
             ctx.fillStyle = background.color;
             ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.restore();
@@ -52,7 +52,7 @@ export class StartScene extends Scene {
             continueButton.y = 280;
             continueButton.width = 200;
             continueButton.height = 50;
-            continueButton.color = "#337AB7"; // Blue
+            continueButton.color = "#337AB7"; 
             continueButton.hoverColor = "#286090";
             continueButton.onClick = () => {
                 SceneManager.setScene(new LoadingScene(async () => MainScene.create(
@@ -69,7 +69,7 @@ export class StartScene extends Scene {
             const newGameButton = new ButtonComponent();
             newGameButton.text = "New Game";
             newGameButton.x = 300;
-            newGameButton.y = 350; // Position below continue
+            newGameButton.y = 350; 
             newGameButton.width = 200;
             newGameButton.height = 50;
             newGameButton.onClick = () => {
@@ -82,7 +82,7 @@ export class StartScene extends Scene {
             const startButton = new ButtonComponent();
             startButton.text = "Start New Game";
             startButton.x = 300;
-            startButton.y = 300; // Centered if no continue button
+            startButton.y = 300; 
             startButton.width = 200;
             startButton.height = 50;
             startButton.onClick = () => {
@@ -94,17 +94,17 @@ export class StartScene extends Scene {
     }
 
     private isRecent(timestamp: number): boolean {
-        const oneDay = 24 * 60 * 60 * 1000; // Milliseconds in a day
+        const oneDay = 24 * 60 * 60 * 1000; 
         return (Date.now() - timestamp) < oneDay;
     }
 
     override render(ctx: CanvasRenderingContext2D): void {
-        // Override to ensure camera is reset before rendering UI elements
+        
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        Camera.reset(ctx); // Reset camera transform for UI
+        Camera.reset(ctx); 
 
-        // Render components without applying camera again
-        this.sortComponents(); // Ensure zIndex is respected
+        
+        this.sortComponents(); 
         for (const c of this.components) {
             if (c.visible) {
                 ctx.save();

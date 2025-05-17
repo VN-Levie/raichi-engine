@@ -4,20 +4,20 @@ import { Input } from "../core/input";
 export class ButtonComponent extends Component {
     public text: string = "Button";
     public font: string = "16px Arial";
-    public color: string = "#4A4A4A"; // Default color
-    public hoverColor: string = "#6A6A6A"; // Default hover color
-    public textColor: string = "#FFFFFF"; // Default text color
+    public color: string = "#4A4A4A"; 
+    public hoverColor: string = "#6A6A6A"; 
+    public textColor: string = "#FFFFFF"; 
     public onClick: (() => void) | null = null;
 
     private isHovering = false;
-    private mouseWasPressedOnButton = false; // Tracks if the current press originated on this button
+    private mouseWasPressedOnButton = false; 
 
     constructor() {
         super();
-        // Default size, can be overridden by setting width/height after creation
+        
         this.width = 150;
         this.height = 40;
-        this.zIndex = 100; // Ensure buttons are typically on top for rendering
+        this.zIndex = 100; 
     }
 
     update(dt: number): void {
@@ -29,39 +29,39 @@ export class ButtonComponent extends Component {
 
         const mouseCurrentlyPressed = Input.isMousePressed();
 
-        // --- DEBUGGING LOGS (uncomment to see detailed button state) ---
-        // console.log(
-        //     `Button "${this.text}": ` +
-        //     `X/Y: ${this.x.toFixed(0)},${this.y.toFixed(0)} | ` +
-        //     `W/H: ${this.width},${this.height} | ` +
-        //     `Mouse: ${Input.mouseX.toFixed(0)},${Input.mouseY.toFixed(0)} | ` +
-        //     `Hover: ${this.isHovering} | ` +
-        //     `MousePressed: ${mouseCurrentlyPressed} | ` +
-        //     `OriginPress: ${this.mouseWasPressedOnButton}`
-        // );
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
         if (this.isHovering && mouseCurrentlyPressed && !this.mouseWasPressedOnButton) {
-            // Mouse was just pressed down while hovering over the button
+            
             this.mouseWasPressedOnButton = true;
-            // console.log(`Button "${this.text}": MOUSE DOWN originated on button.`);
+            
         }
 
         if (this.mouseWasPressedOnButton && this.isHovering && !mouseCurrentlyPressed) {
-            // Mouse was released while hovering over the button, AND the press originated on this button
+            
             if (this.onClick) {
-                // console.log(`Button "${this.text}": CLICKED! Executing onClick.`);
+                
                 this.onClick();
             } else {
-                // console.log(`Button "${this.text}": Clicked, but no onClick handler assigned.`);
+                
             }
-            this.mouseWasPressedOnButton = false; // Reset for the next click cycle
+            this.mouseWasPressedOnButton = false; 
         }
 
-        // If mouse is released (anywhere), or if mouse moves off the button while it was pressed,
-        // reset the state indicating the press originated on this button.
+        
+        
         if (!mouseCurrentlyPressed || (this.mouseWasPressedOnButton && !this.isHovering)) {
             if (this.mouseWasPressedOnButton && !this.isHovering) {
-                // console.log(`Button "${this.text}": Mouse dragged off button while pressed. Resetting origin press.`);
+                
             }
             this.mouseWasPressedOnButton = false;
         }

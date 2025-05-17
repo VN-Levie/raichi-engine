@@ -51,7 +51,7 @@ export class GameOverScene extends Scene {
     retryButton.color = "#444"
     retryButton.hoverColor = "#666"
     retryButton.onClick = async () => {
-        clearGameState(); // Clear save before starting a new attempt from game over
+        clearGameState(); 
         const mapToLoad = this.mapUrlToRestart || '/data/maps/map-1-1.json';
         SceneManager.setScene(new LoadingScene(async () => MainScene.create(mapToLoad, 0, INITIAL_LIVES, undefined, undefined, 0)));
     }
@@ -66,7 +66,7 @@ export class GameOverScene extends Scene {
     menuButton.color = "#444"
     menuButton.hoverColor = "#666"
     menuButton.onClick = () => {
-      clearGameState(); // Clear save when returning to menu
+      clearGameState(); 
       SceneManager.setScene(new StartScene())
     }
     this.add(menuButton)
