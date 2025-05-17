@@ -98,7 +98,7 @@ export class MainScene extends Scene {
     this.livesText.zIndex = 100
     this.add(this.livesText)
 
-    // Initialize UI with current values
+    
     this.updateScoreUI();
     this.updateLivesUI();
 
@@ -114,9 +114,9 @@ export class MainScene extends Scene {
   }
 
   private resetPlayerAndLevel() {
-    // This method is now effectively handled by creating a new MainScene instance
-    // with the correct score and lives, managed by DeathScene.
-    // Kept for clarity, but its direct usage for reset is reduced.
+    
+    
+    
     this.player.resetState(this.initialPlayerX, this.initialPlayerY);
 
     for (const enemy of this.enemies) {
