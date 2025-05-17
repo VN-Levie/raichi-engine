@@ -5,6 +5,7 @@ import { CircleComponent } from "../entities/circleComponent"
 import { Camera } from "../core/camera"
 import { SceneManager } from "../core/sceneManager"
 import { GameOverScene } from "./gameOverScene"
+import { EnemyComponent } from "../game/entities/enemyComponent"
 
 export class MainScene extends Scene {
   private player: BoxComponent
@@ -12,7 +13,8 @@ export class MainScene extends Scene {
   private gravity = 0.45
   private jumpForce = -10
   private isGrounded = false
-  private gameOverY = 600 // Y position threshold for game over
+  private gameOverY = 600
+  private enemies: EnemyComponent[] = []
 
   constructor() {
     super()
@@ -55,10 +57,8 @@ export class MainScene extends Scene {
     this.player.solid = true
     this.add(this.player)
 
-    // Create ground with gaps
     this.createGroundWithGaps()
 
-    // Add bushes
     const bushPositions = [
       { x: 3, size: 3 },
       { x: 12, size: 2 },
@@ -75,26 +75,39 @@ export class MainScene extends Scene {
       this.createMarioBush(bush.x * 32, 300, bush.size)
     }
 
-    // Add pipes on solid ground sections
     this.createPipes()
-
-    // Add floating platforms for gameplay
     this.createFloatingPlatforms()
+    this.createEnemies()
 
     Camera.follow(this.player)
   }
 
-  // Create ground with strategic gaps that require jumping
+  private createEnemies() {
+    const enemyPositions = [
+      { x: 8 * 32, y: 268 },
+      { x: 20 * 32, y: 268 },
+      { x: 32 * 32, y: 268 },
+      { x: 48 * 32, y: 268 },
+      { x: 57 * 32, y: 268 },
+      { x: 67 * 32, y: 268 },
+      { x: 85 * 32, y: 268 },
+    ]
+    
+    for (const pos of enemyPositions) {
+      const enemy = new EnemyComponent(pos.x, pos.y, 32, 32)
+      this.enemies.push(enemy)
+      this.add(enemy)
+    }
+  }
+
   private createGroundWithGaps() {
-    // Define ground segments with fewer, more logical gaps
     const groundSegments = [
-      { start: 0, end: 15 },     // Initial platform
-      { start: 19, end: 40 },    // Long middle section
-      { start: 44, end: 70 },    // Another long section
-      { start: 74, end: 100 }    // Final section
+      { start: 0, end: 15 },
+      { start: 19, end: 40 },
+      { start: 44, end: 70 },
+      { start: 74, end: 100 }
     ]
 
-    // Create ground blocks based on defined segments
     for (const segment of groundSegments) {
       for (let i = segment.start; i <= segment.end; i++) {
         const g = new BoxComponent(i * 32, 300, 32, "green")
@@ -107,21 +120,16 @@ export class MainScene extends Scene {
     }
   }
 
-  // Add pipes at different positions with heights that player can jump over
   private createPipes() {
-    // Only place pipes on solid ground, with varying heights
     const pipePositions = [
-      { x: 5, height: 2 },     // Small pipe on first section
-      { x: 12, height: 3 },    // Medium pipe on first section
-      
-      { x: 25, height: 4 },    // Tall pipe on middle section (needs platforms to climb)
-      { x: 35, height: 2 },    // Small pipe on middle section
-      
-      { x: 50, height: 5 },    // Very tall pipe (needs stair-like platforms to climb)
-      { x: 60, height: 3 },    // Medium pipe
-      
-      { x: 80, height: 3 },    // Medium pipe on final section
-      { x: 90, height: 2 },    // Small pipe near end
+      { x: 5, height: 2 },
+      { x: 12, height: 3 },
+      { x: 25, height: 4 },
+      { x: 35, height: 2 },
+      { x: 50, height: 5 },
+      { x: 60, height: 3 },
+      { x: 80, height: 3 },
+      { x: 90, height: 2 },
     ]
 
     for (const pipe of pipePositions) {
@@ -129,28 +137,17 @@ export class MainScene extends Scene {
     }
   }
 
-  // Create better-looking floating platforms to help with navigation
   private createFloatingPlatforms() {
-    // Strategic platforms - both for gaps and for climbing tall pipes
     const platforms = [
-      // Platforms for the first gap
       { x: 16, y: 8, width: 3, style: 'stone' },
-      
-      // Stair-like platforms to climb the tall pipe at x=25
-      { x: 23, y: 7, width: 2, style: 'stone' }, // First step
-      { x: 24, y: 5, width: 2, style: 'stone' }, // Second step
-      { x: 26, y: 3, width: 2, style: 'stone' }, // Top step (allows jumping over pipe)
-      
-      // Platform for the second gap
+      { x: 23, y: 7, width: 2, style: 'stone' },
+      { x: 24, y: 5, width: 2, style: 'stone' },
+      { x: 26, y: 3, width: 2, style: 'stone' },
       { x: 41, y: 7, width: 3, style: 'stone' },
-      
-      // Stair-like platforms to climb the very tall pipe at x=50
-      { x: 48, y: 8, width: 2, style: 'stone' }, // First step
-      { x: 49, y: 6, width: 2, style: 'stone' }, // Second step
-      { x: 51, y: 4, width: 2, style: 'stone' }, // Third step
-      { x: 52, y: 2, width: 2, style: 'stone' }, // Top step
-      
-      // Platform for the third gap
+      { x: 48, y: 8, width: 2, style: 'stone' },
+      { x: 49, y: 6, width: 2, style: 'stone' },
+      { x: 51, y: 4, width: 2, style: 'stone' },
+      { x: 52, y: 2, width: 2, style: 'stone' },
       { x: 71, y: 7, width: 3, style: 'stone' },
     ]
     
@@ -162,39 +159,34 @@ export class MainScene extends Scene {
   private createStylizedPlatform(x: number, y: number, width: number, style: string) {
     const blockY = y * 32
     
-    // Colors for different platform styles
     let colors = {
-      base: "#8B4513", // Brown
-      top: "#A0522D",  // Lighter brown
-      side: "#654321"  // Darker brown
+      base: "#8B4513",
+      top: "#A0522D",
+      side: "#654321"
     }
     
     if (style === 'stone') {
       colors = {
-        base: "#696969", // Dark gray
-        top: "#A9A9A9",  // Medium gray
-        side: "#555555"  // Darker gray
+        base: "#696969",
+        top: "#A9A9A9",
+        side: "#555555"
       }
     }
     
-    // Create base blocks for the platform
     for (let i = 0; i < width; i++) {
       const blockX = (x + i) * 32
       
-      // Main block
       const block = new BoxComponent(blockX, blockY, 32, colors.base)
       block.solid = true
       block.zIndex = 1
       this.add(block)
       
-      // Top highlight (smaller rectangle on top)
       const topHighlight = new BoxComponent(blockX, blockY, 32, colors.top)
       topHighlight.height = 8
       topHighlight.solid = false
       topHighlight.zIndex = 2
       this.add(topHighlight)
       
-      // Side highlight for first block
       if (i === 0) {
         const leftHighlight = new BoxComponent(blockX, blockY, 6, colors.side)
         leftHighlight.height = 32
@@ -203,7 +195,6 @@ export class MainScene extends Scene {
         this.add(leftHighlight)
       }
       
-      // Side highlight for last block
       if (i === width - 1) {
         const rightHighlight = new BoxComponent(blockX + 26, blockY, 6, colors.side)
         rightHighlight.height = 32
@@ -215,14 +206,12 @@ export class MainScene extends Scene {
   }
 
   private createMarioPipe(x: number, groundY: number, height: number) {
-    const pipeWidth = 64 // 2 blocks wide
-    const pipeColor = "#00AA00" // Green color
-    const pipeBorderColor = "#008800" // Darker green for borders/highlights
+    const pipeWidth = 64
+    const pipeColor = "#00AA00"
+    const pipeBorderColor = "#008800"
     
-    // Calculate the total height of the pipe (in pixels)
     const pipeHeight = height * 32
     
-    // Create pipe body (main shaft)
     const pipeBody = new BoxComponent(x, groundY - pipeHeight, pipeWidth, pipeColor)
     pipeBody.width = pipeWidth
     pipeBody.height = pipeHeight
@@ -230,7 +219,6 @@ export class MainScene extends Scene {
     pipeBody.solid = true
     this.add(pipeBody)
     
-    // Create pipe top (the lip at the top of the pipe)
     const pipeTopHeight = 16
     const pipeTopWidth = pipeWidth + 16
     const pipeTop = new BoxComponent(x - 8, groundY - pipeHeight - pipeTopHeight, pipeTopWidth, pipeColor)
@@ -240,15 +228,13 @@ export class MainScene extends Scene {
     pipeTop.solid = true
     this.add(pipeTop)
     
-    // Add highlight to the left side of the pipe (light reflection)
     const highlight = new BoxComponent(x + 8, groundY - pipeHeight, 16, pipeBorderColor)
     highlight.width = 16
     highlight.height = pipeHeight
     highlight.zIndex = 6
-    highlight.solid = false // Highlight is visual only
+    highlight.solid = false
     this.add(highlight)
     
-    // Add highlight to the top left of the pipe top
     const topHighlight = new BoxComponent(x - 0, groundY - pipeHeight - pipeTopHeight, 24, pipeBorderColor)
     topHighlight.width = 24
     topHighlight.height = pipeTopHeight / 2
@@ -290,105 +276,92 @@ export class MainScene extends Scene {
   }
 
   private createMarioBush(x: number, groundY: number, size: number) {
-    // Color palette for authentic Mario-style bushes
-    const darkGreen = "#025d02";  // Darker base color
-    const lightGreen = "#00c800"; // Brighter highlight color
+    const darkGreen = "#025d02"
+    const lightGreen = "#00c800"
     
-    // Bush dimensions
-    const bushWidth = size * 32;
-    const bushHeight = 24 + size * 8; // Taller bushes for larger sizes
+    const bushWidth = size * 32
+    const bushHeight = 24 + size * 8
     
-    // Embed the bush slightly into the ground (8 pixels)
-    const embedDepth = 16;
-    const bushY = groundY - bushHeight + embedDepth;
+    const embedDepth = 16
+    const bushY = groundY - bushHeight + embedDepth
     
-    // Create cloud-like bush structures using circles
-    
-    // Base (bottom layer)
     for (let i = 0; i < size; i++) {
       const circle = new CircleComponent(
         x + 16 + i * 32, 
-        groundY - 16 + embedDepth, // Move down by embedDepth
+        groundY - 16 + embedDepth,
         16, 
         darkGreen
-      );
-      circle.zIndex = -1; // Set to negative so ground covers the bottom
-      circle.solid = false;
-      this.add(circle);
+      )
+      circle.zIndex = -1
+      circle.solid = false
+      this.add(circle)
     }
     
-    // Middle layer (slightly smaller, offset upward)
     if (size > 1) {
       for (let i = 0; i < size - 1; i++) {
         const circle = new CircleComponent(
           x + 32 + i * 32, 
-          groundY - 32 + embedDepth, // Move down by embedDepth
+          groundY - 32 + embedDepth,
           16, 
           darkGreen
-        );
-        circle.zIndex = -1;
-        circle.solid = false;
-        this.add(circle);
+        )
+        circle.zIndex = -1
+        circle.solid = false
+        this.add(circle)
       }
     }
     
-    // Top layer (for larger bushes)
     if (size > 2) {
       for (let i = 0; i < size - 2; i++) {
         const circle = new CircleComponent(
           x + 48 + i * 32, 
-          groundY - 48 + embedDepth, // Move down by embedDepth
+          groundY - 48 + embedDepth,
           16, 
           darkGreen
-        );
-        circle.zIndex = -1;
-        circle.solid = false;
-        this.add(circle);
+        )
+        circle.zIndex = -1
+        circle.solid = false
+        this.add(circle)
       }
     }
     
-    // Add highlights (smaller light green circles)
-    
-    // Bottom layer highlights
     for (let i = 0; i < size; i++) {
       const highlight = new CircleComponent(
         x + 12 + i * 32, 
-        groundY - 20 + embedDepth, // Move down by embedDepth
+        groundY - 20 + embedDepth,
         8, 
         lightGreen
-      );
-      highlight.zIndex = -1;
-      highlight.solid = false;
-      this.add(highlight);
+      )
+      highlight.zIndex = -1
+      highlight.solid = false
+      this.add(highlight)
     }
     
-    // Middle layer highlights
     if (size > 1) {
       for (let i = 0; i < size - 1; i++) {
         const highlight = new CircleComponent(
           x + 28 + i * 32, 
-          groundY - 36 + embedDepth, // Move down by embedDepth
+          groundY - 36 + embedDepth,
           8, 
           lightGreen
-        );
-        highlight.zIndex = -1;
-        highlight.solid = false;
-        this.add(highlight);
+        )
+        highlight.zIndex = -1
+        highlight.solid = false
+        this.add(highlight)
       }
     }
     
-    // Top layer highlights
     if (size > 2) {
       for (let i = 0; i < size - 2; i++) {
         const highlight = new CircleComponent(
           x + 44 + i * 32, 
-          groundY - 52 + embedDepth, // Move down by embedDepth
+          groundY - 52 + embedDepth,
           8, 
           lightGreen
-        );
-        highlight.zIndex = -1;
-        highlight.solid = false;
-        this.add(highlight);
+        )
+        highlight.zIndex = -1
+        highlight.solid = false
+        this.add(highlight)
       }
     }
   }
@@ -400,10 +373,8 @@ export class MainScene extends Scene {
     const originalX = this.player.x
     const originalY = this.player.y
 
-    // Update horizontal position with boundary check for left edge
     if (Input.isKeyDown("ArrowLeft")) {
       this.player.x -= speed
-      // Add left boundary check (prevent going past x=0)
       if (this.player.x < 0) {
         this.player.x = 0
       }
@@ -422,9 +393,50 @@ export class MainScene extends Scene {
       this.velocityY = this.jumpForce
     }
 
-    // Check for game over (falling off the screen)
+    // Update all enemies first
+    for (const enemy of this.enemies) {
+      enemy.update(dt)
+    }
+
+    // Then check collisions
+    this.checkEnemyCollisions()
+
     if (this.player.y > this.gameOverY) {
-      SceneManager.setScene(new GameOverScene())
+      SceneManager.setScene(new GameOverScene("You fell into a pit!"))
+    }
+  }
+
+  private checkEnemyCollisions() {
+    for (const enemy of this.enemies) {
+      if (!enemy.isAlive) continue
+      
+      const playerLeft = this.player.x
+      const playerRight = this.player.x + this.player.width
+      const playerTop = this.player.y
+      const playerBottom = this.player.y + this.player.height
+      
+      const enemyLeft = enemy.x
+      const enemyRight = enemy.x + enemy.width
+      const enemyTop = enemy.y
+      const enemyBottom = enemy.y + enemy.height
+      
+      // Check if there's any overlap between player and enemy
+      if (
+        playerRight > enemyLeft &&
+        playerLeft < enemyRight &&
+        playerBottom > enemyTop &&
+        playerTop < enemyBottom
+      ) {
+        const safeLanding = enemy.checkPlayerCollision(this.player)
+        
+        if (!safeLanding) {
+          // Player jumped on enemy - bounce up
+          this.velocityY = -5
+        } else {
+          // Player hit enemy from the side - game over
+          SceneManager.setScene(new GameOverScene("You were defeated by an enemy!"))
+        }
+      }
     }
   }
 

@@ -7,27 +7,33 @@ import { MainScene } from "./mainScene"
 import { BoxComponent } from "../entities/boxComponent"
 
 export class GameOverScene extends Scene {
-  constructor() {
+  constructor(message: string = "Game Over") {
     super()
 
-    // Add dark background overlay
     const background = new BoxComponent(0, 0, 800, "rgba(0, 0, 0, 0.7)")
     background.height = 600
     background.zIndex = -1
     background.solid = false
+    
+    const originalRender = background.render
+    background.render = (ctx) => {
+      ctx.save()
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.fillStyle = background.color
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+      ctx.restore()
+    }
+    
     this.add(background)
 
-    // Game Over title
     const gameOverText = new TextComponent("Game Over", 400, 150, "bold 64px Arial", "red")
     gameOverText.align = "center"
     this.add(gameOverText)
 
-    // Subtitle message
-    const subtitleText = new TextComponent("You fell into a pit!", 400, 220, "24px Arial", "white")
+    const subtitleText = new TextComponent(message, 400, 220, "24px Arial", "white")
     subtitleText.align = "center"
     this.add(subtitleText)
 
-    // Retry button
     const retryButton = new ButtonComponent()
     retryButton.text = "Play Again"
     retryButton.x = 300
@@ -41,7 +47,6 @@ export class GameOverScene extends Scene {
     }
     this.add(retryButton)
 
-    // Menu button
     const menuButton = new ButtonComponent()
     menuButton.text = "Return to Menu"
     menuButton.x = 300
