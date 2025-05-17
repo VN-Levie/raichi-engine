@@ -13,6 +13,7 @@ import { FlagPoleComponent } from "../entities/map/flagPoleComponent";
 import { CheckpointComponent } from "../entities/map/checkpointComponent";
 import { CoinComponent } from "../entities/collectable/coinComponent";
 import { LifeItemComponent } from "../entities/collectable/lifeItemComponent";
+import { BaseEnemyComponent } from "../entities/enemy/baseEnemyComponent";
 
 export function createCloudComponent(cloudConfig: MapData['decorations']['clouds'][0]): CloudClusterComponent {
   return new CloudClusterComponent(cloudConfig.x, cloudConfig.y, cloudConfig.size);
@@ -37,19 +38,18 @@ export function createFloatingPlatformComponent(platformConfig: MapData['terrain
 export function createEnemy(
     enemyConfig: MapData['enemies']['positions'][0], 
     yPosition: number, 
-    sceneComponents: Component[]): Component { 
+    sceneComponents: Component[]): BaseEnemyComponent { 
   
   const enemyType = enemyConfig.type || "goomba"; 
 
-  let enemy: Component;
+  let enemy: BaseEnemyComponent;
 
   if (enemyType === "turtle") {
     enemy = new TurtleEnemyComponent(enemyConfig.xTile * TILE_SIZE, yPosition, TILE_SIZE, TILE_SIZE);
-    (enemy as TurtleEnemyComponent).setScene(sceneComponents);
   } else { 
     enemy = new GoombaEnemyComponent(enemyConfig.xTile * TILE_SIZE, yPosition, TILE_SIZE, TILE_SIZE);
-    (enemy as GoombaEnemyComponent).setScene(sceneComponents);
   }
+  enemy.setScene(sceneComponents);
   return enemy;
 }
 

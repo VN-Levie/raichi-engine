@@ -30,11 +30,12 @@ import { LoadingScene } from "./LoadingScene";
 import { CheckpointComponent } from "../entities/map/checkpointComponent";
 import { CoinComponent } from "../entities/collectable/coinComponent";
 import { LifeItemComponent } from "../entities/collectable/lifeItemComponent";
+import { BaseEnemyComponent } from "../entities/enemy/baseEnemyComponent";
 
 export class MainScene extends Scene {
   private player!: PlayerComponent
   private gameOverY!: number
-  private enemies: (GoombaEnemyComponent | TurtleEnemyComponent)[] = []
+  private enemies: BaseEnemyComponent[] = []
   private newGroundLevelY!: number
   private goalComponent: GoalComponent | null = null
   private currentMapUrl!: string
@@ -255,7 +256,7 @@ export class MainScene extends Scene {
     const enemyYPosition = this.newGroundLevelY + mapData.enemies.yOffsetFromGround
     this.enemies = []
     for (const pos of mapData.enemies.positions) {
-      const enemy = createEnemy(pos, enemyYPosition, this.components) as GoombaEnemyComponent | TurtleEnemyComponent
+      const enemy = createEnemy(pos, enemyYPosition, this.components) as BaseEnemyComponent
       this.enemies.push(enemy)
       this.add(enemy)
     }
@@ -265,18 +266,13 @@ export class MainScene extends Scene {
     if (this.playerIsCurrentlyDying || this.player.isDying) return
 
     for (const enemy of this.enemies) {
+      if (!enemy.isAlive || !enemy.enabled) continue
 
-      let isEnemyHarmful = false;
-      if (enemy instanceof TurtleEnemyComponent) {
-        isEnemyHarmful = enemy.isHarmfulOnContact();
-      } else if (enemy instanceof GoombaEnemyComponent) {
-        isEnemyHarmful = enemy.isAlive;
-      } else {
-        isEnemyHarmful = (enemy as any).isAlive !== undefined ? (enemy as any).isAlive : true;
+      const isEnemyHarmful = enemy.isHarmfulOnContact()
+
+      if (!isEnemyHarmful && !(enemy instanceof TurtleEnemyComponent && enemy.isShelled && !enemy.isMovingInShell)) {
+        continue
       }
-
-      if (!isEnemyHarmful || !enemy.enabled) continue;
-
 
       const playerFeetY = this.player.y + this.player.height
       const playerPrevFeetY = playerFeetY - playerVelocityYBeforeCollisionResolution
@@ -290,52 +286,42 @@ export class MainScene extends Scene {
       const enemyLeft = enemy.x
       const enemyRight = enemy.x + enemy.width
 
-
       if (
         playerRight > enemyLeft &&
         playerLeft < enemyRight &&
         playerBottom > enemyTop &&
         playerTop < enemyBottom
       ) {
+        const isFalling = playerVelocityYBeforeCollisionResolution > 0
+        const wasAbove = playerPrevFeetY <= enemyTop + 2
+        const landedOnTop = playerFeetY >= enemyTop && playerFeetY <= enemyTop + Math.min(10, enemy.height * 0.3)
 
-        const isFalling = playerVelocityYBeforeCollisionResolution > 0;
-        const wasAbove = playerPrevFeetY <= enemyTop + 2;
-        const landedOnTop = playerFeetY >= enemyTop && playerFeetY <= enemyTop + Math.min(10, enemy.height * 0.3);
-
-        let stompedEnemy = false;
+        let stompedEnemy = false
         if (isFalling && wasAbove && landedOnTop) {
-          if (enemy instanceof TurtleEnemyComponent) {
-            enemy.stomp();
+          enemy.stomp()
+          this.score += 10
+          this.hudController.updateScore(this.score)
+          stompedEnemy = true
 
-            if (enemy.isShelled && !enemy.isMovingInShell) {
-              this.player.bounceOffEnemySlightly();
-            } else {
-              this.player.bounceOffEnemy();
-            }
-            this.score += 10;
-            this.hudController.updateScore(this.score);
-            stompedEnemy = true;
-          } else if (enemy instanceof GoombaEnemyComponent) {
-            enemy.stomp();
-            this.player.bounceOffEnemy();
-            this.score += 10;
-            this.hudController.updateScore(this.score);
-            stompedEnemy = true;
+          if (enemy instanceof TurtleEnemyComponent && enemy.isShelled && !enemy.isMovingInShell) {
+            this.player.bounceOffEnemySlightly()
+          } else {
+            this.player.bounceOffEnemy()
           }
         }
 
-        if (!stompedEnemy) {
-
-
-
-          let playerDies = true;
+        if (!stompedEnemy && isEnemyHarmful) {
+          let playerDies = true
           if (enemy instanceof TurtleEnemyComponent) {
-            playerDies = enemy.hitByPlayerNonStomp();
+            if (enemy.isShelled && !enemy.isMovingInShell) {
+              playerDies = enemy.hitByPlayerNonStomp()
+            } else {
+              playerDies = true
+            }
           }
 
-
           if (playerDies) {
-            this.handlePlayerDeath("You were defeated by an enemy!");
+            this.handlePlayerDeath("You were defeated by an enemy!")
           }
         }
       }
