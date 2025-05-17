@@ -9,10 +9,11 @@
     "strictNullChecks": true,
     "esModuleInterop": true,
     // "verbatimModuleSyntax": true,
-    "resolveJsonModule": false
+    "resolveJsonModule": false,
+    "declaration": true,
+    "emitDeclarationOnly": false
   },
   "include": [
-    "src/**/*",
-    "scripts"
+    "src/**/*"
   ]
 }

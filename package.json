@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc && tsc-alias && node scripts/fixImportExtension.js",
     "start": "node dist/server.js",
@@ -10,8 +12,9 @@
     "postcompile": "tsc-alias && node scripts/fixImportExtension.js",
     "start:server": "nodemon --watch dist --ext js,mjs,json --delay 1s dist/server.js",
     "postcompile:and:start": "npm run postcompile --silent && npm run start:server",
-    "watch:build": "tsc-watch --onSuccess \"npm run postcompile --silent --noClear\""
-
+    "watch:build": "tsc-watch --onSuccess \"npm run postcompile --silent --noClear\"",
+    "build:init:old": "tsc scripts/raichi-init.ts --outDir dist/scripts",
+    "build:init": "tsc -p scripts/tsconfig.json"
   },
   "keywords": [],
   "author": "",
@@ -30,5 +33,8 @@
     "tsc-watch": "^6.2.1",
     "typescript": "^5.8.3",
     "undici-types": "^7.9.0"
+  },
+  "bin": {
+    "raichi-init": "./dist/scripts/raichi-init.js"
   }
 }
