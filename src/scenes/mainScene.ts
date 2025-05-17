@@ -1,20 +1,17 @@
 import { Scene } from "../core/scene"
-import { Input } from "../core/input"
 import { BoxComponent } from "../entities/boxComponent"
 import { CircleComponent } from "../entities/circleComponent"
 import { Camera } from "../core/camera"
 import { SceneManager } from "../core/sceneManager"
 import { GameOverScene } from "./gameOverScene"
 import { EnemyComponent } from "../game/entities/enemyComponent"
+import { PlayerComponent } from "../game/entities/playerComponent"
 
 export class MainScene extends Scene {
-  private player: BoxComponent
-  private velocityY = 0
-  private gravity = 0.45
-  private jumpForce = -10
-  private isGrounded = false
-  private gameOverY = 600
+  private player: PlayerComponent
+  private gameOverY = 750 // Adjusted gameOverY
   private enemies: EnemyComponent[] = []
+  private newGroundLevelY = 450 // New ground level
 
   constructor() {
     super()
@@ -50,14 +47,12 @@ export class MainScene extends Scene {
       this.createDetailedCloud(cloudPos.x, cloudPos.y, cloudPos.size)
     }
 
-    this.player = new BoxComponent(100, 100, 32, "blue")
-    this.player.width = 32
-    this.player.height = 32
-    this.player.zIndex = 10
-    this.player.solid = true
-    this.add(this.player)
-
+    // Create ground first to ensure it's available for collision checks
     this.createGroundWithGaps()
+
+    // Create player with a higher initial position to give it time to fall naturally
+    this.player = new PlayerComponent(150, 100) // Player starts at y=100, will fall to new ground
+    this.add(this.player)
 
     const bushPositions = [
       { x: 3, size: 3 },
@@ -72,29 +67,33 @@ export class MainScene extends Scene {
     ]
 
     for (const bush of bushPositions) {
-      this.createMarioBush(bush.x * 32, 300, bush.size)
+      this.createMarioBush(bush.x * 32, this.newGroundLevelY, bush.size) // Use newGroundLevelY
     }
 
     this.createPipes()
     this.createFloatingPlatforms()
+
+    // Create enemies last
     this.createEnemies()
 
     Camera.follow(this.player)
   }
 
   private createEnemies() {
+    const enemyYPosition = this.newGroundLevelY - 32 // Enemies on top of the new ground
     const enemyPositions = [
-      { x: 8 * 32, y: 268 },
-      { x: 20 * 32, y: 268 },
-      { x: 32 * 32, y: 268 },
-      { x: 48 * 32, y: 268 },
-      { x: 57 * 32, y: 268 },
-      { x: 67 * 32, y: 268 },
-      { x: 85 * 32, y: 268 },
+      { x: 8 * 32, y: enemyYPosition },
+      { x: 20 * 32, y: enemyYPosition },
+      { x: 32 * 32, y: enemyYPosition },
+      { x: 48 * 32, y: enemyYPosition },
+      { x: 57 * 32, y: enemyYPosition },
+      { x: 67 * 32, y: enemyYPosition },
+      { x: 85 * 32, y: enemyYPosition },
     ]
     
     for (const pos of enemyPositions) {
       const enemy = new EnemyComponent(pos.x, pos.y, 32, 32)
+      enemy.setScene(this.components)
       this.enemies.push(enemy)
       this.add(enemy)
     }
@@ -106,49 +105,80 @@ export class MainScene extends Scene {
       { start: 19, end: 40 },
       { start: 44, end: 70 },
       { start: 74, end: 100 }
-    ]
+    ];
+
+    const groundColor = "#A0522D"; // Sienna
+    const groundTopHighlightColor = "#DEB887"; // BurlyWood
+    const groundTextureColor = "#8B4513"; // SaddleBrown for texture lines
 
     for (const segment of groundSegments) {
       for (let i = segment.start; i <= segment.end; i++) {
-        const g = new BoxComponent(i * 32, 300, 32, "green")
-        g.width = 32
-        g.height = 32
-        g.zIndex = 0
-        g.solid = true
-        this.add(g)
+        const blockX = i * 32;
+        const blockY = this.newGroundLevelY; // Use new ground level
+
+        // Main ground block
+        const g = new BoxComponent(blockX, blockY, 32, groundColor);
+        g.width = 32;
+        g.height = 32;
+        g.zIndex = 0;
+        g.solid = true;
+        
+        // Custom render for texture
+        const originalGroundRender = g.render.bind(g);
+        g.render = (ctx) => {
+          originalGroundRender(ctx); // Draw base color
+
+          // Draw texture lines
+          ctx.fillStyle = groundTextureColor;
+          const lineThickness = 2;
+          const numLines = 3;
+          const lineSpacing = g.height / (numLines + 1);
+          for (let j = 1; j <= numLines; j++) {
+            ctx.fillRect(g.x, g.y + j * lineSpacing - lineThickness / 2, g.width, lineThickness);
+          }
+        }
+        this.add(g);
+
+        // Top highlight for the ground block
+        const topHighlight = new BoxComponent(blockX, blockY, 32, groundTopHighlightColor);
+        topHighlight.height = 6; 
+        topHighlight.solid = false; 
+        topHighlight.zIndex = 1; 
+        this.add(topHighlight);
       }
     }
   }
 
   private createPipes() {
     const pipePositions = [
-      { x: 5, height: 2 },
-      { x: 12, height: 3 },
-      { x: 25, height: 4 },
-      { x: 35, height: 2 },
-      { x: 50, height: 5 },
-      { x: 60, height: 3 },
-      { x: 80, height: 3 },
-      { x: 90, height: 2 },
+      { x: 5, height: 1.5 },
+      { x: 12, height: 2 },
+      { x: 25, height: 2.5 },
+      { x: 35, height: 1.5 },
+      { x: 50, height: 2.5 },
+      { x: 60, height: 2 },
+      { x: 80, height: 2 },
+      { x: 90, height: 1.5 },
     ]
 
     for (const pipe of pipePositions) {
-      this.createMarioPipe(pipe.x * 32, 300, pipe.height)
+      this.createMarioPipe(pipe.x * 32, this.newGroundLevelY, pipe.height) // Use newGroundLevelY
     }
   }
 
   private createFloatingPlatforms() {
+    // Adjust y-values to lower platforms. (Original ground 300, new 450. Diff 150. 150/32 ~ 4.7 blocks. Add 5 to y)
     const platforms = [
-      { x: 16, y: 8, width: 3, style: 'stone' },
-      { x: 23, y: 7, width: 2, style: 'stone' },
-      { x: 24, y: 5, width: 2, style: 'stone' },
-      { x: 26, y: 3, width: 2, style: 'stone' },
-      { x: 41, y: 7, width: 3, style: 'stone' },
-      { x: 48, y: 8, width: 2, style: 'stone' },
-      { x: 49, y: 6, width: 2, style: 'stone' },
-      { x: 51, y: 4, width: 2, style: 'stone' },
-      { x: 52, y: 2, width: 2, style: 'stone' },
-      { x: 71, y: 7, width: 3, style: 'stone' },
+      { x: 10, y: 6 + 5, width: 3, style: 'stone' },
+      { x: 18, y: 5 + 5, width: 2, style: 'stone' },
+      { x: 22, y: 4 + 5, width: 3, style: 'stone' },
+      { x: 30, y: 7 + 5, width: 2, style: 'stone' },
+      { x: 38, y: 6 + 5, width: 3, style: 'stone' },
+      { x: 45, y: 5 + 5, width: 2, style: 'stone' },
+      { x: 55, y: 4 + 5, width: 3, style: 'stone' },
+      { x: 65, y: 6 + 5, width: 2, style: 'stone' },
+      { x: 75, y: 5 + 5, width: 3, style: 'stone' },
+      { x: 88, y: 7 + 5, width: 2, style: 'stone' },
     ]
     
     for (const platform of platforms) {
@@ -157,19 +187,19 @@ export class MainScene extends Scene {
   }
 
   private createStylizedPlatform(x: number, y: number, width: number, style: string) {
-    const blockY = y * 32
+    const blockY = y * 32 // y is now adjusted in createFloatingPlatforms
     
-    let colors = {
-      base: "#8B4513",
-      top: "#A0522D",
-      side: "#654321"
+    let colors = { // Default to wood-like
+      base: "#8B4513", // SaddleBrown
+      top: "#A0522D",  // Sienna
+      side: "#654321"  // Dark Brown
     }
     
     if (style === 'stone') {
       colors = {
-        base: "#696969",
-        top: "#A9A9A9",
-        side: "#555555"
+        base: "#778899", // LightSlateGray - a bit more distinct
+        top: "#D3D3D3",  // LightGray - for a brighter top
+        side: "#464E57"  // Darker Slate Gray variant for side
       }
     }
     
@@ -205,7 +235,7 @@ export class MainScene extends Scene {
     }
   }
 
-  private createMarioPipe(x: number, groundY: number, height: number) {
+  private createMarioPipe(x: number, groundY: number, height: number) { // groundY is now this.newGroundLevelY
     const pipeWidth = 64
     const pipeColor = "#00AA00"
     const pipeBorderColor = "#008800"
@@ -275,7 +305,7 @@ export class MainScene extends Scene {
     }
   }
 
-  private createMarioBush(x: number, groundY: number, size: number) {
+  private createMarioBush(x: number, groundY: number, size: number) { // groundY is now this.newGroundLevelY
     const darkGreen = "#025d02"
     const lightGreen = "#00c800"
     
@@ -367,125 +397,153 @@ export class MainScene extends Scene {
   }
 
   override update(dt: number) {
-    const speed = 3
     Camera.update()
 
+    // Store original position for collision resolution
     const originalX = this.player.x
     const originalY = this.player.y
 
-    if (Input.isKeyDown("ArrowLeft")) {
-      this.player.x -= speed
-      if (this.player.x < 0) {
-        this.player.x = 0
-      }
-    }
-    
-    if (Input.isKeyDown("ArrowRight")) this.player.x += speed
+    // Update player physics
+    this.player.update(dt)
+    // Capture velocityY *after* player.update (gravity applied) but *before* collision resolution
+    const playerVelocityYBeforeCollisionResolution = this.player.velocityY;
 
+    // Check horizontal collisions first
     this.checkAndResolveCollisions('horizontal', originalX)
+    
+    // Check vertical collisions and set grounded state
+    const isGrounded = this.checkAndResolveCollisions('vertical', originalX, originalY)
+    this.player.setGrounded(isGrounded)
 
-    this.velocityY += this.gravity
-    this.player.y += this.velocityY
-
-    this.isGrounded = this.checkAndResolveCollisions('vertical', originalX, originalY)
-
-    if (this.isGrounded && Input.isKeyPressed("ArrowUp")) {
-      this.velocityY = this.jumpForce
-    }
-
-    // Update all enemies first
+    // Update enemies after player
     for (const enemy of this.enemies) {
+      enemy.setScene(this.components)
       enemy.update(dt)
     }
 
-    // Then check collisions
-    this.checkEnemyCollisions()
+    // Check enemy collisions, passing the velocity before it might have been reset by landing
+    this.checkEnemyCollisions(playerVelocityYBeforeCollisionResolution)
 
-    if (this.player.y > this.gameOverY) {
+    // Check for falling off the screen
+    if (this.player.y > this.gameOverY) { // Check against adjusted gameOverY
       SceneManager.setScene(new GameOverScene("You fell into a pit!"))
     }
   }
 
-  private checkEnemyCollisions() {
+  private checkEnemyCollisions(playerVelocityYBeforeCollisionResolution: number) {
     for (const enemy of this.enemies) {
-      if (!enemy.isAlive) continue
-      
-      const playerLeft = this.player.x
-      const playerRight = this.player.x + this.player.width
-      const playerTop = this.player.y
-      const playerBottom = this.player.y + this.player.height
-      
-      const enemyLeft = enemy.x
-      const enemyRight = enemy.x + enemy.width
-      const enemyTop = enemy.y
-      const enemyBottom = enemy.y + enemy.height
-      
-      // Check if there's any overlap between player and enemy
+      if (!enemy.isAlive) continue;
+
+      const playerFeetY = this.player.y + this.player.height;
+      // Calculate player's previous foot position based on the velocity *before* collision resolution.
+      // playerFeetY is the position *after* collision resolution (player might be on top of enemy).
+      // Subtracting playerVelocityYBeforeCollisionResolution gives the foot position before that movement.
+      const playerPrevFeetY = playerFeetY - playerVelocityYBeforeCollisionResolution; 
+      const playerLeft = this.player.x;
+      const playerRight = this.player.x + this.player.width;
+      const playerTop = this.player.y;
+
+      const enemyTop = enemy.y;
+      const enemyBottom = enemy.y + enemy.height;
+      const enemyLeft = enemy.x;
+      const enemyRight = enemy.x + enemy.width;
+
+      // Check for collision (AABB)
       if (
         playerRight > enemyLeft &&
         playerLeft < enemyRight &&
-        playerBottom > enemyTop &&
+        playerFeetY >= enemyTop && 
         playerTop < enemyBottom
       ) {
-        const safeLanding = enemy.checkPlayerCollision(this.player)
+        // Use the velocity *before* collision resolution for isFalling check
+        const isFalling = playerVelocityYBeforeCollisionResolution > 0;
+        // Player was above (or very slightly intersecting) the enemy in the previous state.
+        const wasAbove = playerPrevFeetY <= enemyTop + 2; 
+
+        console.log(`Enemy Collision: isFalling: ${isFalling} (using vel ${playerVelocityYBeforeCollisionResolution.toFixed(2)}), wasAbove: ${wasAbove} (prevFeetY: ${playerPrevFeetY.toFixed(2)}, enemyTop+2: ${(enemyTop + 2).toFixed(2)}) ` +
+                    `PlayerCurrentY: ${this.player.y.toFixed(2)}, PlayerCurrentVelY: ${this.player.velocityY.toFixed(2)}, PlayerFeetY: ${playerFeetY.toFixed(2)}, EnemyTop: ${enemyTop.toFixed(2)}`);
         
-        if (!safeLanding) {
-          // Player jumped on enemy - bounce up
-          this.velocityY = -5
+        if (isFalling && wasAbove) { 
+          const stompDepthTolerance = Math.min(10, enemy.height * 0.3);
+
+          if (playerFeetY <= enemyTop + stompDepthTolerance) {
+            console.log("Stomp confirmed: Player landed on top.");
+            enemy.stomp();
+            this.player.bounceOffEnemy();
+          } else {
+            console.log("Stomp failed: Player fell through or hit side too low.");
+            if (enemy.isAlive) { 
+              SceneManager.setScene(new GameOverScene("You were defeated by an enemy!"));
+            }
+          }
         } else {
-          // Player hit enemy from the side - game over
-          SceneManager.setScene(new GameOverScene("You were defeated by an enemy!"))
+          console.log("Hit: Not a stomp (e.g., rising, side/bottom collision, or failed wasAbove/isFalling).");
+          if (enemy.isAlive) {
+            SceneManager.setScene(new GameOverScene("You were defeated by an enemy!"));
+          }
         }
       }
     }
   }
 
   private checkAndResolveCollisions(direction: 'horizontal' | 'vertical', originalX: number, originalY?: number): boolean {
-    let collided = false
-    let isGrounded = false
+    let collided = false;
+    let isGrounded = false;
+    let groundY = 0;
 
     for (const c of this.components) {
-      if (c === this.player || !c.solid) continue
+      if (c === this.player || !c.solid) continue;
 
-      const playerLeft = this.player.x
-      const playerRight = this.player.x + this.player.width
-      const playerTop = this.player.y
-      const playerBottom = this.player.y + this.player.height
+      const playerLeft = this.player.x;
+      const playerRight = this.player.x + this.player.width;
+      const playerTop = this.player.y;
+      const playerBottom = this.player.y + this.player.height;
 
-      const blockLeft = c.x
-      const blockRight = c.x + c.width
-      const blockTop = c.y
-      const blockBottom = c.y + c.height
+      const blockLeft = c.x;
+      const blockRight = c.x + c.width;
+      const blockTop = c.y;
+      const blockBottom = c.y + c.height;
 
+      // Check if player overlaps with the component
       if (
         playerRight > blockLeft &&
         playerLeft < blockRight &&
         playerBottom > blockTop &&
         playerTop < blockBottom
       ) {
-        collided = true
+        collided = true;
 
         if (direction === 'horizontal') {
+          // Handle horizontal collision by pushing player out
           if (originalX + this.player.width <= blockLeft) {
-            this.player.x = blockLeft - this.player.width
+            this.player.x = blockLeft - this.player.width;
           } else if (originalX >= blockRight) {
-            this.player.x = blockRight
+            this.player.x = blockRight;
           }
         } else if (direction === 'vertical') {
+          // Handle vertical collision
           if (originalY !== undefined) {
             if (originalY + this.player.height <= blockTop) {
-              this.player.y = blockTop - this.player.height
-              this.velocityY = 0
-              isGrounded = true
+              // Player landed on top of something
+              this.player.y = blockTop - this.player.height;
+              this.player.stopVerticalMovement();
+              isGrounded = true;
+              groundY = blockTop; // Record the ground Y position
             } else if (originalY >= blockBottom) {
-              this.player.y = blockBottom
-              this.velocityY = 0.1
+              // Player hit something from below
+              this.player.y = blockBottom;
+              this.player.velocityY = 0.1;
             }
           }
         }
       }
     }
 
-    return direction === 'vertical' ? isGrounded : collided
+    // Set grounded state and pass the ground Y position if grounded
+    if (direction === 'vertical') {
+      this.player.setGrounded(isGrounded, isGrounded ? groundY : undefined);
+    }
+
+    return direction === 'vertical' ? isGrounded : collided;
   }
 }

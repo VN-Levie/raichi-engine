@@ -43,7 +43,8 @@ export class GameOverScene extends Scene {
     retryButton.color = "#444"
     retryButton.hoverColor = "#666"
     retryButton.onClick = () => {
-      SceneManager.setScene(new MainScene())
+      const mainScene = new MainScene()
+      SceneManager.setScene(mainScene)
     }
     this.add(retryButton)
 
