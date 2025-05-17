@@ -29,7 +29,7 @@ btn.x = 300
 btn.y = 200
 btn.width = 150
 btn.height = 50
-btn.onClick = () => console.log("Button clicked!")
+btn.onClick = () => console.log("Button clicked")
 scene.add(btn)
 
 
@@ -40,7 +40,7 @@ Promise.all([
     const sprite = new SpriteComponent(null, anim)
     sprite.x = 300
     sprite.y = 100
-    sprite.width = 64
-    sprite.height = 64
+    sprite.width = 48
+    sprite.height = 48
     scene.add(sprite)
 })
