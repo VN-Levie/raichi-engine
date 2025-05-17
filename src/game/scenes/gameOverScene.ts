@@ -42,9 +42,13 @@ export class GameOverScene extends Scene {
     retryButton.height = 50
     retryButton.color = "#444"
     retryButton.hoverColor = "#666"
-    retryButton.onClick = () => {
-      const mainScene = new MainScene()
-      SceneManager.setScene(mainScene)
+    retryButton.onClick = async () => {
+      try {
+        const mainScene = await MainScene.create(); // Score and lives reset to default
+        SceneManager.setScene(mainScene);
+      } catch (error) {
+        console.error("Failed to create MainScene on retry:", error);
+      }
     }
     this.add(retryButton)
 

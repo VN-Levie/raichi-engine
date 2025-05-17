@@ -25,8 +25,14 @@ export class StartScene extends Scene {
         startBtn.y = 250
         startBtn.width = 200
         startBtn.height = 60
-        startBtn.onClick = () => {
-            SceneManager.setScene(new MainScene())
+        startBtn.onClick = async () => {
+            try {
+                const mainScene = await MainScene.create();
+                SceneManager.setScene(mainScene);
+            } catch (error) {
+                console.error("Failed to create MainScene:", error);
+                // Optionally, handle this error in the UI, e.g., show a message
+            }
         }
 
         this.add(startBtn)

@@ -56,7 +56,7 @@ export class DeathScene extends Scene {
         this.add(livesText);
     }
 
-    override update(dt: number) {
+    override async update(dt: number) {
         super.update(dt);
 
         this.timer -= dt;
@@ -64,7 +64,13 @@ export class DeathScene extends Scene {
             if (this.remainingLives <= 0) {
                 SceneManager.setScene(new GameOverScene(this.deathReason + " - No lives left!"));
             } else {
-                SceneManager.setScene(new MainScene(this.currentScore, this.remainingLives));
+                try {
+                    const mainScene = await MainScene.create(this.currentScore, this.remainingLives);
+                    SceneManager.setScene(mainScene);
+                } catch (error) {
+                    console.error("Failed to create MainScene after death:", error);
+                    SceneManager.setScene(new GameOverScene("Error loading level."));
+                }
             }
         }
     }

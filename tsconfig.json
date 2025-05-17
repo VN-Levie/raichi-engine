@@ -1,19 +1,22 @@
 {
   "compilerOptions": {
-    "target": "es2022",
-    "module": "esnext",
+    "target": "es6",
+    "module": "ES2022",
     "moduleResolution": "bundler",
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
     "strictNullChecks": true,
     "esModuleInterop": true,
-    // "verbatimModuleSyntax": true,
-    "resolveJsonModule": false,
+    "resolveJsonModule": true,
     "declaration": true,
     "emitDeclarationOnly": false
   },
   "include": [
     "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }

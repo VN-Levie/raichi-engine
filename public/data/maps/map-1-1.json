@@ -1,0 +1,83 @@
+{
+  "name": "World 1-1",
+  "player": {
+    "initialX": 150,
+    "initialY": 100
+  },
+  "level": {
+    "groundLevelY": 570,
+    "gameOverY": 600,
+    "backgroundColor": "lightblue",
+    "worldWidthTiles": 100
+  },
+  "decorations": {
+    "clouds": [
+      { "x": 100, "y": 50, "size": 2.5 },
+      { "x": 400, "y": 80, "size": 3 },
+      { "x": 700, "y": 40, "size": 2 },
+      { "x": 1000, "y": 60, "size": 3.5 },
+      { "x": 1300, "y": 70, "size": 2.2 },
+      { "x": 1700, "y": 50, "size": 3 },
+      { "x": 2000, "y": 90, "size": 2.8 },
+      { "x": 2400, "y": 30, "size": 2.2 }
+    ],
+    "bushes": [
+      { "xTile": 3, "size": 3 },
+      { "xTile": 12, "size": 2 },
+      { "xTile": 20, "size": 4 },
+      { "xTile": 31, "size": 2 },
+      { "xTile": 40, "size": 3 },
+      { "xTile": 51, "size": 4 },
+      { "xTile": 65, "size": 2 },
+      { "xTile": 78, "size": 3 },
+      { "xTile": 89, "size": 5 }
+    ]
+  },
+  "terrain": {
+    "ground": {
+      "segments": [
+        { "startTile": 0, "endTile": 15 },
+        { "startTile": 19, "endTile": 40 },
+        { "startTile": 44, "endTile": 70 },
+        { "startTile": 74, "endTile": 100 }
+      ],
+      "color": "#A0522D",
+      "topHighlightColor": "#DEB887",
+      "textureColor": "#8B4513"
+    },
+    "pipes": [
+      { "xTile": 5, "heightMultiplier": 1.5 },
+      { "xTile": 12, "heightMultiplier": 2 },
+      { "xTile": 25, "heightMultiplier": 2.5 },
+      { "xTile": 35, "heightMultiplier": 1.5 },
+      { "xTile": 50, "heightMultiplier": 2.5 },
+      { "xTile": 60, "heightMultiplier": 2 },
+      { "xTile": 80, "heightMultiplier": 2 },
+      { "xTile": 90, "heightMultiplier": 1.5 }
+    ],
+    "floatingPlatforms": [
+      { "xTile": 10, "yTile": 12, "widthTiles": 3, "style": "stone" },
+      { "xTile": 18, "yTile": 10, "widthTiles": 2, "style": "stone" },
+      { "xTile": 22, "yTile": 11, "widthTiles": 3, "style": "stone" },
+      { "xTile": 30, "yTile": 9, "widthTiles": 2, "style": "stone" },
+      { "xTile": 38, "yTile": 12, "widthTiles": 3, "style": "stone" },
+      { "xTile": 45, "yTile": 10, "widthTiles": 2, "style": "stone" },
+      { "xTile": 55, "yTile": 13, "widthTiles": 3, "style": "stone" },
+      { "xTile": 65, "yTile": 11, "widthTiles": 2, "style": "stone" },
+      { "xTile": 75, "yTile": 9, "widthTiles": 3, "style": "stone" },
+      { "xTile": 88, "yTile": 12, "widthTiles": 2, "style": "stone" }
+    ]
+  },
+  "enemies": {
+    "yOffsetFromGround": -32,
+    "positions": [
+      { "xTile": 8 },
+      { "xTile": 20 },
+      { "xTile": 32 },
+      { "xTile": 48 },
+      { "xTile": 57 },
+      { "xTile": 67 },
+      { "xTile": 85 }
+    ]
+  }
+}
