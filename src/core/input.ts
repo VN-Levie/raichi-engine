@@ -24,4 +24,9 @@ export class Input {
   static isMousePressed() {
     return Input.mouseDown
   }
+
+  //isKeyPressed
+  static isKeyPressed(key: string) {
+    return Input.keys.has(key);
+  }
 }

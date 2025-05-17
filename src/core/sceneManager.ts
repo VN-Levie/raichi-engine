@@ -9,6 +9,7 @@ export class SceneManager {
 
   static update(dt: number) {
     this.currentScene?.update(dt)
+    // console.log("SceneManager.update", this.currentScene);
   }
 
   static render(ctx: CanvasRenderingContext2D) {
