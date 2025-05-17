@@ -18,7 +18,8 @@ import {
   createFlagPoleComponent,
   createCheckpointComponent,
   createCoinComponent,
-  createLifeItemComponent
+  createLifeItemComponent,
+  createTornadoComponent
 } from "../factories/levelElementFactory"
 import { TILE_SIZE, INITIAL_LIVES, MAX_LIVES_ON_LOAD } from "../constants"
 import { HUDController } from "../ui/HUDController"
@@ -33,6 +34,8 @@ import { LifeItemComponent } from "../entities/collectable/lifeItemComponent";
 import { BaseEnemyComponent } from "../entities/enemy/baseEnemyComponent";
 import { saveGameState, clearGameState } from "../utils/gameStateManager";
 import { StartScene } from "./startScene";
+import { CloudClusterComponent } from "../entities/map/cloudClusterComponent";
+import { TornadoComponent } from "../entities/effects/TornadoComponent";
 
 export class MainScene extends Scene {
   private player!: PlayerComponent
@@ -45,6 +48,7 @@ export class MainScene extends Scene {
   private checkpoints: CheckpointComponent[] = []
   private coins: CoinComponent[] = []
   private lifeItems: LifeItemComponent[] = []
+  private tornadoes: TornadoComponent[] = []
 
   private score = 0
   private lives = MAX_LIVES_ON_LOAD
@@ -56,6 +60,15 @@ export class MainScene extends Scene {
 
   private playerIsCurrentlyDying = false
   private lastDeathReason = ""
+
+  private isUnderwater: boolean = false;
+
+  // Dynamic cloud properties
+  private dynamicCloudsEnabled: boolean = false;
+  private dynamicCloudSpawnTimer: number = 0;
+  private nextDynamicCloudSpawnTime: number = 0;
+  private readonly MIN_CLOUD_SPAWN_INTERVAL = 4; // seconds
+  private readonly MAX_CLOUD_SPAWN_INTERVAL = 8; // seconds
 
   private constructor() {
     super()
@@ -119,15 +132,23 @@ export class MainScene extends Scene {
 
     this.gameOverY = mapData.level.gameOverY
     this.newGroundLevelY = mapData.level.groundLevelY
+    this.isUnderwater = mapData.level.type === "underwater";
 
     this.initialPlayerX = playerInitialXOverride ?? mapData.player.initialX
     this.initialPlayerY = playerInitialYOverride ?? mapData.player.initialY
 
+    // Dynamic clouds setup
+    this.dynamicCloudsEnabled = mapData.decorations.dynamicClouds || false;
+    if (this.dynamicCloudsEnabled) {
+      this.setNextDynamicCloudSpawnTime();
+      this.dynamicCloudSpawnTimer = 0; // Reset timer for the new scene
+    }
+
     if (!playerInitialXOverride && !playerInitialYOverride) {
-      this.player = new PlayerComponent(this.initialPlayerX, this.initialPlayerY)
+      this.player = new PlayerComponent(this.initialPlayerX, this.initialPlayerY, this.isUnderwater);
       this.player.setRespawnPoint(this.initialPlayerX, this.initialPlayerY)
     } else {
-      this.player = new PlayerComponent(this.initialPlayerX, this.initialPlayerY)
+      this.player = new PlayerComponent(this.initialPlayerX, this.initialPlayerY, this.isUnderwater);
     }
 
     this.hudController = new HUDController()
@@ -186,6 +207,7 @@ export class MainScene extends Scene {
     }
 
     this.populateEnemies(mapData)
+    this.populateTornadoes(mapData);
 
     this.checkpoints = []
     if (mapData.checkpoints) {
@@ -250,6 +272,23 @@ export class MainScene extends Scene {
     })
   }
 
+  private setNextDynamicCloudSpawnTime(): void {
+    this.nextDynamicCloudSpawnTime = Math.random() * (this.MAX_CLOUD_SPAWN_INTERVAL - this.MIN_CLOUD_SPAWN_INTERVAL) + this.MIN_CLOUD_SPAWN_INTERVAL;
+  }
+
+  private spawnDynamicCloud(): void {
+    const canvasWidth = SceneManager.getScene().components.find(c => c instanceof BoxComponent && c.zIndex === -10)?.width || 800; // A way to get canvas width, or use a constant
+    
+    const y = Math.random() * 200 + 30; 
+    const size = Math.random() * 1.0 + 0.8; 
+    const speed = -(Math.random() * 25 + 25); 
+
+    const startX = Camera.x + canvasWidth + Math.random() * 50 + 50; // Start further off-screen and randomized
+
+    const cloud = createCloudComponent({ x: startX, y, size }, speed);
+    this.add(cloud);
+  }
+
   private resetPlayerAndLevel() {
     this.player.resetToLastCheckpoint()
 
@@ -284,6 +323,17 @@ export class MainScene extends Scene {
       const enemy = createEnemy(pos, enemyYPosition, this.components) as BaseEnemyComponent
       this.enemies.push(enemy)
       this.add(enemy)
+    }
+  }
+
+  private populateTornadoes(mapData: MapData) {
+    this.tornadoes = [];
+    if (mapData.terrain.tornadoes) {
+      for (const tornadoConfig of mapData.terrain.tornadoes) {
+        const tornado = createTornadoComponent(tornadoConfig);
+        this.add(tornado);
+        this.tornadoes.push(tornado);
+      }
     }
   }
 
@@ -353,6 +403,25 @@ export class MainScene extends Scene {
     }
   }
 
+  private checkTornadoCollisions() {
+    if (!this.player || this.player.isDying || this.playerIsCurrentlyDying) return;
+
+    for (const tornado of this.tornadoes) {
+      if (!tornado.enabled || !tornado.isHarmful) continue;
+
+      // Simple AABB collision check
+      if (
+        this.player.x < tornado.x + tornado.width &&
+        this.player.x + this.player.width > tornado.x &&
+        this.player.y < tornado.y + tornado.height &&
+        this.player.y + this.player.height > tornado.y
+      ) {
+        this.handlePlayerDeath("Hit by a tornado!");
+        return;
+      }
+    }
+  }
+
   private checkCoinCollisions() {
     if (!this.player || this.player.isDying) return
 
@@ -405,7 +474,7 @@ export class MainScene extends Scene {
         ) {
           checkpoint.activate()
           this.player.setRespawnPoint(checkpoint.x, this.player.y)
-          console.log(`Checkpoint activated at ${checkpoint.x}, new respawn: ${this.player.getRespawnPoint().x}, ${this.player.getRespawnPoint().y}`)
+          console.log(`Checkpoint activated at ${checkpoint.x}, new respawn: ${checkpoint.x}, ${this.player.y}`)
 
           saveGameState({
             mapUrl: this.currentMapUrl,
@@ -521,6 +590,16 @@ export class MainScene extends Scene {
   override update(dt: number) {
     if (!this.enabled || !this.player) return
 
+    // Dynamic cloud spawning
+    if (this.dynamicCloudsEnabled) {
+      this.dynamicCloudSpawnTimer += dt;
+      if (this.dynamicCloudSpawnTimer >= this.nextDynamicCloudSpawnTime) {
+        this.spawnDynamicCloud(); 
+        this.dynamicCloudSpawnTimer = 0;
+        this.setNextDynamicCloudSpawnTime();
+      }
+    }
+
     if (this.playerIsCurrentlyDying) {
       this.player.update(dt)
 
@@ -562,6 +641,24 @@ export class MainScene extends Scene {
         enemy.update(dt)
       }
     }
+    for (const tornado of this.tornadoes) {
+      if (tornado.enabled) {
+        tornado.update(dt);
+      }
+    }
+    // Update and cull dynamic clouds
+    for (let i = this.components.length - 1; i >= 0; i--) {
+      const component = this.components[i];
+      if (component instanceof CloudClusterComponent && component.speedX < 0) { // Check if it's a dynamic cloud
+        // component.x is the cloud's left edge.
+        // component.width is the cloud's width.
+        // Camera.x is the left edge of the viewport.
+        if (component.x + component.width < Camera.x) {
+          this.remove(component);
+        }
+      }
+    }
+
     for (const coint of this.coins) {
       if (coint.enabled) {
         coint.update(dt)
@@ -579,6 +676,7 @@ export class MainScene extends Scene {
     }
 
     this.checkEnemyCollisions(playerVelocityYBeforeCollisionResolution)
+    this.checkTornadoCollisions();
     this.checkGoalCollision()
     this.checkCoinCollisions()
     this.checkLifeItemCollisions()

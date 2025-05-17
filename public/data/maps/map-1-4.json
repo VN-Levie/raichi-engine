@@ -47,9 +47,12 @@
     "yOffsetFromGround": -32,
     "positions": [
       { "xTile": 18, "type": "goomba" },
+      { "xTile": 28, "yTile": 9, "type": "bat", "patrolRangeXTiles": [25, 32] },
       { "xTile": 33, "type": "turtle" },
       { "xTile": 50, "type": "goomba" },
+      { "xTile": 45, "yTile": 10, "type": "bat", "patrolRangeXTiles": [42, 50] },
       { "xTile": 58, "type": "turtle" },
+      { "xTile": 65, "yTile": 8, "type": "bat", "patrolRangeXTiles": [62, 70] },
       { "xTile": 75, "type": "goomba" }
     ]
   },
@@ -62,8 +65,8 @@
     "isWinGoal": false
   },
   "checkpoints": [
-    { "xTile": 30 },
-    { "xTile": 60 }
+    { "xTile": 35 },
+    { "xTile": 62 }
   ],
   "coins": [
     { "xTile": 9, "yTile": 10 },

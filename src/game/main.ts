@@ -10,10 +10,12 @@ import {
 
 import { StartScene } from "./scenes/startScene"
 
-Input.init()
+const CANVAS_ID = "game"; // Define canvas ID
+
+Input.init(CANVAS_ID); // Initialize Input with canvas ID
 SceneManager.setScene(new StartScene())
 
-const game = new Game("game",
+const game = new Game(CANVAS_ID, // Use the same ID for Game
   SceneManager.update.bind(SceneManager),
   SceneManager.render.bind(SceneManager)
 )

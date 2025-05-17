@@ -19,7 +19,8 @@
       { "xTile": 5, "size": 2 },
       { "xTile": 25, "size": 3 }
     ],
-    "flagPole": { "xTile": 75, "yTile": 18 } 
+    "flagPole": { "xTile": 75, "yTile": 18 },
+    "dynamicClouds": true
   },
   "terrain": {
     "ground": {
@@ -41,11 +42,11 @@
   "enemies": {
     "yOffsetFromGround": -32,
     "positions": [
-      { "xTile": 10, "type": "turtle" },
-      { "xTile": 22, "type": "turtle" },
+      { "xTile": 10, "type": "goomba" },
+      { "xTile": 22, "type": "goomba" },
       { "xTile": 35, "type": "goomba" },
-      { "xTile": 45, "type": "turtle" },
-      { "xTile": 60, "type": "turtle" }
+      { "xTile": 45, "type": "goomba" },
+      { "xTile": 60, "type": "goomba" }
     ]
   },
   "goal": {
@@ -57,7 +58,7 @@
     "isWinGoal": false 
   },
   "checkpoints": [
-    { "xTile": 25 },
+    { "xTile": 15 },
     { "xTile": 50 }
   ],
   "coins": [

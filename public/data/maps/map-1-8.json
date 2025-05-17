@@ -1,0 +1,84 @@
+{
+  "name": "World 1-8 (Final Fortress Approach)", 
+  "player": {
+    "initialX": 100,
+    "initialY": 450
+  },
+  "level": {
+    "groundLevelY": 570,
+    "gameOverY": 600,
+    "backgroundColor": "#000000",
+    "worldWidthTiles": 70,
+    "type": "ground" 
+  },
+  "decorations": {
+    "clouds": [],
+    "bushes": [
+      { "xTile": 3, "size": 2 },
+      { "xTile": 60, "size": 3 }
+    ],
+    "flagPole": { "xTile": 65, "yTile": 18 } 
+  },
+  "terrain": {
+    "ground": {
+      "segments": [
+        { "startTile": 0, "endTile": 69 }
+      ],
+      "color": "#1A1A1A",
+      "topHighlightColor": "#333333",
+      "textureColor": "#0D0D0D"
+    },
+    "pipes": [
+      { "xTile": 12, "heightMultiplier": 2.5 },
+      { "xTile": 40, "heightMultiplier": 3 }
+    ],
+    "floatingPlatforms": [
+      { "xTile": 5, "yTile": 13, "widthTiles": 4, "style": "stone" },
+      { "xTile": 18, "yTile": 11, "widthTiles": 3, "style": "stone" },
+      { "xTile": 28, "yTile": 14, "widthTiles": 5, "style": "stone" },
+      { "xTile": 35, "yTile": 12, "widthTiles": 2, "style": "stone" },
+      { "xTile": 45, "yTile": 10, "widthTiles": 4, "style": "stone" },
+      { "xTile": 55, "yTile": 13, "widthTiles": 3, "style": "stone" }
+    ],
+    "tornadoes": [] 
+  },
+  "enemies": {
+    "yOffsetFromGround": -32,
+    "positions": [
+      { "xTile": 8, "type": "turtle" },
+      { "xTile": 15, "yTile": 10, "type": "bat", "patrolRangeXTiles": [12, 20] },
+      { "xTile": 20, "type": "goomba" },
+      { "xTile": 22, "type": "turtle" },
+      { "xTile": 28, "yTile": 8, "type": "bat", "patrolRangeXTiles": [25, 33] },
+      { "xTile": 30, "type": "goomba" },
+      { "xTile": 38, "type": "turtle" },
+      { "xTile": 45, "yTile": 9, "type": "bat", "patrolRangeXTiles": [42, 50] },
+      { "xTile": 48, "type": "goomba" },
+      { "xTile": 50, "type": "turtle" },
+      { "xTile": 55, "yTile": 7, "type": "bat", "patrolRangeXTiles": [52, 60] },
+      { "xTile": 58, "type": "goomba" }
+    ]
+  },
+  "goal": {
+    "xTile": 65, 
+    "yTile": 13,
+    "widthTiles": 3,
+    "heightTiles": 5,
+    "isWinGoal": true, 
+    "style": "flagpole" 
+  },
+  "checkpoints": [
+    { "xTile": 28 },
+    { "xTile": 55 }
+  ],
+  "coins": [
+    { "xTile": 6, "yTile": 11 },
+    { "xTile": 19, "yTile": 9 },
+    { "xTile": 30, "yTile": 12 },
+    { "xTile": 46, "yTile": 8 },
+    { "xTile": 58, "yTile": 11 }
+  ],
+  "lifeItems": [
+    { "xTile": 33, "yTile": 10 }
+  ]
+}

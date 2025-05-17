@@ -1,6 +1,15 @@
 import { Component } from "../../core/component"
 import { Input } from "../../core/input"
 
+enum PlayerState {
+  IDLE,
+  RUNNING,
+  JUMPING,
+  FALLING,
+  DYING,
+  SWIMMING, // Added swimming state
+}
+
 export class PlayerComponent extends Component {
   velocityY = 0
   private gravity = 0.45
@@ -13,16 +22,33 @@ export class PlayerComponent extends Component {
   private animTimer = 0
   private jumpPressed = false
   private groundY = 0
-
+  private isUnderwater: boolean = false;
+  private state: PlayerState = PlayerState.IDLE
+  private readonly underwaterDrag = 0.95; // Drag factor for underwater movement
+  private readonly jumpDrag = 0.9; // Drag factor for jumping
+  private readonly swimDrag = 0.8; // Drag factor for swimming
+  // velocityX
+  private velocityX = 0
   isDying = false;
   private deathAnimTimer = 0;
   private readonly DEATH_ANIM_DURATION = 1.5;
   private readonly DEATH_BOUNCE_FORCE = -7;
 
+  private currentJumps: number = 0;
+  private readonly maxJumps: number = 2; // Allow double jump
+
+  // Underwater physics properties
+  private readonly buoyancyAcceleration = 0.15; // Upward acceleration in water
+  private readonly swimAcceleration = 0.3;    // Acceleration when player actively swims
+  private readonly underwaterDragFactor = 0.97; // Drag factor for velocity in water (closer to 1 means less drag)
+  private readonly maxUnderwaterVerticalSpeed = 2.0;
+  private readonly underwaterHorizontalSpeedFactor = 0.8; // Player moves a bit slower horizontally underwater
+
+
   respawnX: number;
   respawnY: number;
 
-  constructor(x: number, y: number) {
+  constructor(x: number, y: number, isUnderwater: boolean = false) {
     super()
     this.x = x
     this.y = y
@@ -33,6 +59,12 @@ export class PlayerComponent extends Component {
     this.zIndex = 10
     this.solid = true
     this.velocityY = 0
+    this.isUnderwater = isUnderwater
+    this.gravity = isUnderwater ? 0 : 0.45
+
+    if (this.isUnderwater) {
+      this.state = PlayerState.SWIMMING; // Start in swimming state if underwater
+    }
   }
 
   setRespawnPoint(x: number, y: number) {
@@ -77,6 +109,13 @@ export class PlayerComponent extends Component {
     this.direction = 1;
     this.animFrame = 0;
     this.isMoving = false;
+    this.currentJumps = 0;
+
+    if (this.isUnderwater) {
+      this.state = PlayerState.SWIMMING;
+    } else {
+      this.state = PlayerState.IDLE;
+    }
   }
 
   resetToMapStart(mapInitialX: number, mapInitialY: number) {
@@ -93,6 +132,30 @@ export class PlayerComponent extends Component {
     this.direction = 1;
     this.animFrame = 0;
     this.isMoving = false;
+    this.currentJumps = 0;
+
+    if (this.isUnderwater) {
+      this.state = PlayerState.SWIMMING;
+    } else {
+      this.state = PlayerState.IDLE;
+    }
+  }
+
+  jump() {
+    if (this.isUnderwater) {
+      return;
+    }
+    if (this.isGrounded || this.currentJumps < this.maxJumps) {
+      this.velocityY = this.jumpForce;
+      this.isGrounded = false;
+      this.currentJumps++;
+    }
+  }
+
+  private applyGravity() {
+    if (!this.isGrounded) {
+      this.velocityY += this.gravity;
+    }
   }
 
   update(dt: number) {
@@ -105,41 +168,60 @@ export class PlayerComponent extends Component {
       return;
     }
 
+    const isJumpKeyDown = Input.isKeyDown("ArrowUp");
+    const isSwimDownKeyDown = Input.isKeyDown("ArrowDown");
 
-    this.isMoving = false
+    this.isMoving = false;
 
+    // Horizontal Movement
+    this.velocityX = 0;
+    const currentSpeed = this.isUnderwater ? this.speed * this.underwaterHorizontalSpeedFactor : this.speed;
     if (Input.isKeyDown("ArrowLeft")) {
-      this.x -= this.speed
-      this.direction = -1
-      this.isMoving = true
-      if (this.x < 0) {
-        this.x = 0
-      }
+      this.velocityX = -currentSpeed;
+      this.direction = -1;
+      this.isMoving = true;
     }
-
     if (Input.isKeyDown("ArrowRight")) {
-      this.x += this.speed
-      this.direction = 1
-      this.isMoving = true
+      this.velocityX = currentSpeed;
+      this.direction = 1;
+      this.isMoving = true;
     }
 
+    if (this.isUnderwater) {
+      // Apply drag to horizontal movement underwater
+      this.velocityX *= this.underwaterDragFactor;
 
-    if (Input.isKeyDown("ArrowUp")) {
-      if (this.isGrounded && !this.jumpPressed && !this.isDying) {
-        this.velocityY = this.jumpForce
-        this.isGrounded = false
-        this.jumpPressed = true;
+      // Vertical Underwater Movement
+      this.velocityY -= this.buoyancyAcceleration * dt * 60;
+
+      if (isJumpKeyDown) {
+        this.velocityY -= this.swimAcceleration * dt * 60;
       }
+      if (isSwimDownKeyDown) {
+        this.velocityY += this.swimAcceleration * dt * 60;
+      }
+
+      // Apply underwater drag to vertical movement
+      this.velocityY *= this.underwaterDragFactor;
+
+      // Clamp vertical speed
+      this.velocityY = Math.max(-this.maxUnderwaterVerticalSpeed, Math.min(this.maxUnderwaterVerticalSpeed, this.velocityY));
+
+      this.isGrounded = false;
+
     } else {
-      this.jumpPressed = false;
+      if (isJumpKeyDown && !this.jumpPressed) {
+        this.jump();
+        this.jumpPressed = true;
+      } else if (!isJumpKeyDown) {
+        this.jumpPressed = false;
+      }
+      this.applyGravity();
     }
 
-
-    if (!this.isGrounded) {
-      this.velocityY += this.gravity;
-      this.y += this.velocityY;
-    }
-
+    // Update position
+    this.y += this.velocityY;
+    this.x += this.velocityX;
 
     if (this.isMoving && this.isGrounded) {
       this.animTimer += dt
@@ -746,14 +828,24 @@ export class PlayerComponent extends Component {
   setGrounded(isGrounded: boolean, groundY?: number) {
     if (this.isDying) return;
 
-    if (groundY !== undefined) {
-      this.groundY = groundY;
+    if (this.isUnderwater) {
+      if (isGrounded && this.velocityY > 0) {
+        this.velocityY = 0;
+      }
+      this.isGrounded = false;
+    } else {
+      if (groundY !== undefined) {
+        this.groundY = groundY;
 
+        if (isGrounded) {
+          this.y = this.groundY - this.height;
+        }
+      }
+      this.isGrounded = isGrounded;
       if (isGrounded) {
-        this.y = this.groundY - this.height;
+        this.currentJumps = 0;
       }
     }
-    this.isGrounded = isGrounded;
   }
 
   stopVerticalMovement() {

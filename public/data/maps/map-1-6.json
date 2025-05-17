@@ -44,16 +44,18 @@
   "enemies": {
     "yOffsetFromGround": -32,
     "positions": [
-      { "xTile": 8, "type": "goomba" },
-      { "xTile": 12, "type": "turtle" },
       { "xTile": 18, "type": "goomba" },
       { "xTile": 22, "type": "goomba" },
+      { "xTile": 26, "yTile": 8, "type": "bat", "patrolRangeXTiles": [23, 30] },
       { "xTile": 28, "type": "turtle" },
       { "xTile": 33, "type": "goomba" },
+      { "xTile": 36, "yTile": 7, "type": "bat", "patrolRangeXTiles": [33, 40] },
       { "xTile": 38, "type": "turtle" },
       { "xTile": 43, "type": "goomba" },
+      { "xTile": 46, "yTile": 9, "type": "bat", "patrolRangeXTiles": [43, 50] },
       { "xTile": 48, "type": "turtle" },
       { "xTile": 53, "type": "goomba" },
+      { "xTile": 56, "yTile": 6, "type": "bat", "patrolRangeXTiles": [53, 60] },
       { "xTile": 58, "type": "turtle" },
       { "xTile": 63, "type": "goomba" },
       { "xTile": 68, "type": "turtle" }
@@ -68,8 +70,8 @@
     "isWinGoal": false
   },
   "checkpoints": [
-    { "xTile": 20 },
-    { "xTile": 50 }
+    { "xTile": 25 },
+    { "xTile": 55 }
   ],
   "coins": [
     { "xTile": 16, "yTile": 10 },

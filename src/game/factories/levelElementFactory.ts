@@ -1,4 +1,4 @@
-import { MapData } from "../types/mapData";
+import { MapData, TornadoConfigType } from "../types/mapData";
 import { GroundBlockComponent } from "../entities/map/groundBlockComponent";
 import { PipeComponent } from "../entities/map/pipeComponent";
 import { FloatingPlatformComponent } from "../entities/map/floatingPlatformComponent";
@@ -15,9 +15,18 @@ import { CoinComponent } from "../entities/collectable/coinComponent";
 import { LifeItemComponent } from "../entities/collectable/lifeItemComponent";
 import { BaseEnemyComponent } from "../entities/enemy/baseEnemyComponent";
 import { BatEnemyComponent } from "../entities/enemy/BatEnemyComponent";
+import { TornadoComponent } from "../entities/effects/TornadoComponent";
 
-export function createCloudComponent(cloudConfig: MapData['decorations']['clouds'][0]): CloudClusterComponent {
-  return new CloudClusterComponent(cloudConfig.x, cloudConfig.y, cloudConfig.size);
+export function createCloudComponent(
+  cloudConfig: MapData['decorations']['clouds'][0],
+  speedX: number = 0 // Optional speed for dynamic clouds
+): CloudClusterComponent {
+  const cloud = new CloudClusterComponent(cloudConfig.x, cloudConfig.y, cloudConfig.size, speedX);
+  // If speedX is non-zero, it's a dynamic cloud, potentially different zIndex or properties
+  if (speedX !== 0) {
+    cloud.zIndex = -6; // Ensure dynamic clouds are also far back
+  }
+  return cloud;
 }
 
 export function createBushComponent(bushConfig: MapData['decorations']['bushes'][0], groundLevelY: number): BushComponent {
@@ -51,15 +60,34 @@ export function createEnemy(
     enemy = new TurtleEnemyComponent(xPos, yPos, TILE_SIZE, TILE_SIZE);
   } else if (enemyType === "bat") {
     const patrolXTiles = enemyConfig.patrolRangeXTiles;
-    const patrolRangeXPx: [number, number] | undefined = patrolXTiles ?
-      [patrolXTiles[0] * TILE_SIZE, patrolXTiles[1] * TILE_SIZE] :
-      undefined;
+    let patrolRangeXPx: [number, number] | undefined = undefined;
+    if (patrolXTiles && patrolXTiles.length === 2) {
+      patrolRangeXPx = [patrolXTiles[0] * TILE_SIZE, patrolXTiles[1] * TILE_SIZE];
+    }
     enemy = new BatEnemyComponent(xPos, yPos, TILE_SIZE, TILE_SIZE, patrolRangeXPx);
   } else { 
     enemy = new GoombaEnemyComponent(xPos, yPos, TILE_SIZE, TILE_SIZE);
   }
   enemy.setScene(sceneComponents);
   return enemy;
+}
+
+export function createTornadoComponent(tornadoConfig: TornadoConfigType): TornadoComponent {
+    const xPos = tornadoConfig.xTile * TILE_SIZE;
+    const yPos = tornadoConfig.yTile * TILE_SIZE;
+    
+    let patrolRangeXPx: [number, number] | undefined = undefined;
+    // Check if patrolRangeXTiles exists and is a valid two-element tuple
+    if (tornadoConfig.patrolRangeXTiles && 
+        tornadoConfig.patrolRangeXTiles.length === 2 &&
+        typeof tornadoConfig.patrolRangeXTiles[0] === 'number' &&
+        typeof tornadoConfig.patrolRangeXTiles[1] === 'number') {
+        patrolRangeXPx = [
+            tornadoConfig.patrolRangeXTiles[0] * TILE_SIZE, 
+            tornadoConfig.patrolRangeXTiles[1] * TILE_SIZE
+        ];
+    }
+    return new TornadoComponent(xPos, yPos, patrolRangeXPx);
 }
 
 export function createGoal(goalConfig: MapData['goal']): GoalComponent | null {
@@ -70,7 +98,8 @@ export function createGoal(goalConfig: MapData['goal']): GoalComponent | null {
     goalConfig.widthTiles * TILE_SIZE,
     goalConfig.heightTiles * TILE_SIZE,
     goalConfig.nextMapUrl,
-    goalConfig.isWinGoal
+    goalConfig.isWinGoal,
+    goalConfig.style
   );
 }
 

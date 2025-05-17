@@ -1,55 +1,75 @@
-import { CircleComponent } from "../../../entities/circleComponent";
 import { Component } from "../../../core/component";
+import { CircleComponent } from "../../../entities/circleComponent"; // Assuming CircleComponent is used
 
 export class CloudClusterComponent extends Component {
-  private parts: CircleComponent[] = [];
+  private circles: CircleComponent[] = [];
+  public size: number; // Make size public if accessed for width calculation elsewhere
+  public speedX: number = 0;
 
-  constructor(x: number, y: number, size: number) {
+  constructor(x: number, y: number, size: number, speedX: number = 0) {
     super();
     this.x = x;
     this.y = y;
-    this.zIndex = -5;
+    this.size = size;
+    this.speedX = speedX;
+    this.zIndex = -5; // Behind most things
     this.solid = false;
 
-    const baseSize = 20 * size;
-    const cloudColor = "#ffffff";
+    // Approximate width based on size and typical circle arrangement
+    // Assuming circles are about 20*size radius and overlap
+    this.width = this.size * 20 * 2.5; // Rough estimate of total width
 
-    this.parts.push(new CircleComponent(x, y, baseSize, cloudColor));
+    this.createCircles();
+  }
 
-    const variations = [
-      { xOffset: -baseSize * 0.6, yOffset: -baseSize * 0.2, sizeRatio: 0.7 },
-      { xOffset: baseSize * 0.7, yOffset: -baseSize * 0.3, sizeRatio: 0.8 },
-      { xOffset: -baseSize * 0.8, yOffset: baseSize * 0.1, sizeRatio: 0.6 },
-      { xOffset: baseSize * 0.5, yOffset: baseSize * 0.2, sizeRatio: 0.7 },
-      { xOffset: 0, yOffset: -baseSize * 0.4, sizeRatio: 0.9 },
-      { xOffset: -baseSize * 0.3, yOffset: baseSize * 0.3, sizeRatio: 0.6 },
-      { xOffset: baseSize * 0.2, yOffset: baseSize * 0.1, sizeRatio: 0.8 },
+  private createCircles() {
+    const baseRadius = 20 * this.size;
+    const offsets = [
+      { dx: 0, dy: 0, radius: baseRadius },
+      { dx: baseRadius * 0.8, dy: baseRadius * 0.3, radius: baseRadius * 0.9 },
+      { dx: -baseRadius * 0.7, dy: baseRadius * 0.2, radius: baseRadius * 0.8 },
+      { dx: baseRadius * 0.3, dy: -baseRadius * 0.4, radius: baseRadius * 0.7 }
     ];
 
-    for (const v of variations) {
-      this.parts.push(new CircleComponent(
-        x + v.xOffset,
-        y + v.yOffset,
-        baseSize * v.sizeRatio,
-        cloudColor
-      ));
+    for (const offset of offsets) {
+      const circle = new CircleComponent(
+        this.x + offset.dx,
+        this.y + offset.dy,
+        offset.radius,
+        "rgba(255, 255, 255, 0.8)"
+      );
+      circle.visible = false; // Circles themselves are not directly rendered by Scene loop
+      this.circles.push(circle);
     }
-    this.parts.forEach(p => {
-        p.zIndex = this.zIndex;
-        p.solid = this.solid;
-    });
   }
 
   update(dt: number): void {
-    // Clouds are static or could have slow movement
+    this.x += this.speedX * dt;
+    // Update individual circle positions if they are independently managed by this component
+    for (const circle of this.circles) {
+        // If circles store relative offsets, their absolute x needs updating when parent x changes
+        // Assuming circle.x was set to absolute initially, this line updates them:
+        circle.x += this.speedX * dt;
+    }
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    this.parts.forEach(part => {
-        // If CloudClusterComponent can move, update part.x and part.y relative to this.x, this.y
-        // part.x = this.x + original_offset_x_for_this_part
-        // part.y = this.y + original_offset_y_for_this_part
-        part.render(ctx);
-    });
+    // The CloudClusterComponent itself doesn't draw, its constituent circles do.
+    // However, if we want to render them relative to this component's x,y:
+    for (const circle of this.circles) {
+        // To render relative to this.x, this.y, adjust circle rendering logic or store relative offsets.
+        // For simplicity, assuming circles are already at absolute positions or factory handles this.
+        // If circles are children components, Scene handles their rendering.
+        // If they are internal, this component must render them.
+        // Based on current structure, CloudClusterComponent is a "logical" group.
+        // Let's assume it should render its parts.
+        ctx.beginPath();
+        // Calculate render X based on current this.x and original relative offset
+        // This requires storing original relative offsets if not done already.
+        // For now, let's assume circle.x, circle.y are absolute and updated in this.update()
+        ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = circle.color; // circle.color should be "rgba(255, 255, 255, 0.8)"
+        ctx.fill();
+    }
   }
 }

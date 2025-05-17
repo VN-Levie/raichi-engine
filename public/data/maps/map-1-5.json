@@ -19,7 +19,8 @@
       { "x": 950, "y": 160, "size": 3 }
     ],
     "bushes": [],
-    "flagPole": { "xTile": 95, "yTile": 18 }
+    "flagPole": { "xTile": 95, "yTile": 18 },
+    "dynamicClouds": true
   },
   "terrain": {
     "ground": {
@@ -70,8 +71,8 @@
     "isWinGoal": false
   },
   "checkpoints": [
-    { "xTile": 30 },
-    { "xTile": 65 }
+    { "xTile": 22 },
+    { "xTile": 61 }
   ],
   "coins": [
     { "xTile": 11, "yTile": 13 },
