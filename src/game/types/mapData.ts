@@ -52,4 +52,8 @@ export type TornadoConfigType = {
   xTile: number;
   yTile: number;
   patrolRangeXTiles?: [number, number];
+  canToggle?: boolean; // If true, tornado will toggle active/inactive state
+  toggleIntervalSeconds?: [min: number, max: number]; // Time range for each state
+  baseSpeedMultiplier?: number; // Multiplier for default patrol speed
+  speedRandomnessFactor?: number; // 0-1, e.g., 0.2 for +/- 20% speed variation
 };

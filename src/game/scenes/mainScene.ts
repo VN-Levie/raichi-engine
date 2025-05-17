@@ -500,17 +500,17 @@ export class MainScene extends Scene {
     let groundY = 0
 
     for (const c of this.components) {
-      if (c === this.player || !c.solid) continue
+      if (c === this.player || !c.solid) continue;
 
-      const playerLeft = this.player.x
-      const playerRight = this.player.x + this.player.width
-      const playerTop = this.player.y
-      const playerBottom = this.player.y + this.player.height
+      const playerLeft = this.player.x;
+      const playerRight = this.player.x + this.player.width;
+      const playerTop = this.player.y;
+      const playerBottom = this.player.y + this.player.height;
 
-      const blockLeft = c.x
-      const blockRight = c.x + c.width
-      const blockTop = c.y
-      const blockBottom = c.y + c.height
+      const blockLeft = c.x;
+      const blockRight = c.x + c.width;
+      const blockTop = c.y;
+      const blockBottom = c.y + c.height;
 
       if (
         playerRight > blockLeft &&
@@ -518,24 +518,28 @@ export class MainScene extends Scene {
         playerBottom > blockTop &&
         playerTop < blockBottom
       ) {
-        collided = true
+        collided = true;
 
         if (direction === 'horizontal') {
           if (originalX + this.player.width <= blockLeft) {
-            this.player.x = blockLeft - this.player.width
+            this.player.x = blockLeft - this.player.width;
           } else if (originalX >= blockRight) {
-            this.player.x = blockRight
+            this.player.x = blockRight;
           }
         } else if (direction === 'vertical') {
           if (originalY !== undefined) {
-            if (originalY + this.player.height <= blockTop) {
-              this.player.y = blockTop - this.player.height
-              this.player.stopVerticalMovement()
-              isGrounded = true
-              groundY = blockTop
-            } else if (originalY >= blockBottom) {
-              this.player.y = blockBottom
-              this.player.velocityY = 0.1
+            if (originalY + this.player.height <= blockTop) { // Player was above the block, hit its top (ground)
+              this.player.y = blockTop - this.player.height;
+              this.player.stopVerticalMovement();
+              isGrounded = true;
+              groundY = blockTop;
+            } else if (originalY >= blockBottom) { // Player was below the block, hit its bottom (ceiling)
+              this.player.y = blockBottom;
+              if (this.isUnderwater && this.player.velocityY < 0) { // Underwater and moving up
+                this.player.velocityY = 0; // Stop upward movement
+              } else {
+                this.player.velocityY = 0.1; // Default behavior (e.g., slight bounce down for non-underwater)
+              }
             }
           }
         }
@@ -543,10 +547,10 @@ export class MainScene extends Scene {
     }
 
     if (direction === 'vertical') {
-      this.player.setGrounded(isGrounded, isGrounded ? groundY : undefined)
+      this.player.setGrounded(isGrounded, isGrounded ? groundY : undefined);
     }
 
-    return direction === 'vertical' ? isGrounded : collided
+    return direction === 'vertical' ? isGrounded : collided;
   }
 
   private async checkGoalCollision() {

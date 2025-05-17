@@ -2,41 +2,77 @@ import { Component } from "../../../core/component";
 import { AssetLoader } from "../../../core/assetLoader";
 import { Animator } from "../../../core/animator";
 import { TILE_SIZE } from "../../constants";
+import { TornadoConfigType } from "../../types/mapData"; 
 
 const TORNADO_FRAME_HEIGHT = 120;
-const TORNADO_SPRITE_WIDTH = 64; // Assuming a width for the tornado sprite, adjust if necessary
+const TORNADO_SPRITE_WIDTH = 64;
+const DEFAULT_TORNADO_PATROL_SPEED_PPS = 0.5 * TILE_SIZE; 
 
 export class TornadoComponent extends Component {
     private animator: Animator | null = null;
     public isHarmful: boolean = true;
-    private speedX: number = 0;
+    private speedX: number = 0; 
     private direction: number = 1;
     private patrolStartX?: number;
     private patrolEndX?: number;
 
-    constructor(x: number, y: number, patrolRangeXPx?: [number, number]) {
+    
+    private canToggle: boolean;
+    private toggleIntervalSeconds?: [min: number, max: number];
+    private isCurrentlyActive: boolean = true;
+    private toggleTimer: number = 0;
+    private currentToggleDuration: number = 0;
+
+    constructor(x: number, y: number, config: Partial<TornadoConfigType> = {}) { 
         super();
         this.x = x;
         this.y = y;
-        this.width = TORNADO_SPRITE_WIDTH; // Adjust as per your sprite's actual content width
+        this.width = TORNADO_SPRITE_WIDTH;
         this.height = TORNADO_FRAME_HEIGHT;
-        this.solid = false; // Player passes through, but takes damage
-        this.zIndex = 5; // In front of background, behind player? Or same as enemies.
+        this.solid = false;
+        this.zIndex = 5;
 
-        if (patrolRangeXPx && patrolRangeXPx[0] < patrolRangeXPx[1]) {
-            this.patrolStartX = patrolRangeXPx[0];
-            this.patrolEndX = patrolRangeXPx[1];
-            this.speedX = 0.5 * TILE_SIZE / 60; // Slow drift, e.g., 0.5 tile per second
+        this.canToggle = config.canToggle ?? false;
+        this.toggleIntervalSeconds = config.toggleIntervalSeconds;
+
+        if (this.canToggle && this.toggleIntervalSeconds) {
+            this.isCurrentlyActive = Math.random() > 0.3; 
+            this.setNextToggleTime();
+            this.toggleTimer = this.currentToggleDuration;
+        } else {
+            this.isCurrentlyActive = true; 
+        }
+        this.isHarmful = this.isCurrentlyActive;
+        this.visible = this.isCurrentlyActive;
+
+        if (config.patrolRangeXTiles && config.patrolRangeXTiles[0] < config.patrolRangeXTiles[1]) {
+            this.patrolStartX = config.patrolRangeXTiles[0];
+            this.patrolEndX = config.patrolRangeXTiles[1];
+
+            let currentBaseSpeed = DEFAULT_TORNADO_PATROL_SPEED_PPS * (config.baseSpeedMultiplier ?? 1);
+            if (config.speedRandomnessFactor) {
+                const randomness = (Math.random() - 0.5) * 2 * config.speedRandomnessFactor; 
+                currentBaseSpeed *= (1 + randomness);
+            }
+            this.speedX = currentBaseSpeed;
+        } else {
+            this.speedX = 0; 
         }
 
         this.loadAssets();
     }
 
+    private setNextToggleTime(): void {
+        if (!this.toggleIntervalSeconds) return;
+        const [min, max] = this.toggleIntervalSeconds;
+        this.currentToggleDuration = min + Math.random() * (max - min);
+    }
+
     private async loadAssets() {
         try {
             const image = await AssetLoader.loadImage("/assets/images/effects/tornado.png");
-            this.animator = new Animator(image, 'vertical', 8, true); // 8 FPS animation
-            this.animator.frameWidth = image.width; // Assuming full width of sprite sheet for each frame
+            this.animator = new Animator(image, 'vertical', 8, true); 
+            this.animator.frameWidth = image.width; 
             this.animator.frameHeight = TORNADO_FRAME_HEIGHT;
             this.animator.frameCount = Math.floor(image.height / TORNADO_FRAME_HEIGHT);
             if (this.animator.frameCount !== 4) {
@@ -50,8 +86,19 @@ export class TornadoComponent extends Component {
     update(dt: number): void {
         this.animator?.update(dt);
 
+        if (this.canToggle) {
+            this.toggleTimer -= dt;
+            if (this.toggleTimer <= 0) {
+                this.isCurrentlyActive = !this.isCurrentlyActive;
+                this.isHarmful = this.isCurrentlyActive;
+                this.visible = this.isCurrentlyActive; 
+                this.setNextToggleTime();
+                this.toggleTimer = this.currentToggleDuration;
+            }
+        }
+
         if (this.patrolStartX !== undefined && this.patrolEndX !== undefined && this.speedX !== 0) {
-            this.x += this.speedX * this.direction * dt * 60; // dt is in seconds, speedX in pixels per frame (assuming 60fps logic)
+            this.x += this.speedX * this.direction * dt;
 
             if (this.direction === 1 && this.x + this.width >= this.patrolEndX) {
                 this.direction = -1;

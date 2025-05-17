@@ -76,18 +76,25 @@ export function createTornadoComponent(tornadoConfig: TornadoConfigType): Tornad
     const xPos = tornadoConfig.xTile * TILE_SIZE;
     const yPos = tornadoConfig.yTile * TILE_SIZE;
     
-    let patrolRangeXPx: [number, number] | undefined = undefined;
-    // Check if patrolRangeXTiles exists and is a valid two-element tuple
+    // Prepare a config object for the TornadoComponent constructor
+    const componentConfig: Partial<TornadoConfigType> & { patrolRangeXTiles?: [number, number] } = { // Ensure patrolRangeXTiles is correctly typed for component
+        canToggle: tornadoConfig.canToggle,
+        toggleIntervalSeconds: tornadoConfig.toggleIntervalSeconds,
+        baseSpeedMultiplier: tornadoConfig.baseSpeedMultiplier,
+        speedRandomnessFactor: tornadoConfig.speedRandomnessFactor,
+    };
+
     if (tornadoConfig.patrolRangeXTiles && 
         tornadoConfig.patrolRangeXTiles.length === 2 &&
         typeof tornadoConfig.patrolRangeXTiles[0] === 'number' &&
         typeof tornadoConfig.patrolRangeXTiles[1] === 'number') {
-        patrolRangeXPx = [
+        componentConfig.patrolRangeXTiles = [
             tornadoConfig.patrolRangeXTiles[0] * TILE_SIZE, 
             tornadoConfig.patrolRangeXTiles[1] * TILE_SIZE
         ];
     }
-    return new TornadoComponent(xPos, yPos, patrolRangeXPx);
+    // Pass xPos, yPos, and the structured config
+    return new TornadoComponent(xPos, yPos, componentConfig);
 }
 
 export function createGoal(goalConfig: MapData['goal']): GoalComponent | null {
