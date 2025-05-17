@@ -1,5 +1,6 @@
 import express from "express";
-import path from "path";
+import { fileURLToPath } from "url"
+import path from "path"
 import http from "http";
 import { WebSocketServer } from "ws";
 
@@ -7,7 +8,8 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 const PORT = 3000;
-
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 app.use(express.static(path.join(__dirname, "../public")));
 app.use(express.static(path.join(__dirname, "../dist")));
 

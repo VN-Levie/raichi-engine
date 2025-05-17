@@ -18,6 +18,8 @@ export class Game {
   }
 
   start() {
+    console.log("Game started");
+    
     this.lastTime = performance.now()
     this.isRunning = true
     requestAnimationFrame(this.loop)

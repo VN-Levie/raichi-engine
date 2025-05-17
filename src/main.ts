@@ -1,19 +1,19 @@
-import { Game } from "./core/Game"
+import { Game } from "./core/game"
+import { Scene } from "./core/scene"
+import { BoxComponent } from "./entities/boxComponent"
+import { Input } from "./core/input"
 
-const game = new Game("game", update, render)
+Input.init()
 
-let x = 100
+const scene = new Scene()
+const game = new Game("game", scene.update.bind(scene), scene.render.bind(scene))
 
-function update(dt: number) {
-  x += 50 * dt
-  if (x > 800) x = 0
-}
-
-function render(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = "skyblue"
-  ctx.fillRect(0, 0, 800, 600)
-  ctx.fillStyle = "black"
-  ctx.fillRect(x, 300, 50, 50)
-}
+const box = new BoxComponent(100, 300, 50, "black")
+scene.add(box)
 
 game.start()
+
+setInterval(() => {
+  if (Input.isKeyDown("ArrowRight")) box.x += 5
+  if (Input.isKeyDown("ArrowLeft")) box.x -= 5
+}, 16)
