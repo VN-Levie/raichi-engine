@@ -47,13 +47,13 @@
   "enemies": {
     "yOffsetFromGround": -32,
     "positions": [
-      { "xTile": 10, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [7, 13], "hitSfx": "sfx_stomp" },
-      { "xTile": 22, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [19, 25], "hitSfx": "sfx_stomp" },
-      { "xTile": 35, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [32, 38], "hitSfx": "sfx_stomp" },
-      { "xTile": 45, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [42, 48], "hitSfx": "sfx_stomp" },
-      { "xTile": 60, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [57, 63], "hitSfx": "sfx_stomp" },
-      { "xTile": 82, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [79, 85], "hitSfx": "sfx_stomp" },
-      { "xTile": 95, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [92, 98], "hitSfx": "sfx_stomp" }
+      { "xTile": 10, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [7, 13], "hitSfx": "sfx_stomp" },
+      { "xTile": 22, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [19, 25], "hitSfx": "sfx_stomp" },
+      { "xTile": 35, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [32, 38], "hitSfx": "sfx_stomp" },
+      { "xTile": 45, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [42, 48], "hitSfx": "sfx_stomp" },
+      { "xTile": 60, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [57, 63], "hitSfx": "sfx_stomp" },
+      { "xTile": 82, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [79, 85], "hitSfx": "sfx_stomp" },
+      { "xTile": 95, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [92, 98], "hitSfx": "sfx_stomp" }
     ]
   },
   "goal": {

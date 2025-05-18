@@ -37,7 +37,7 @@
       {"xTile":   0, "yTile": 14, "widthTiles":   1, "style": "rock"},
       {"xTile":   0, "yTile": 15, "widthTiles":   1, "style": "rock"},
       {"xTile":   0, "yTile": 16, "widthTiles":   1, "style": "rock"},
-      {"xTile":   0, "yTile": 17, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile": 16.8, "widthTiles":   1, "style": "rock"},
       
       {"xTile": 119, "yTile":  1, "widthTiles":   1, "style": "rock"},
       {"xTile": 119, "yTile":  2, "widthTiles":   1, "style": "rock"},
@@ -55,7 +55,7 @@
       {"xTile": 119, "yTile": 14, "widthTiles":   1, "style": "rock"},
       {"xTile": 119, "yTile": 15, "widthTiles":   1, "style": "rock"},
       {"xTile": 119, "yTile": 16, "widthTiles":   1, "style": "rock"},
-      {"xTile": 119, "yTile": 17, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile": 16.8, "widthTiles":   1, "style": "rock"},
       {"xTile":  15, "yTile": 10, "widthTiles":   5, "style": "rock"},
       {"xTile":  40, "yTile": 12, "widthTiles":   6, "style": "rock"},
       {"xTile":  65, "yTile":  8, "widthTiles":   4, "style": "rock"},

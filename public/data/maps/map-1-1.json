@@ -81,16 +81,17 @@
   "enemies": {
     "yOffsetFromGround": -32,
     "positions": [
-      { "xTile": 8, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [5, 11], "hitSfx": "sfx_stomp" },
-      { "xTile": 20, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [17, 23], "hitSfx": "sfx_stomp" },
-      { "xTile": 32, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [29, 35], "hitSfx": "sfx_stomp" },
-      { "xTile": 48, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [45, 51], "hitSfx": "sfx_stomp" },
-      { "xTile": 57, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [54, 60], "hitSfx": "sfx_stomp" },
-      { "xTile": 67, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [64, 70], "hitSfx": "sfx_stomp" },
-      { "xTile": 85, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [82, 88], "hitSfx": "sfx_stomp" },
-      { "xTile": 103, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [100, 106], "hitSfx": "sfx_stomp" },
-      { "xTile": 110, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [107, 113], "hitSfx": "sfx_stomp" },
-      { "xTile": 118, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [115, 121], "hitSfx": "sfx_stomp" }
+      { "xTile": 10, "yTile": 11, "type": "goomba", "patrolRangeXTiles": [5, 11], "hitSfx": "sfx_stomp" },
+      { "xTile": 8, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [5, 11], "hitSfx": "sfx_stomp" },
+      { "xTile": 20,  "yTile": 16.8,"type": "goomba", "patrolRangeXTiles": [17, 23], "hitSfx": "sfx_stomp" },
+      { "xTile": 32, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [29, 35], "hitSfx": "sfx_stomp" },
+      { "xTile": 48, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [45, 51], "hitSfx": "sfx_stomp" },
+      { "xTile": 57, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [54, 60], "hitSfx": "sfx_stomp" },
+      { "xTile": 67, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [64, 70], "hitSfx": "sfx_stomp" },
+      { "xTile": 85, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [82, 88], "hitSfx": "sfx_stomp" },
+      { "xTile": 103, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [100, 106], "hitSfx": "sfx_stomp" },
+      { "xTile": 110, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [107, 113], "hitSfx": "sfx_stomp" },
+      { "xTile": 118, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [115, 121], "hitSfx": "sfx_stomp" }
     ]
   },
   "goal": {

@@ -37,7 +37,7 @@
       { "xTile": 35, "heightMultiplier": 1.5 },
       { "xTile": 52, "heightMultiplier": 2.5 },
       { "xTile": 70, "heightMultiplier": 2 },
-      { "xTile": 98, "heightMultiplier": 2 },
+     
       { "xTile": 108, "heightMultiplier": 1.5 }
     ],
     "floatingPlatforms": [
@@ -53,17 +53,17 @@
   "enemies": {
     "yOffsetFromGround": -32,
     "positions": [
-      { "xTile": 18, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [15, 21], "hitSfx": "sfx_stomp" },
+      { "xTile": 18, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [15, 21], "hitSfx": "sfx_stomp" },
       { "xTile": 28, "yTile": 9, "type": "bat", "patrolRangeXTiles": [25, 32], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 33, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [30, 36], "hitSfx": "sfx_stomp" },
-      { "xTile": 50, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [47, 53], "hitSfx": "sfx_stomp" },
+      { "xTile": 33, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [30, 36], "hitSfx": "sfx_stomp" },
+      { "xTile": 50, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [47, 53], "hitSfx": "sfx_stomp" },
       { "xTile": 45, "yTile": 10, "type": "bat", "patrolRangeXTiles": [42, 50], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 58, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [55, 61], "hitSfx": "sfx_stomp" },
+      { "xTile": 58, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [55, 61], "hitSfx": "sfx_stomp" },
       { "xTile": 65, "yTile": 8, "type": "bat", "patrolRangeXTiles": [62, 70], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 75, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [72, 78], "hitSfx": "sfx_stomp" },
-      { "xTile": 96, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [93, 99], "hitSfx": "sfx_stomp" },
+      { "xTile": 75, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [72, 78], "hitSfx": "sfx_stomp" },
+      { "xTile": 105, "yTile": 16.8, "type": "goomba",  "hitSfx": "sfx_stomp" },
       { "xTile": 102, "yTile": 10, "type": "bat", "patrolRangeXTiles": [99, 105], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 110, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [107, 113], "hitSfx": "sfx_stomp" }
+      { "xTile": 102, "yTile": 16.8, "type": "turtle",  "hitSfx": "sfx_stomp" }
     ]
   },
   "goal": {
@@ -77,8 +77,8 @@
   "checkpoints": [
     { "xTile": 35 },
     { "xTile": 60 },
-    { "xTile": 90 },
-    { "xTile": 105 }
+    { "xTile": 85 },
+    { "xTile": 100 }
   ],
   "coins": [
     { "xTile": 9, "yTile": 10 },

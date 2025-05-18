@@ -14,6 +14,8 @@ import { loadGameState, clearGameState, SavedGameState } from "../utils/gameStat
 import { INITIAL_LIVES } from "../constants";
 import { Camera } from "../../core/camera";
 import { SettingScene } from "./settingScene";
+import { AudioManager } from "../../core/audioManager"; // Added
+import { getMusicEnabled } from "../utils/audioSettings"; // Added
 
 export class StartScene extends Scene {
     constructor() {
@@ -21,6 +23,11 @@ export class StartScene extends Scene {
 
         Camera.resetViewport(); 
         Camera.setPosition(0, 0);
+
+        AudioManager.stopMusic(); // Stop any previous music
+        if (getMusicEnabled()) {
+            AudioManager.playMusic("assets/sound/bgm/bgm_final_boss_approach.mp3", true);
+        }
 
         const background = new BoxComponent(0, 0, 800, "#1A1A2E"); 
         background.height = 600;
@@ -56,6 +63,7 @@ export class StartScene extends Scene {
             continueButton.color = "#337AB7"; 
             continueButton.hoverColor = "#286090";
             continueButton.onClick = () => {
+                AudioManager.stopMusic(); // Stop music before transitioning
                 SceneManager.setScene(new LoadingScene(async () => MainScene.create(
                     savedGame.mapUrl,
                     savedGame.score,
@@ -74,6 +82,7 @@ export class StartScene extends Scene {
             newGameButton.width = 200;
             newGameButton.height = 50;
             newGameButton.onClick = () => {
+                AudioManager.stopMusic(); // Stop music before transitioning
                 clearGameState();
                 SceneManager.setScene(new LoadingScene(async () => MainScene.create('/data/maps/map-1-1.json', 0, INITIAL_LIVES)));
             };
@@ -100,6 +109,7 @@ export class StartScene extends Scene {
             startButton.width = 200;
             startButton.height = 50;
             startButton.onClick = () => {
+                AudioManager.stopMusic(); // Stop music before transitioning
                 clearGameState();
                 SceneManager.setScene(new LoadingScene(async () => MainScene.create('/data/maps/map-1-1.json', 0, INITIAL_LIVES)));
             };
