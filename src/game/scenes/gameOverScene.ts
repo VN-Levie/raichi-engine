@@ -13,7 +13,7 @@ export class GameOverScene extends Scene {
   private mapUrlToRestart: string;
   private mapName: string;
 
-  constructor(message: string = "Game Over", mapUrl: string = '/data/maps/map-1-1.json', mapName: string = "World 1-1") { 
+  constructor(message: string = "Game Over", mapUrl: string = '/data/maps/map-1-1.json', mapName: string = "World 1-1") {
     super()
     this.mapUrlToRestart = mapUrl;
     this.mapName = mapName;
@@ -22,7 +22,7 @@ export class GameOverScene extends Scene {
     background.height = 600
     background.zIndex = -1
     background.solid = false
-    
+
     const originalRender = background.render
     background.render = (ctx) => {
       ctx.save()
@@ -31,7 +31,7 @@ export class GameOverScene extends Scene {
       ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       ctx.restore()
     }
-    
+
     this.add(background)
 
     const gameOverText = new TextComponent("Game Over", 400, 150, "bold 64px Arial", "red")
@@ -51,9 +51,9 @@ export class GameOverScene extends Scene {
     retryButton.color = "#444"
     retryButton.hoverColor = "#666"
     retryButton.onClick = async () => {
-        clearGameState(); 
-        const mapToLoad = this.mapUrlToRestart || '/data/maps/map-1-1.json';
-        SceneManager.setScene(new LoadingScene(async () => MainScene.create(mapToLoad, 0, INITIAL_LIVES, undefined, undefined, 0)));
+      clearGameState();
+      const mapToLoad = '/data/maps/map-1-1.json';
+      SceneManager.setScene(new LoadingScene(async () => MainScene.create(mapToLoad, 0, INITIAL_LIVES, undefined, undefined, 0)));
     }
     this.add(retryButton)
 
@@ -66,7 +66,7 @@ export class GameOverScene extends Scene {
     menuButton.color = "#444"
     menuButton.hoverColor = "#666"
     menuButton.onClick = () => {
-      clearGameState(); 
+      clearGameState();
       SceneManager.setScene(StartScene.getInstance());
     }
     this.add(menuButton)
