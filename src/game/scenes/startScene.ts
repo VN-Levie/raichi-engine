@@ -13,6 +13,7 @@ import { LoadingScene } from "./LoadingScene";
 import { loadGameState, clearGameState, SavedGameState } from "../utils/gameStateManager";
 import { INITIAL_LIVES } from "../constants";
 import { Camera } from "../../core/camera";
+import { SettingScene } from "./settingScene";
 
 export class StartScene extends Scene {
     constructor() {
@@ -78,6 +79,19 @@ export class StartScene extends Scene {
             };
             this.add(newGameButton);
 
+            const settingsButton = new ButtonComponent();
+            settingsButton.text = "Settings";
+            settingsButton.x = 300;
+            settingsButton.y = 420;
+            settingsButton.width = 200;
+            settingsButton.height = 45;
+            settingsButton.color = "#888";
+            settingsButton.hoverColor = "#555";
+            settingsButton.onClick = () => {
+                SceneManager.setScene(new SettingScene());
+            };
+            this.add(settingsButton);
+
         } else {
             const startButton = new ButtonComponent();
             startButton.text = "Start New Game";
@@ -90,6 +104,19 @@ export class StartScene extends Scene {
                 SceneManager.setScene(new LoadingScene(async () => MainScene.create('/data/maps/map-1-1.json', 0, INITIAL_LIVES)));
             };
             this.add(startButton);
+
+            const settingsButton = new ButtonComponent();
+            settingsButton.text = "Settings";
+            settingsButton.x = 300;
+            settingsButton.y = 370;
+            settingsButton.width = 200;
+            settingsButton.height = 45;
+            settingsButton.color = "#888";
+            settingsButton.hoverColor = "#555";
+            settingsButton.onClick = () => {
+                SceneManager.setScene(new SettingScene());
+            };
+            this.add(settingsButton);
         }
     }
 
