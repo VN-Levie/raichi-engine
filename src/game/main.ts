@@ -1,3 +1,4 @@
+import { GameAudioManager as AudioManager } from "./audio/gameAudioManager";
 import {
   Game,
   Scene,
@@ -10,12 +11,12 @@ import {
 
 import { StartScene } from "./scenes/startScene"
 
-const CANVAS_ID = "game"; 
+const CANVAS_ID = "game";
 
-Input.init(CANVAS_ID); 
-SceneManager.setScene(new StartScene())
+Input.init(CANVAS_ID);
+SceneManager.setScene(StartScene.getInstance());
 
-const game = new Game(CANVAS_ID, 
+const game = new Game(CANVAS_ID,
   SceneManager.update.bind(SceneManager),
   SceneManager.render.bind(SceneManager)
 )

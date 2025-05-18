@@ -67,7 +67,7 @@ export class GameOverScene extends Scene {
     menuButton.hoverColor = "#666"
     menuButton.onClick = () => {
       clearGameState(); 
-      SceneManager.setScene(new StartScene())
+      SceneManager.setScene(StartScene.getInstance());
     }
     this.add(menuButton)
   }

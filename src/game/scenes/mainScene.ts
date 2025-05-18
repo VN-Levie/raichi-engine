@@ -38,7 +38,8 @@ import { CloudClusterComponent } from "../entities/map/cloudClusterComponent";
 import { TornadoComponent } from "../entities/effects/TornadoComponent";
 import { PumpkinShellComponent } from "../entities/enemy/PumpkinShellComponent";
 import { getMusicEnabled } from "../utils/audioSettings";
-import { AudioManager } from "../../core/audioManager";
+import { GameAudioManager as AudioManager } from "../audio/gameAudioManager";
+import { SettingScene } from "./settingScene"
 
 export class MainScene extends Scene {
   private player!: PlayerComponent
@@ -159,14 +160,14 @@ export class MainScene extends Scene {
 
     this.hudController.getBackToCheckpointButton().onClick = () => this.handleBackToLastCheckpointClick()
     this.hudController.getRestartLevelButton().onClick = () => this.handleRestartLevelClick()
-    this.hudController.getBackToMenuButton().onClick = () => this.handleBackToMenuButton()
+    this.hudController.getMenuButton().onClick = () => this.handleMenuButton()
 
     this.add(this.hudController.getScoreTextComponent())
     this.add(this.hudController.getLivesTextComponent())
     this.add(this.hudController.getCoinsTextComponent())
     this.add(this.hudController.getBackToCheckpointButton())
     this.add(this.hudController.getRestartLevelButton())
-    this.add(this.hudController.getBackToMenuButton())
+    this.add(this.hudController.getMenuButton())
 
 
     this.hudController.updateScore(this.score)
@@ -188,12 +189,10 @@ export class MainScene extends Scene {
     }
     this.add(background)
 
-    // Stop any existing music and play new BGM if enabled
-    AudioManager.stopMusic();
-    if (getMusicEnabled() && mapData.bgm) {
-      const bgmPath = `assets/sound/bgm/${mapData.bgm}`;
-      AudioManager.playMusic(bgmPath, true);
-    }
+
+    const bgmPath = `assets/sound/bgm/${mapData.bgm}`;
+    AudioManager.getInstance().playMusic(bgmPath, true);
+
 
     for (const cloudConfig of mapData.decorations.clouds) {
       this.add(createCloudComponent(cloudConfig))
@@ -321,7 +320,7 @@ export class MainScene extends Scene {
 
     this.playerIsCurrentlyDying = true
     this.lastDeathReason = reason
-    AudioManager.stopMusic(); // Stop BGM on death
+    // AudioManager.getInstance().stopMusic(); // Stop BGM on death
 
     if (reason === "You fell into a pit!") {
       this.player.startDeathSequence('pit')
@@ -675,7 +674,6 @@ export class MainScene extends Scene {
       playerRect.y < goalRect.y + goalRect.height &&
       playerRect.y + playerRect.height > goalRect.y
     ) {
-      AudioManager.stopMusic(); // Stop BGM on reaching goal
       this.player.enabled = false
       this.enabled = false
 
@@ -710,7 +708,7 @@ export class MainScene extends Scene {
     if (this.hudController) {
       this.hudController.getBackToCheckpointButton().update(dt);
       this.hudController.getRestartLevelButton().update(dt);
-      this.hudController.getBackToMenuButton().update(dt);
+      this.hudController.getMenuButton().update(dt);
     }
 
 
@@ -835,7 +833,7 @@ export class MainScene extends Scene {
         c === this.hudController.getCoinsTextComponent() ||
         c === this.hudController.getBackToCheckpointButton() ||
         c === this.hudController.getRestartLevelButton() ||
-        c === this.hudController.getBackToMenuButton()) {
+        c === this.hudController.getMenuButton()) {
         continue
       }
 
@@ -883,7 +881,7 @@ export class MainScene extends Scene {
       ctx.restore()
     }
 
-    const backToMenuButton = this.hudController.getBackToMenuButton()
+    const backToMenuButton = this.hudController.getMenuButton()
     if (backToMenuButton.visible) {
       ctx.save()
       backToMenuButton.render(ctx)
@@ -913,11 +911,9 @@ export class MainScene extends Scene {
     })
   }
 
-  private handleBackToMenuButton(): void {
-    AudioManager.stopMusic(); // Stop BGM when going back to menu
-    console.log("Going back to start scene.")
+  private handleMenuButton(): void {
 
-    SceneManager.setScene(new StartScene())
+    SceneManager.setScene(SettingScene.getInstance());
 
   }
 }

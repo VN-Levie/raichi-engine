@@ -14,29 +14,37 @@ import { loadGameState, clearGameState, SavedGameState } from "../utils/gameStat
 import { INITIAL_LIVES } from "../constants";
 import { Camera } from "../../core/camera";
 import { SettingScene } from "./settingScene";
-import { AudioManager } from "../../core/audioManager"; // Added
-import { getMusicEnabled } from "../utils/audioSettings"; // Added
+import { GameAudioManager as AudioManager } from "../audio/gameAudioManager";
+import { getMusicEnabled } from "../utils/audioSettings";
 
 export class StartScene extends Scene {
-    constructor() {
+    private static instance: StartScene;
+    public static getInstance(): StartScene {
+        if (!StartScene.instance) {
+            StartScene.instance = new StartScene();
+        }
+        return StartScene.instance;
+    }
+    private constructor() {
         super();
 
-        Camera.resetViewport(); 
+        Camera.resetViewport();
         Camera.setPosition(0, 0);
 
-        AudioManager.stopMusic(); // Stop any previous music
-        if (getMusicEnabled()) {
-            AudioManager.playMusic("assets/sound/bgm/bgm_final_boss_approach.mp3", true);
-        }
+        console.log("StartScene constructor called");
 
-        const background = new BoxComponent(0, 0, 800, "#1A1A2E"); 
+
+
+        //console.log("StartScene constructor called");
+
+        const background = new BoxComponent(0, 0, 800, "#1A1A2E");
         background.height = 600;
         background.zIndex = -1;
         background.solid = false;
         const originalBgRender = background.render;
         background.render = (ctx) => {
             ctx.save();
-            ctx.setTransform(1, 0, 0, 1, 0, 0); 
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.fillStyle = background.color;
             ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.restore();
@@ -60,10 +68,9 @@ export class StartScene extends Scene {
             continueButton.y = 280;
             continueButton.width = 200;
             continueButton.height = 50;
-            continueButton.color = "#337AB7"; 
+            continueButton.color = "#337AB7";
             continueButton.hoverColor = "#286090";
             continueButton.onClick = () => {
-                AudioManager.stopMusic(); // Stop music before transitioning
                 SceneManager.setScene(new LoadingScene(async () => MainScene.create(
                     savedGame.mapUrl,
                     savedGame.score,
@@ -78,11 +85,10 @@ export class StartScene extends Scene {
             const newGameButton = new ButtonComponent();
             newGameButton.text = "New Game";
             newGameButton.x = 300;
-            newGameButton.y = 350; 
+            newGameButton.y = 350;
             newGameButton.width = 200;
             newGameButton.height = 50;
             newGameButton.onClick = () => {
-                AudioManager.stopMusic(); // Stop music before transitioning
                 clearGameState();
                 SceneManager.setScene(new LoadingScene(async () => MainScene.create('/data/maps/map-1-1.json', 0, INITIAL_LIVES)));
             };
@@ -97,7 +103,7 @@ export class StartScene extends Scene {
             settingsButton.color = "#888";
             settingsButton.hoverColor = "#555";
             settingsButton.onClick = () => {
-                SceneManager.setScene(new SettingScene());
+                SceneManager.setScene(SettingScene.getInstance());
             };
             this.add(settingsButton);
 
@@ -105,11 +111,10 @@ export class StartScene extends Scene {
             const startButton = new ButtonComponent();
             startButton.text = "Start New Game";
             startButton.x = 300;
-            startButton.y = 300; 
+            startButton.y = 300;
             startButton.width = 200;
             startButton.height = 50;
             startButton.onClick = () => {
-                AudioManager.stopMusic(); // Stop music before transitioning
                 clearGameState();
                 SceneManager.setScene(new LoadingScene(async () => MainScene.create('/data/maps/map-1-1.json', 0, INITIAL_LIVES)));
             };
@@ -124,24 +129,26 @@ export class StartScene extends Scene {
             settingsButton.color = "#888";
             settingsButton.hoverColor = "#555";
             settingsButton.onClick = () => {
-                SceneManager.setScene(new SettingScene());
+                SceneManager.setScene(SettingScene.getInstance());
             };
             this.add(settingsButton);
+
         }
+
     }
 
     private isRecent(timestamp: number): boolean {
-        const oneDay = 24 * 60 * 60 * 1000; 
+        const oneDay = 24 * 60 * 60 * 1000;
         return (Date.now() - timestamp) < oneDay;
     }
 
     override render(ctx: CanvasRenderingContext2D): void {
-        
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        Camera.reset(ctx); 
 
-        
-        this.sortComponents(); 
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        Camera.reset(ctx);
+
+
+        this.sortComponents();
         for (const c of this.components) {
             if (c.visible) {
                 ctx.save();

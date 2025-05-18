@@ -23,7 +23,7 @@ export class HUDController {
     this.coinsText.zIndex = 100;
     this.coinsText.align = "center";
 
-    
+
     const buttonY = 40;
     const buttonHeight = 30;
     const buttonWidth = 180;
@@ -33,7 +33,7 @@ export class HUDController {
     this.backToCheckpointButton.text = "Last Checkpoint";
     this.backToCheckpointButton.width = buttonWidth;
     this.backToCheckpointButton.height = buttonHeight;
-    this.backToCheckpointButton.x = 20; 
+    this.backToCheckpointButton.x = 20;
     this.backToCheckpointButton.y = buttonY;
     this.backToCheckpointButton.font = buttonFontSize;
     this.backToCheckpointButton.zIndex = 101;
@@ -42,22 +42,22 @@ export class HUDController {
     this.restartLevelButton.text = "Restart Level";
     this.restartLevelButton.width = buttonWidth;
     this.restartLevelButton.height = buttonHeight;
-    this.restartLevelButton.x = (800 - buttonWidth) / 2; 
+    this.restartLevelButton.x = (800 - buttonWidth) / 2;
     this.restartLevelButton.y = buttonY;
     this.restartLevelButton.font = buttonFontSize;
     this.restartLevelButton.zIndex = 101;
-    
+
     this.backToMenuButton = new ButtonComponent();
-    this.backToMenuButton.text = "Restart Game (Menu)";
+    this.backToMenuButton.text = "Menu";
     this.backToMenuButton.width = buttonWidth + 40;
     this.backToMenuButton.height = buttonHeight;
-    this.backToMenuButton.x = 800 - (buttonWidth + 40) - 20; 
+    this.backToMenuButton.x = 800 - (buttonWidth + 40) - 20;
     this.backToMenuButton.y = buttonY;
     this.backToMenuButton.font = buttonFontSize;
     this.backToMenuButton.zIndex = 101;
-    this.backToMenuButton.color = "#FF0000"; 
-    this.backToMenuButton.hoverColor = "#FF4444"; 
-    
+    this.backToMenuButton.color = "#FF0000";
+    this.backToMenuButton.hoverColor = "#FF4444";
+
 
   }
 
@@ -81,7 +81,7 @@ export class HUDController {
     return this.backToCheckpointButton;
   }
 
-  public getBackToMenuButton(): ButtonComponent {
+  public getMenuButton(): ButtonComponent {
     return this.backToMenuButton;
   }
 

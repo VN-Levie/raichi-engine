@@ -5,17 +5,15 @@ import { SceneManager } from "../../core/sceneManager";
 import { StartScene } from "./startScene";
 import { BoxComponent } from "../../entities/boxComponent";
 import { clearGameState } from "../utils/gameStateManager";
-import { AudioManager } from "../../core/audioManager";
+import { GameAudioManager as AudioManager } from "../audio/gameAudioManager";
 import { getMusicEnabled } from "../utils/audioSettings";
 
 export class WinScene extends Scene {
   constructor() {
     super();
 
-    AudioManager.stopMusic(); // Stop any previous music
-    if (getMusicEnabled()) {
-      AudioManager.playMusic("assets/sound/bgm/bgm_final_boss_approach.mp3", true);
-    }
+
+
 
     const background = new BoxComponent(0, 0, 800, "#33AA33");
     background.height = 600;
@@ -49,10 +47,11 @@ export class WinScene extends Scene {
     menuButton.color = "#4CAF50";
     menuButton.hoverColor = "#45a049";
     menuButton.onClick = () => {
-      AudioManager.stopMusic(); // Stop music before transitioning
       clearGameState();
-      SceneManager.setScene(new StartScene());
+      SceneManager.setScene(StartScene.getInstance());
     };
+
     this.add(menuButton);
+    AudioManager.getInstance().playMusic("assets/sound/bgm/bgm_final_boss_approach.mp3", true);
   }
 }

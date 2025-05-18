@@ -10,10 +10,17 @@ import { getMusicEnabled, setMusicEnabled, getSfxEnabled, setSfxEnabled } from "
 import { StartScene } from "./startScene";
 
 export class SettingScene extends Scene {
+    private static instance: SettingScene;
+    public static getInstance(): SettingScene {
+        if (!SettingScene.instance) {
+            SettingScene.instance = new SettingScene();
+        }
+        return SettingScene.instance;
+    }
     private musicButton: ButtonComponent;
     private sfxButton: ButtonComponent;
 
-    constructor() {
+    private constructor() {
         super();
 
         Camera.resetViewport();
@@ -74,7 +81,7 @@ export class SettingScene extends Scene {
         backButton.color = "#888";
         backButton.hoverColor = "#555";
         backButton.onClick = () => {
-            SceneManager.setScene(new StartScene());
+            SceneManager.setScene(SceneManager.getPreviousScene() || StartScene.getInstance());
         };
         this.add(backButton);
 

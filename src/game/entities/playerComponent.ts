@@ -2,6 +2,7 @@ import { Component } from "../../core/component"
 import { Input } from "../../core/input"
 import { AssetLoader } from "../../core/assetLoader";
 import { Animator } from "../../core/animator";
+import { GameAudioManager } from "../audio/gameAudioManager";
 
 enum PlayerState {
   IDLE,
@@ -128,6 +129,7 @@ export class PlayerComponent extends Component {
     this.state = PlayerState.DYING;
 
     if (deathType === 'enemy') {
+      GameAudioManager.getInstance().playSound("assets/sound/sfx/die.wav");
       this.velocityY = this.DEATH_BOUNCE_FORCE;
     }
   }
@@ -182,10 +184,12 @@ export class PlayerComponent extends Component {
     if (this.isUnderwater) {
       return;
     }
+    
     if (this.isGrounded || this.currentJumps < this.maxJumps) {
       this.velocityY = this.jumpForce;
       this.isGrounded = false;
       this.currentJumps++;
+      GameAudioManager.getInstance().playSound("assets/sound/sfx/jump.wav");
     }
   }
 
@@ -244,6 +248,7 @@ export class PlayerComponent extends Component {
     this.animTimer += dt;
     switch (this.state) {
       case PlayerState.JUMPING:
+        
         this.animator.currentFrame = Math.min(this.JUMP_UP_FRAME, this.animator.frameCount - 1);
         break;
       case PlayerState.FALLING:
@@ -261,9 +266,11 @@ export class PlayerComponent extends Component {
           let currentIndexInSeq = validRunFrames.indexOf(this.animator.currentFrame);
           if (currentIndexInSeq === -1 || !validRunFrames.includes(this.animator.currentFrame)) {
             this.animFrame = 0;
+            GameAudioManager.getInstance().playSound("assets/sound/sfx/step.wav");
           } else {
             this.animFrame = (currentIndexInSeq + 1) % validRunFrames.length;
           }
+          
           this.animator.currentFrame = validRunFrames[this.animFrame];
         }
         break;
@@ -292,7 +299,7 @@ export class PlayerComponent extends Component {
       this.velocityY -= this.buoyancyAcceleration * dt * 60;
 
       if (isJumpKeyDown) {
-        this.velocityY -= this.swimAcceleration * dt * 60;
+        this.velocityY -= this.swimAcceleration * dt * 60;        
       }
       if (isSwimDownKeyDown) {
         this.velocityY += this.swimAcceleration * dt * 60;
@@ -389,10 +396,12 @@ export class PlayerComponent extends Component {
   bounceOffEnemy() {
     if (this.isDying) return;
     this.velocityY = -5;
+    
   }
 
   bounceOffEnemySlightly() {
     if (this.isDying) return;
     this.velocityY = -3;
+    
   }
 }
