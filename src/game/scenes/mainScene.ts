@@ -75,6 +75,8 @@ export class MainScene extends Scene {
   private readonly MIN_CLOUD_SPAWN_INTERVAL = 4;
   private readonly MAX_CLOUD_SPAWN_INTERVAL = 8;
 
+  private static mapDataCache: Map<string, MapData> = new Map(); 
+
   private constructor() {
     super()
   }
@@ -90,10 +92,21 @@ export class MainScene extends Scene {
     const scene = new MainScene()
     scene.currentMapUrl = mapUrl
     try {
-      const mapData = await AssetLoader.loadJson<MapData>(mapUrl)
+      let mapData: MapData | undefined = MainScene.mapDataCache.get(mapUrl);
+      if (!mapData) {
+        mapData = await AssetLoader.loadJson<MapData>(mapUrl);
+        if (mapData) {
+          MainScene.mapDataCache.set(mapUrl, mapData);
+        } else {
+          
+          throw new Error(`Map data at ${mapUrl} could not be loaded or is invalid.`);
+        }
+      }
       scene.initializeScene(mapData, initialScore, initialLives, false, playerStartX, playerStartY, initialTotalCoins)
     } catch (error) {
       console.error(`Failed to load or parse map data from ${mapUrl}:`, error)
+      
+      MainScene.mapDataCache.delete(mapUrl); 
       scene.initializeScene(scene.getDefaultFallbackMapData(), initialScore, initialLives, true, playerStartX, playerStartY, initialTotalCoins)
     }
     return scene
@@ -320,7 +333,7 @@ export class MainScene extends Scene {
 
     this.playerIsCurrentlyDying = true
     this.lastDeathReason = reason
-    // AudioManager.getInstance().stopMusic(); // Stop BGM on death
+    
 
     if (reason === "You fell into a pit!") {
       this.player.startDeathSequence('pit')
@@ -413,6 +426,7 @@ export class MainScene extends Scene {
             if (shell.isHarmfulOnContact()) {
 
               shell.killAndFall(true);
+              AudioManager.getInstance().playSound("assets/sound/sfx/hit_2.wav", 5);
               this.player.bounceOffEnemySlightly();
             } else {
               AudioManager.getInstance().playSound("assets/sound/sfx/hit.wav");
@@ -421,9 +435,7 @@ export class MainScene extends Scene {
             }
             stompedEnemy = true;
           } else if (enemy instanceof TurtleEnemyComponent || enemy instanceof GoombaEnemyComponent) {
-
             enemy.stomp();
-            // AudioManager.getInstance().playSound(enemy.hitSfx || "assets/sound/sfx/sfx_hit_bat.wav.wav");
             AudioManager.getInstance().playSound("assets/sound/sfx/hit.wav");
             this.player.bounceOffEnemy();
             stompedEnemy = true;
@@ -437,7 +449,8 @@ export class MainScene extends Scene {
         }
 
         if (!stompedEnemy && isEnemyHarmful) {
-          AudioManager.getInstance().playSound(enemy.hitSfx || "assets/sound/sfx/sfx_hit_bat.wav.wav");
+          
+          AudioManager.getInstance().playSound("assets/sound/sfx/hit_2.wav", 5);
           let playerDies = true;
 
           if (playerDies) {
@@ -468,7 +481,7 @@ export class MainScene extends Scene {
             shellA.y < enemy.y + enemy.height &&
             shellA.y + shellA.height > enemy.y
           ) {
-
+            AudioManager.getInstance().playSound("assets/sound/sfx/hit_2.wav", 5);
             enemy.stomp();
             //console.log(`Enemy ${enemy.constructor.name} killed by shell at (${shellA.x}, ${shellA.y})`);
 
@@ -493,6 +506,7 @@ export class MainScene extends Scene {
           shellA.y < shellB.y + shellB.height &&
           shellA.y + shellA.height > shellB.y
         ) {
+          AudioManager.getInstance().playSound("assets/sound/sfx/hit_2.wav", 5);
           shellA.killAndFall(true);
           shellB.killAndFall(true);
         }

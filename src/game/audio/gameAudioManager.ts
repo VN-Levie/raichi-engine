@@ -12,7 +12,6 @@ export class GameAudioManager implements IAudioManager {
 
     private currentMusicSource: AudioBufferSourceNode | null = null;
     private currentMusicPath: string | null = null;
-    private currentMusicBuffer: AudioBuffer | null = null;
     private isMusicLooping: boolean = false;
     private musicVolumeBeforePause: number | null = null;
 
@@ -20,14 +19,16 @@ export class GameAudioManager implements IAudioManager {
     private musicVolume: number = 0.5;
     private sfxVolume: number = 0.7;
 
+    private audioBufferCache: Map<string, AudioBuffer> = new Map();
+
     private constructor() {
-        // Private constructor to prevent direct instantiation
+        
     }
 
     public static getInstance(): GameAudioManager {
         if (!GameAudioManager.instance) {
             GameAudioManager.instance = new GameAudioManager();
-            GameAudioManager.instance.initialize(); 
+            GameAudioManager.instance.initialize();
         }
         return GameAudioManager.instance;
     }
@@ -36,7 +37,7 @@ export class GameAudioManager implements IAudioManager {
         if (!this.audioContext) {
             try {
                 this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-                
+
                 this.masterGainNode = this.audioContext.createGain();
                 this.masterGainNode.connect(this.audioContext.destination);
                 this.masterGainNode.gain.setValueAtTime(this.masterVolume, this.audioContext.currentTime);
@@ -60,9 +61,26 @@ export class GameAudioManager implements IAudioManager {
         return true;
     }
 
+    private async getCachedAudioBuffer(filePath: string): Promise<AudioBuffer | null> {
+        if (this.audioBufferCache.has(filePath)) {
+            return this.audioBufferCache.get(filePath)!;
+        }
+        try {
+            const audioBuffer = await AssetLoader.loadAudioBuffer(filePath);
+            if (audioBuffer) {
+                this.audioBufferCache.set(filePath, audioBuffer);
+                return audioBuffer;
+            }
+        } catch (error) {
+            console.error(`Failed to load or cache audio buffer for: ${filePath}`, error);
+        }
+        return null;
+    }
+
     public async playMusic(filePath: string, loop: boolean = true): Promise<void> {
         if (!getMusicEnabled()) {
-            this.stopMusic(); 
+            this.currentMusicPath = filePath;
+            this.stopMusic();
             return;
         }
         if (!this.initialize() || !this.audioContext || !this.musicGainNode) return;
@@ -76,16 +94,16 @@ export class GameAudioManager implements IAudioManager {
         }
 
         if (this.currentMusicPath !== filePath || !this.currentMusicSource) {
-            this.stopMusic(); 
+            this.stopMusic();
             try {
-                this.currentMusicBuffer = await AssetLoader.loadAudioBuffer(filePath);
-                if (!this.currentMusicBuffer) {
-                    console.error(`Failed to load audio buffer for music: ${filePath}`);
+                const audioBuffer = await this.getCachedAudioBuffer(filePath);
+                if (!audioBuffer) {
+                    console.error(`Failed to get audio buffer for music: ${filePath}`);
                     return;
                 }
 
                 this.currentMusicSource = this.audioContext.createBufferSource();
-                this.currentMusicSource.buffer = this.currentMusicBuffer;
+                this.currentMusicSource.buffer = audioBuffer;
                 this.currentMusicSource.loop = loop;
                 this.currentMusicSource.connect(this.musicGainNode);
                 this.musicGainNode.gain.setValueAtTime(this.musicVolume, this.audioContext.currentTime);
@@ -93,7 +111,7 @@ export class GameAudioManager implements IAudioManager {
 
                 this.currentMusicPath = filePath;
                 this.isMusicLooping = loop;
-                this.musicVolumeBeforePause = null; 
+                this.musicVolumeBeforePause = null;
                 console.log(`Playing music: ${filePath}`);
             } catch (error) {
                 console.error(`Error playing music ${filePath}:`, error);
@@ -109,10 +127,7 @@ export class GameAudioManager implements IAudioManager {
             this.currentMusicSource.disconnect();
             this.currentMusicSource = null;
         }
-        this.currentMusicBuffer = null;
         this.musicVolumeBeforePause = null;
-        // Optionally keep currentMusicPath if resumeMusic should try to replay it after a full stop
-        // this.currentMusicPath = null; 
         console.log("Music stopped.");
     }
 
@@ -141,9 +156,9 @@ export class GameAudioManager implements IAudioManager {
         if (!getSfxEnabled() || !this.initialize() || !this.audioContext || !this.sfxGainNode) return;
 
         try {
-            const audioBuffer = await AssetLoader.loadAudioBuffer(filePath);
+            const audioBuffer = await this.getCachedAudioBuffer(filePath);
             if (!audioBuffer) {
-                console.error(`Failed to load audio buffer for sound: ${filePath}`);
+                console.error(`Failed to get audio buffer for sound: ${filePath}`);
                 return;
             }
 
@@ -152,7 +167,7 @@ export class GameAudioManager implements IAudioManager {
 
             const soundGainNode = this.audioContext.createGain();
             soundGainNode.gain.setValueAtTime(volume, this.audioContext.currentTime);
-            soundGainNode.connect(this.sfxGainNode); 
+            soundGainNode.connect(this.sfxGainNode);
 
             sourceNode.connect(soundGainNode);
             sourceNode.start(0);
@@ -162,7 +177,7 @@ export class GameAudioManager implements IAudioManager {
                 soundGainNode.disconnect();
             };
         } catch (error) {
-            console.error(`Error playing sound ${filePath}:`, error);
+            
         }
     }
 
@@ -180,10 +195,9 @@ export class GameAudioManager implements IAudioManager {
     public setMusicVolume(volume: number): void {
         this.musicVolume = Math.max(0, Math.min(1, volume));
         if (this.musicGainNode && this.audioContext) {
-            if (this.musicVolumeBeforePause === null) { // Not paused by setting gain to 0
+            if (this.musicVolumeBeforePause === null) {
                 this.musicGainNode.gain.setValueAtTime(this.musicVolume, this.audioContext.currentTime);
-            } else { 
-                // If paused (gain is 0), update the volume that will be restored on resume
+            } else {
                 this.musicVolumeBeforePause = this.musicVolume;
             }
         }

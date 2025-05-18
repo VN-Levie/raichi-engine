@@ -43,7 +43,7 @@ export class SettingScene extends Scene {
         titleText.align = "center";
         this.add(titleText);
 
-        // Music toggle
+        
         this.musicButton = new ButtonComponent();
         this.musicButton.x = 250;
         this.musicButton.y = 220;
@@ -57,7 +57,7 @@ export class SettingScene extends Scene {
         };
         this.add(this.musicButton);
 
-        // SFX toggle
+        
         this.sfxButton = new ButtonComponent();
         this.sfxButton.x = 250;
         this.sfxButton.y = 310;
@@ -71,7 +71,7 @@ export class SettingScene extends Scene {
         };
         this.add(this.sfxButton);
 
-        // Back button
+        
         const backButton = new ButtonComponent();
         backButton.text = "Back";
         backButton.x = 250;
