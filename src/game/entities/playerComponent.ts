@@ -49,7 +49,7 @@ export class PlayerComponent extends Component {
   respawnX: number;
   respawnY: number;
 
-  
+
   private animator: Animator | null = null;
   private spritesheet: HTMLImageElement | null = null;
   private assetsLoaded: boolean = false;
@@ -58,14 +58,16 @@ export class PlayerComponent extends Component {
   private readonly SPRITE_FRAME_WIDTH = 50;
   private readonly SPRITE_FRAME_HEIGHT = 52;
 
-  
+
   private readonly IDLE_FRAMES = [0, 1];
   private readonly IDLE_ANIM_FPS = 4;
   private readonly RUN_FRAMES = [2, 3, 4, 5];
   private readonly RUN_ANIM_FPS = 15;
-  private readonly JUMP_UP_FRAME = 4; 
+  private readonly JUMP_UP_FRAME = 4;
   private readonly FALL_FRAME = 5;
   private readonly DEATH_FRAME = 5;
+  private lastPlayStepSound: number = 0;
+  private readonly STEP_SOUND_INTERVAL = 1.1;
 
   constructor(x: number, y: number, isUnderwater: boolean = false) {
     super()
@@ -103,7 +105,7 @@ export class PlayerComponent extends Component {
       this.animator.frameHeight = frameHeight;
       this.animator.frameCount = calculatedFrameCount;
       this.animator.currentFrame = this.IDLE_FRAMES[0];
-      
+
       this.assetsLoaded = true;
     } catch (error) {
       console.error("Failed to load player spritesheet:", error);
@@ -121,7 +123,7 @@ export class PlayerComponent extends Component {
 
   startDeathSequence(deathType: 'enemy' | 'pit') {
     if (this.isDying) return;
-
+    GameAudioManager.getInstance().playSound("assets/sound/sfx/die.wav");
     this.isDying = true;
     this.deathAnimTimer = this.DEATH_ANIM_DURATION;
     this.isGrounded = false;
@@ -129,7 +131,6 @@ export class PlayerComponent extends Component {
     this.state = PlayerState.DYING;
 
     if (deathType === 'enemy') {
-      GameAudioManager.getInstance().playSound("assets/sound/sfx/die.wav");
       this.velocityY = this.DEATH_BOUNCE_FORCE;
     }
   }
@@ -184,7 +185,7 @@ export class PlayerComponent extends Component {
     if (this.isUnderwater) {
       return;
     }
-    
+
     if (this.isGrounded || this.currentJumps < this.maxJumps) {
       this.velocityY = this.jumpForce;
       this.isGrounded = false;
@@ -244,11 +245,11 @@ export class PlayerComponent extends Component {
     } else {
       this.state = PlayerState.IDLE;
     }
-    
+    const currentTime = new Date().getTime() / 1000;
     this.animTimer += dt;
     switch (this.state) {
       case PlayerState.JUMPING:
-        
+
         this.animator.currentFrame = Math.min(this.JUMP_UP_FRAME, this.animator.frameCount - 1);
         break;
       case PlayerState.FALLING:
@@ -266,12 +267,23 @@ export class PlayerComponent extends Component {
           let currentIndexInSeq = validRunFrames.indexOf(this.animator.currentFrame);
           if (currentIndexInSeq === -1 || !validRunFrames.includes(this.animator.currentFrame)) {
             this.animFrame = 0;
-            GameAudioManager.getInstance().playSound("assets/sound/sfx/step.wav");
+
           } else {
             this.animFrame = (currentIndexInSeq + 1) % validRunFrames.length;
           }
-          
+
           this.animator.currentFrame = validRunFrames[this.animFrame];
+        }
+
+
+        if (this.isMoving && currentTime - this.lastPlayStepSound >= this.STEP_SOUND_INTERVAL) {
+          if (this.isUnderwater) {
+            GameAudioManager.getInstance().playSound("assets/sound/sfx/swim.wav", 5);
+          } else {
+            GameAudioManager.getInstance().playSound("assets/sound/sfx/step.wav", 5);
+          }
+
+          this.lastPlayStepSound = currentTime;
         }
         break;
       case PlayerState.IDLE:
@@ -291,6 +303,11 @@ export class PlayerComponent extends Component {
           }
           this.animator.currentFrame = validIdleFrames[this.animFrame];
         }
+        if (currentTime - this.lastPlayStepSound >= this.STEP_SOUND_INTERVAL && this.isUnderwater) {
+          GameAudioManager.getInstance().playSound("assets/sound/sfx/swim.wav", 5);
+
+          this.lastPlayStepSound = currentTime;
+        }
         break;
     }
 
@@ -299,7 +316,7 @@ export class PlayerComponent extends Component {
       this.velocityY -= this.buoyancyAcceleration * dt * 60;
 
       if (isJumpKeyDown) {
-        this.velocityY -= this.swimAcceleration * dt * 60;        
+        this.velocityY -= this.swimAcceleration * dt * 60;
       }
       if (isSwimDownKeyDown) {
         this.velocityY += this.swimAcceleration * dt * 60;
@@ -396,12 +413,12 @@ export class PlayerComponent extends Component {
   bounceOffEnemy() {
     if (this.isDying) return;
     this.velocityY = -5;
-    
+
   }
 
   bounceOffEnemySlightly() {
     if (this.isDying) return;
     this.velocityY = -3;
-    
+
   }
 }
