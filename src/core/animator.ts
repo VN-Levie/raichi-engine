@@ -45,23 +45,20 @@ export class Animator {
     if (!this.playing || this.frameCount === 0 || this.frameRate <= 0) return;
 
     this.timer += dt;
-    const frameTime = 1 / this.frameRate;
+    const rawIndex = Math.floor(this.timer * this.frameRate);
 
-    if (this.timer >= frameTime) {
-      this.timer = 0;
-      const oldFrame = this.currentFrame;
-      this.currentFrame++;
-
-      if (this.currentFrame >= this.frameCount) {
-        if (this.loop) {
-          this.currentFrame = 0;
-        } else {
-          this.currentFrame = this.frameCount - 1;
-          this.playing = false;
-        }
+    if (this.loop) {
+      this.currentFrame = rawIndex % this.frameCount;
+    } else {
+      if (rawIndex >= this.frameCount) {
+        this.currentFrame = this.frameCount - 1;
+        this.playing = false;
+      } else {
+        this.currentFrame = rawIndex;
       }
     }
   }
+
 
   getFrameSourceRect(): { sx: number, sy: number, sWidth: number, sHeight: number } | null {
     if (!this.spritesheet || this.frameCount === 0) return null;
