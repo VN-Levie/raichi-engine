@@ -52,21 +52,21 @@
   "enemies": {
     "yOffsetFromGround": -32,
     "positions": [
-      { "xTile": 8, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [5, 11], "hitSfx": "sfx_stomp" },
-      { "xTile": 15, "yTile": 10, "type": "bat", "patrolRangeXTiles": [12, 20], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 20, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [17, 23], "hitSfx": "sfx_stomp" },
-      { "xTile": 22, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [19, 25], "hitSfx": "sfx_stomp" },
-      { "xTile": 28, "yTile": 8, "type": "bat", "patrolRangeXTiles": [25, 33], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 30, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [27, 33], "hitSfx": "sfx_stomp" },
-      { "xTile": 38, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [35, 41], "hitSfx": "sfx_stomp" },
-      { "xTile": 45, "yTile": 9, "type": "bat", "patrolRangeXTiles": [42, 50], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 48, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [45, 51], "hitSfx": "sfx_stomp" },
-      { "xTile": 50, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [47, 53], "hitSfx": "sfx_stomp" },
-      { "xTile": 55, "yTile": 7, "type": "bat", "patrolRangeXTiles": [52, 60], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 58, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [55, 61], "hitSfx": "sfx_stomp" },
-      { "xTile": 74, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [71, 77], "hitSfx": "sfx_stomp" },
-      { "xTile": 78, "yTile": 9, "type": "bat", "patrolRangeXTiles": [75, 83], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 88, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [85, 91], "hitSfx": "sfx_stomp" }
+      { "xTile": 8, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [5, 11], "hitSfx": "sfx_stomp_turtle.wav" },
+      { "xTile": 15, "yTile": 10, "type": "bat", "patrolRangeXTiles": [12, 20], "hitSfx": "sfx_hit_bat.wav" },
+      { "xTile": 20, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [17, 23], "hitSfx": "sfx_stomp_goomba.wav" },
+      { "xTile": 22, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [19, 25], "hitSfx": "sfx_stomp_turtle.wav" },
+      { "xTile": 28, "yTile": 8, "type": "bat", "patrolRangeXTiles": [25, 33], "hitSfx": "sfx_hit_bat.wav" },
+      { "xTile": 30, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [27, 33], "hitSfx": "sfx_stomp_goomba.wav" },
+      { "xTile": 38, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [35, 41], "hitSfx": "sfx_stomp_turtle.wav" },
+      { "xTile": 45, "yTile": 9, "type": "bat", "patrolRangeXTiles": [42, 50], "hitSfx": "sfx_hit_bat.wav" },
+      { "xTile": 48, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [45, 51], "hitSfx": "sfx_stomp_goomba.wav" },
+      { "xTile": 50, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [47, 53], "hitSfx": "sfx_stomp_turtle.wav" },
+      { "xTile": 55, "yTile": 7, "type": "bat", "patrolRangeXTiles": [52, 60], "hitSfx": "sfx_hit_bat.wav" },
+      { "xTile": 58, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [55, 61], "hitSfx": "sfx_stomp_goomba.wav" },
+      { "xTile": 74, "yTile": 16.8, "type": "turtle", "patrolRangeXTiles": [71, 77], "hitSfx": "sfx_stomp_turtle.wav" },
+      { "xTile": 78, "yTile": 9, "type": "bat", "patrolRangeXTiles": [75, 83], "hitSfx": "sfx_hit_bat.wav" },
+      { "xTile": 88, "yTile": 16.8, "type": "goomba", "patrolRangeXTiles": [85, 91], "hitSfx": "sfx_stomp_goomba.wav" }
     ]
   },
   "goal": {

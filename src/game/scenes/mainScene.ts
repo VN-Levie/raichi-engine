@@ -336,6 +336,7 @@ export class MainScene extends Scene {
     for (const pos of mapData.enemies.positions) {
 
       const enemy = createEnemy(pos, enemyYPosition, this.components) as BaseEnemyComponent
+      enemy.hitSfx = `assets/sound/sfx/${pos.hitSfx || "sfx_hit_bat.wav.wav"}`
       this.enemies.push(enemy)
       this.add(enemy)
     }
@@ -414,7 +415,7 @@ export class MainScene extends Scene {
               shell.killAndFall(true);
               this.player.bounceOffEnemySlightly();
             } else {
-
+              AudioManager.getInstance().playSound("assets/sound/sfx/hit.wav");
               shell.stomp();
               this.player.bounceOffEnemySlightly();
             }
@@ -422,6 +423,8 @@ export class MainScene extends Scene {
           } else if (enemy instanceof TurtleEnemyComponent || enemy instanceof GoombaEnemyComponent) {
 
             enemy.stomp();
+            // AudioManager.getInstance().playSound(enemy.hitSfx || "assets/sound/sfx/sfx_hit_bat.wav.wav");
+            AudioManager.getInstance().playSound("assets/sound/sfx/hit.wav");
             this.player.bounceOffEnemy();
             stompedEnemy = true;
           }
@@ -434,6 +437,7 @@ export class MainScene extends Scene {
         }
 
         if (!stompedEnemy && isEnemyHarmful) {
+          AudioManager.getInstance().playSound(enemy.hitSfx || "assets/sound/sfx/sfx_hit_bat.wav.wav");
           let playerDies = true;
 
           if (playerDies) {
@@ -528,6 +532,7 @@ export class MainScene extends Scene {
         this.player.y + this.player.height > coin.y
       ) {
         coin.collect()
+        AudioManager.getInstance().playSound("assets/sound/sfx/coin.wav");
         this.score += coin.value
         this.totalCoinsCollected++
         this.hudController.updateScore(this.score)
@@ -548,6 +553,7 @@ export class MainScene extends Scene {
         this.player.y + this.player.height > lifeItem.y
       ) {
         lifeItem.collect()
+        AudioManager.getInstance().playSound("assets/sound/sfx/life.wav");
         this.lives += lifeItem.value
         this.hudController.updateLives(this.lives)
       }

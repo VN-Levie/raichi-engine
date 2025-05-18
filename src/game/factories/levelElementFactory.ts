@@ -4,7 +4,7 @@ import { PipeComponent } from "../entities/map/pipeComponent";
 import { FloatingPlatformComponent } from "../entities/map/floatingPlatformComponent";
 import { CloudClusterComponent } from "../entities/map/cloudClusterComponent";
 import { BushComponent } from "../entities/map/bushComponent";
-import { GoombaEnemyComponent as GoombaEnemyComponent } from "../entities/enemy/goombaEnemyComponent"; 
+import { GoombaEnemyComponent as GoombaEnemyComponent } from "../entities/enemy/goombaEnemyComponent";
 import { TurtleEnemyComponent } from "../entities/enemy/turtleEnemyComponent";
 import { GoalComponent } from "../entities/map/goalComponent";
 import { TILE_SIZE } from "../constants";
@@ -19,12 +19,12 @@ import { TornadoComponent } from "../entities/effects/TornadoComponent";
 
 export function createCloudComponent(
   cloudConfig: MapData['decorations']['clouds'][0],
-  speedX: number = 0 
+  speedX: number = 0
 ): CloudClusterComponent {
   const cloud = new CloudClusterComponent(cloudConfig.x, cloudConfig.y, cloudConfig.size, speedX);
-  
+
   if (speedX !== 0) {
-    cloud.zIndex = -6; 
+    cloud.zIndex = -6;
   }
   return cloud;
 }
@@ -46,11 +46,11 @@ export function createFloatingPlatformComponent(platformConfig: MapData['terrain
 }
 
 export function createEnemy(
-    enemyConfig: MapData['enemies']['positions'][0], 
-    defaultYPosition: number, 
-    sceneComponents: Component[]): BaseEnemyComponent { 
-  
-  const enemyType = enemyConfig.type || "goomba"; 
+  enemyConfig: MapData['enemies']['positions'][0],
+  defaultYPosition: number,
+  sceneComponents: Component[]): BaseEnemyComponent {
+
+  const enemyType = enemyConfig.type || "goomba";
   const xPos = enemyConfig.xTile * TILE_SIZE;
   let yPos = enemyConfig.yTile !== undefined ? enemyConfig.yTile * TILE_SIZE : defaultYPosition;
 
@@ -66,36 +66,37 @@ export function createEnemy(
       patrolRangeXPx = [patrolXTiles[0] * TILE_SIZE, patrolXTiles[1] * TILE_SIZE];
     }
     enemy = new BatEnemyComponent(xPos, yPos, TILE_SIZE, TILE_SIZE, patrolRangeXPx);
-  } else { 
+  } else {
     enemy = new GoombaEnemyComponent(xPos, yPos, TILE_SIZE, TILE_SIZE);
   }
+  
   enemy.setScene(sceneComponents);
   return enemy;
 }
 
 export function createTornadoComponent(tornadoConfig: TornadoConfigType): TornadoComponent {
-    const xPos = tornadoConfig.xTile * TILE_SIZE;
-    const yPos = tornadoConfig.yTile * TILE_SIZE;
-    
-    
-    const componentConfig: Partial<TornadoConfigType> & { patrolRangeXTiles?: [number, number] } = { 
-        canToggle: tornadoConfig.canToggle,
-        toggleIntervalSeconds: tornadoConfig.toggleIntervalSeconds,
-        baseSpeedMultiplier: tornadoConfig.baseSpeedMultiplier,
-        speedRandomnessFactor: tornadoConfig.speedRandomnessFactor,
-    };
+  const xPos = tornadoConfig.xTile * TILE_SIZE;
+  const yPos = tornadoConfig.yTile * TILE_SIZE;
 
-    if (tornadoConfig.patrolRangeXTiles && 
-        tornadoConfig.patrolRangeXTiles.length === 2 &&
-        typeof tornadoConfig.patrolRangeXTiles[0] === 'number' &&
-        typeof tornadoConfig.patrolRangeXTiles[1] === 'number') {
-        componentConfig.patrolRangeXTiles = [
-            tornadoConfig.patrolRangeXTiles[0] * TILE_SIZE, 
-            tornadoConfig.patrolRangeXTiles[1] * TILE_SIZE
-        ];
-    }
-    
-    return new TornadoComponent(xPos, yPos, componentConfig);
+
+  const componentConfig: Partial<TornadoConfigType> & { patrolRangeXTiles?: [number, number] } = {
+    canToggle: tornadoConfig.canToggle,
+    toggleIntervalSeconds: tornadoConfig.toggleIntervalSeconds,
+    baseSpeedMultiplier: tornadoConfig.baseSpeedMultiplier,
+    speedRandomnessFactor: tornadoConfig.speedRandomnessFactor,
+  };
+
+  if (tornadoConfig.patrolRangeXTiles &&
+    tornadoConfig.patrolRangeXTiles.length === 2 &&
+    typeof tornadoConfig.patrolRangeXTiles[0] === 'number' &&
+    typeof tornadoConfig.patrolRangeXTiles[1] === 'number') {
+    componentConfig.patrolRangeXTiles = [
+      tornadoConfig.patrolRangeXTiles[0] * TILE_SIZE,
+      tornadoConfig.patrolRangeXTiles[1] * TILE_SIZE
+    ];
+  }
+
+  return new TornadoComponent(xPos, yPos, componentConfig);
 }
 
 export function createGoal(goalConfig: MapData['goal']): GoalComponent | null {

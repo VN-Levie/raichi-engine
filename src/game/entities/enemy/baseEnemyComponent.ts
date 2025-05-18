@@ -12,6 +12,7 @@ export abstract class BaseEnemyComponent extends Component {
   public initialX: number;
   public initialY: number;
   public initialDirection: number;
+  public hitSfx?: string = undefined;
 
   constructor(x: number, y: number, width: number, height: number) {
     super();

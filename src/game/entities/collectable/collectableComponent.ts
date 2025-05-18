@@ -102,7 +102,6 @@ export abstract class CollectableComponent extends Component {
     collect() {
         if (!this.collected) {
             this.collected = true;
-
         }
     }
 }

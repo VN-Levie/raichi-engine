@@ -60,14 +60,14 @@
   "enemies": {
     "yOffsetFromGround": -32,
     "positions": [
-      { "xTile": 10, "yTile": 11, "type": "bat", "patrolRangeXTiles": [8, 18], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 25, "yTile": 10, "type": "bat", "patrolRangeXTiles": [22, 32], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 38, "yTile": 9, "type": "bat", "patrolRangeXTiles": [35, 45], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 50, "yTile": 8, "type": "bat", "patrolRangeXTiles": [47, 57], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 63, "yTile": 7, "type": "bat", "patrolRangeXTiles": [60, 70], "hitSfx": "sfx_hit_bat" },
-      { "xTile": 77, "yTile": 10, "type": "bat", "patrolRangeXTiles": [74, 88], "hitSfx": "sfx_hit_bat" },
+      { "xTile": 10, "yTile": 11, "type": "bat", "patrolRangeXTiles": [8, 18], "hitSfx": "sfx_hit_bat.wav" },
+      { "xTile": 25, "yTile": 10, "type": "bat", "patrolRangeXTiles": [22, 32], "hitSfx": "sfx_hit_bat.wav" },
+      { "xTile": 38, "yTile": 9, "type": "bat", "patrolRangeXTiles": [35, 45], "hitSfx": "sfx_hit_bat.wav" },
+      { "xTile": 50, "yTile": 8, "type": "bat", "patrolRangeXTiles": [47, 57], "hitSfx": "sfx_hit_bat.wav" },
+      { "xTile": 63, "yTile": 7, "type": "bat", "patrolRangeXTiles": [60, 70], "hitSfx": "sfx_hit_bat.wav" },
+      { "xTile": 77, "yTile": 10, "type": "bat", "patrolRangeXTiles": [74, 88], "hitSfx": "sfx_hit_bat.wav" },
       
-      { "xTile": 112, "yTile": 8, "type": "bat", "patrolRangeXTiles": [108, 118], "hitSfx": "sfx_hit_bat" }
+      { "xTile": 112, "yTile": 8, "type": "bat", "patrolRangeXTiles": [108, 118], "hitSfx": "sfx_hit_bat.wav" }
     ]
   },
   "goal": {

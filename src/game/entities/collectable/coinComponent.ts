@@ -12,14 +12,7 @@ export class CoinComponent extends CollectableComponent {
 
     constructor(xTile: number, yTile: number) {
 
-
         super(xTile, yTile, 0.75, 0.75);
-
-
-
-
-
-
         this.renderFallback = (ctx: CanvasRenderingContext2D) => {
             ctx.save();
             ctx.fillStyle = "yellow";
