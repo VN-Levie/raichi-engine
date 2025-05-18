@@ -36,7 +36,7 @@ export class PumpkinShellComponent extends BaseEnemyComponent {
     public isFlippedVertically = false;
 
     private debugLogCooldown = 0;
-    private readonly DEBUG_LOG_INTERVAL = 0.25; // Log more frequently for MOVING
+    private readonly DEBUG_LOG_INTERVAL = 0.25; 
 
     constructor(x: number, y: number, parentPumpkinOriginalHeight: number) {
         super(x, y, TILE_SIZE, TILE_SIZE / 2);
@@ -44,10 +44,10 @@ export class PumpkinShellComponent extends BaseEnemyComponent {
         this.speed = PumpkinShellComponent.SHELL_MOVE_SPEED;
         this.solid = true;
         this.isAlive = true;
-        this.initialX = x; // Capture initialX from constructor
-        this.initialY = y; // Capture initialY from constructor, this is the intended final Y
+        this.initialX = x; 
+        this.initialY = y; 
         this.loadAssets();
-        // Log uses this.y which is set by super() and is the constructor 'y'
+        
         console.log(`PumpkinShell CREATED at x:${this.x.toFixed(2)}, y:${this.y.toFixed(2)}, initial state: IDLE`);
     }
 
@@ -57,15 +57,15 @@ export class PumpkinShellComponent extends BaseEnemyComponent {
             this.spriteNativeFrameWidth = this.spritesheet.width;
             this.spriteNativeFrameHeight = this.spritesheet.height / PumpkinShellComponent.TOTAL_FRAMES;
 
-            // Set the correct height for the shell
+            
             this.height = this.parentPumpkinHeight / 2;
-            // Set the correct width based on aspect ratio
+            
             this.width = this.spriteNativeFrameWidth * (this.height / this.spriteNativeFrameHeight);
 
-            // this.y is already correctly set by the super() call in the constructor
-            // to the 'y' parameter passed in.
-            // this.initialY is also set in the constructor to this 'y' parameter.
-            // No further adjustment to this.y or this.initialY is needed here.
+            
+            
+            
+            
 
             this.animator = new Animator(this.spritesheet, 'vertical', PumpkinShellComponent.IDLE_ANIM_FPS, true);
             this.animator.frameWidth = this.spriteNativeFrameWidth;
@@ -85,16 +85,16 @@ export class PumpkinShellComponent extends BaseEnemyComponent {
     }
 
     protected override checkObstacleCollision(): boolean {
-        const collisionEpsilon = 0.1; // Small tolerance for floating point comparisons
+        const collisionEpsilon = 0.1; 
 
         for (const c of this.scene) {
-            // If the component is itself, not solid, the player, or another PumpkinShell, skip it for obstacle check.
-            // Shell-shell interactions are handled by MainScene.checkShellInteractions.
+            
+            
             if (c === this || !c.solid || c instanceof PlayerComponent || c instanceof PumpkinShellComponent) {
                 continue;
             }
 
-            // Standard AABB collision check against other solid components
+            
             if (
                 this.x < c.x + c.width &&
                 this.x + this.width > c.x &&
@@ -104,11 +104,11 @@ export class PumpkinShellComponent extends BaseEnemyComponent {
                 const verticalOverlap = (this.y + this.height > c.y + collisionEpsilon) && (this.y < c.y + c.height - collisionEpsilon);
 
                 if (verticalOverlap) {
-                    return true; // Collision detected with a non-shell solid obstacle
+                    return true; 
                 }
             }
         }
-        return false; // No collision with standard obstacles
+        return false; 
     }
 
     private handleIdleState(dt: number) {
@@ -119,28 +119,28 @@ export class PumpkinShellComponent extends BaseEnemyComponent {
                 this.animator.timer -= frameDuration;
                 let currentFrameIndex = PumpkinShellComponent.IDLE_ANIM_FRAMES.indexOf(this.animator.currentFrame);
                 if (currentFrameIndex === -1) {
-                    currentFrameIndex = 0; // Default to first frame if not found
+                    currentFrameIndex = 0; 
                 } else {
                     currentFrameIndex = (currentFrameIndex + 1) % PumpkinShellComponent.IDLE_ANIM_FRAMES.length;
                 }
                 this.animator.currentFrame = PumpkinShellComponent.IDLE_ANIM_FRAMES[currentFrameIndex];
             }
         }
-        // Shell remains stationary in IDLE state, no movement logic needed here.
-        // Lifespan timer for IDLE state could be handled here if needed,
-        // but currently, it's reset/checked upon entering/exiting MOVING.
+        
+        
+        
     }
 
     private handleMovingState(dt: number) {
         this.x += this.speed * this.direction * dt * 60;
 
         if (this.checkObstacleCollision()) {
-            this.x -= this.speed * this.direction * dt * 60; // Revert move
+            this.x -= this.speed * this.direction * dt * 60; 
             this.direction *= -1;
-        } else if (this.isLedgeAhead()) { // Check for ledge
+        } else if (this.isLedgeAhead()) { 
             this.currentState = PumpkinShellState.FALLING_DEAD;
-            this.solid = false; // No longer solid when falling into a pit
-            this.deathSpeed = 0; // Start falling from current y
+            this.solid = false; 
+            this.deathSpeed = 0; 
         }
 
         this.lifespanTimer -= dt;
@@ -168,7 +168,7 @@ export class PumpkinShellComponent extends BaseEnemyComponent {
         this.y += this.deathSpeed;
         this.deathSpeed += this.gravity;
 
-        if (this.y > (this.scene.find(c => c.constructor.name === 'BoxComponent' && (c as any).color === 'gray')?.y || 800) + 200) { // Fall off screen
+        if (this.y > (this.scene.find(c => c.constructor.name === 'BoxComponent' && (c as any).color === 'gray')?.y || 800) + 200) { 
             this.visible = false;
             this.enabled = false;
         }
@@ -204,18 +204,18 @@ export class PumpkinShellComponent extends BaseEnemyComponent {
     stomp(): void {
         if (this.currentState === PumpkinShellState.MOVING) {
             this.currentState = PumpkinShellState.IDLE;
-            this.lifespanTimer = PumpkinShellComponent.LIFESPAN_SECONDS; // Reset lifespan
+            this.lifespanTimer = PumpkinShellComponent.LIFESPAN_SECONDS; 
             if (this.animator) {
                 this.animator.currentFrame = PumpkinShellComponent.IDLE_ANIM_FRAMES[0];
             }
         } else if (this.currentState === PumpkinShellState.IDLE) {
             this.currentState = PumpkinShellState.MOVING;
-            // Determine direction based on player's position relative to the shell
+            
             const player = this.scene.find(c => c instanceof PlayerComponent) as PlayerComponent | undefined;
             if (player) {
                 this.direction = (player.x + player.width / 2 < this.x + this.width / 2) ? 1 : -1;
             } else {
-                this.direction = 1; // Default direction if player not found
+                this.direction = 1; 
             }
             this.lifespanTimer = PumpkinShellComponent.LIFESPAN_SECONDS;
         }
@@ -226,7 +226,7 @@ export class PumpkinShellComponent extends BaseEnemyComponent {
         this.isAlive = false;
         this.solid = false;
         this.currentState = PumpkinShellState.FALLING_DEAD;
-        this.deathSpeed = isHitByAnotherShell ? -2 : 0; // Small bounce if hit by another shell
+        this.deathSpeed = isHitByAnotherShell ? -2 : 0; 
         if (this.animator) {
             this.animator.currentFrame = PumpkinShellComponent.IDLE_ANIM_FRAMES[0];
             this.animator.playing = false;
@@ -239,7 +239,7 @@ export class PumpkinShellComponent extends BaseEnemyComponent {
 
     resetState(): void {
         super.resetState();
-        this.y = this.initialY; // Ensure y is reset to the correct initialY from constructor
+        this.y = this.initialY; 
         this.currentState = PumpkinShellState.IDLE;
         this.lifespanTimer = PumpkinShellComponent.LIFESPAN_SECONDS;
         this.isFlippedVertically = false;

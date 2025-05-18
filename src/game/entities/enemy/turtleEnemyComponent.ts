@@ -4,10 +4,10 @@ import { BaseEnemyComponent } from "./baseEnemyComponent";
 import { AssetLoader } from "../../../core/assetLoader";
 import { Animator } from "../../../core/animator";
 import { TILE_SIZE } from "../../constants";
-import { PumpkinShellComponent } from "./PumpkinShellComponent"; // Import the new shell
+import { PumpkinShellComponent } from "./PumpkinShellComponent"; 
 
 enum PumpkinState {
-    IDLE, // Added IDLE state
+    IDLE, 
     WALKING,
     ATTACKING,
     STOMPED,
@@ -25,15 +25,15 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
     private static readonly SPRITESHEET_PATH = "/assets/images/enemies/pumpkin_0.png";
     private static readonly TOTAL_FRAMES = 8;
 
-    // Player-like animation frames
-    private static readonly IDLE_FRAMES = [0, 1]; // Assuming first 2 frames for idle
+    
+    private static readonly IDLE_FRAMES = [0, 1]; 
     private static readonly IDLE_ANIM_FPS = 4;
     private static readonly WALK_FRAMES = [0, 1, 2, 3, 4, 5];
     private static readonly WALK_ANIM_FPS = 8; 
     private static readonly ATTACK_FRAME = 6;
     private static readonly STOMPED_FRAME = 7; 
 
-    private static readonly PLAYER_TARGET_HEIGHT = 46; // Player's height
+    private static readonly PLAYER_TARGET_HEIGHT = 46; 
     private spriteNativeFrameWidth = 0;
     private spriteNativeFrameHeight = 0;
 
@@ -41,17 +41,17 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
     private animTimer = 0;
     private isMoving = false;
 
-    private currentState: PumpkinState = PumpkinState.IDLE; // Start in IDLE
+    private currentState: PumpkinState = PumpkinState.IDLE; 
     private static readonly ATTACK_RANGE = TILE_SIZE;
     private static readonly ATTACK_DURATION = 0.4;
     private static readonly ATTACK_COOLDOWN = 0.4; 
     private attackTimer = 0;
     private timeSinceLastAttack = TurtleEnemyComponent.ATTACK_COOLDOWN;
 
-    private hasSpawnedShell = false; // New flag
+    private hasSpawnedShell = false; 
 
-    constructor(x: number, y: number, width: number, height: number) { // width/height params are effectively ignored
-        super(x, y, TILE_SIZE, TurtleEnemyComponent.PLAYER_TARGET_HEIGHT); // Initial size, width will be adjusted
+    constructor(x: number, y: number, width: number, height: number) { 
+        super(x, y, TILE_SIZE, TurtleEnemyComponent.PLAYER_TARGET_HEIGHT); 
         this.speed = this.getDefaultSpeed();
         this.loadAssets();
     }
@@ -63,12 +63,12 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
             this.spriteNativeFrameWidth = this.spritesheet.width; 
             this.spriteNativeFrameHeight = this.spritesheet.height / TurtleEnemyComponent.TOTAL_FRAMES;
             
-            // Set dimensions based on player height and sprite aspect ratio
+            
             this.height = TurtleEnemyComponent.PLAYER_TARGET_HEIGHT;
             this.width = this.spriteNativeFrameWidth * (this.height / this.spriteNativeFrameHeight);
 
             this.animator = new Animator(this.spritesheet, 'vertical', TurtleEnemyComponent.IDLE_ANIM_FPS, true);
-            this.animator.frameWidth = this.spriteNativeFrameWidth; // Animator uses native sprite frame size
+            this.animator.frameWidth = this.spriteNativeFrameWidth; 
             this.animator.frameHeight = this.spriteNativeFrameHeight;
             this.animator.frameCount = TurtleEnemyComponent.TOTAL_FRAMES;
             this.animator.currentFrame = TurtleEnemyComponent.IDLE_FRAMES[0];
@@ -81,12 +81,12 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
     }
 
     protected getDefaultSpeed(): number {
-        return 0.6; // Pumpkin might be a bit slower
+        return 0.6; 
     }
 
     update(dt: number) {
         if (!this.assetsLoaded || !this.animator) {
-            if (this.currentState === PumpkinState.DEAD) { // Still allow falling if dead and assets failed
+            if (this.currentState === PumpkinState.DEAD) { 
                 this.y += this.deathSpeed; this.deathSpeed += this.gravity;
                 if (this.y > 800) { this.visible = false; this.enabled = false; }
             }
@@ -98,14 +98,14 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
         }
 
         this.timeSinceLastAttack += dt;
-        this.animTimer += dt; // General animation timer
+        this.animTimer += dt; 
 
-        // Determine if trying to move (AI logic)
-        // For now, it always tries to move unless attacking or stomped/dead
+        
+        
         let tryingToMove = (this.currentState === PumpkinState.WALKING || this.currentState === PumpkinState.IDLE);
 
         if (tryingToMove) {
-            this.handleMovementLogic(dt); // Sets this.isMoving based on actual movement
+            this.handleMovementLogic(dt); 
         } else {
             this.isMoving = false;
         }
@@ -119,7 +119,7 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
             playerInRange = distanceToPlayer < TurtleEnemyComponent.ATTACK_RANGE && yDifference < this.height * 1.5;
         }
 
-        // State transitions based on conditions
+        
         if (this.currentState !== PumpkinState.ATTACKING && 
             this.currentState !== PumpkinState.STOMPED && 
             this.currentState !== PumpkinState.DEAD) {
@@ -128,15 +128,15 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
                 this.currentState = PumpkinState.ATTACKING;
                 this.animator!.currentFrame = TurtleEnemyComponent.ATTACK_FRAME;
                 this.attackTimer = 0;
-                this.isMoving = false; // Stop moving when attacking
+                this.isMoving = false; 
             } else if (this.isMoving && this.currentState !== PumpkinState.WALKING) {
                 this.currentState = PumpkinState.WALKING;
-                this.animFrame = 0; // Reset animation sequence index for walk
-                this.animTimer = 0; // Reset timer for new animation
+                this.animFrame = 0; 
+                this.animTimer = 0; 
             } else if (!this.isMoving && this.currentState !== PumpkinState.IDLE) {
                 this.currentState = PumpkinState.IDLE;
-                this.animFrame = 0; // Reset animation sequence index for idle
-                this.animTimer = 0; // Reset timer for new animation
+                this.animFrame = 0; 
+                this.animTimer = 0; 
             }
         }
 
@@ -150,7 +150,7 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
                 }
                 break;
             case PumpkinState.WALKING:
-                // Movement is handled by handleMovementLogic already
+                
                 const walkFrameDuration = 1 / TurtleEnemyComponent.WALK_ANIM_FPS;
                 if (this.animTimer >= walkFrameDuration) {
                     this.animTimer -= walkFrameDuration;
@@ -170,7 +170,7 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
         }
     }
 
-    private handleMovementLogic(dt: number) { // Renamed from handleWalkingState
+    private handleMovementLogic(dt: number) { 
         const oldX = this.x;
         let movedThisFrame = false;
 
@@ -185,7 +185,7 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
                 movedThisFrame = Math.abs(this.x - oldX) > 0.001;
             }
         }
-        // Boundary checks
+        
         if (this.x <= 0 && this.direction === -1) { this.x = 0; this.direction = 1; }
         const worldWidth = 3200; 
         if (this.x + this.width >= worldWidth && this.direction === 1) { this.x = worldWidth - this.width; this.direction = -1; }
@@ -196,8 +196,8 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
     private handleAttackingState(dt: number) {
         this.attackTimer += dt;
         if (this.attackTimer >= TurtleEnemyComponent.ATTACK_DURATION) {
-            // Decide next state based on whether it should be moving or idle
-            // For simplicity, transition to IDLE, main loop will switch to WALKING if needed
+            
+            
             this.currentState = PumpkinState.IDLE; 
             this.animator!.currentFrame = TurtleEnemyComponent.IDLE_FRAMES[0];
             this.animFrame = 0;
@@ -213,7 +213,7 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
             this.deathSpeed = -4; 
 
             if (!this.hasSpawnedShell && this.scene) {
-                // Tính toán vị trí shell để đáy shell trùng đáy pumpkin_0
+                
                 const shellHeight = TurtleEnemyComponent.PLAYER_TARGET_HEIGHT / 2;
                 const shellY = this.y + this.height - shellHeight;
                 const shell = new PumpkinShellComponent(this.x, shellY, TurtleEnemyComponent.PLAYER_TARGET_HEIGHT);
@@ -222,7 +222,7 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
                     sceneComponents.push(shell);
                     shell.setScene(sceneComponents);
                 }
-                // Bounce the player up to avoid immediate overlap with the shell
+                
                 const player = this.scene.find(c => c instanceof PlayerComponent) as PlayerComponent | undefined;
                 if (player && Math.abs(player.x - this.x) < this.width) {
                     player.bounceOffEnemySlightly();
@@ -235,7 +235,7 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
     private handleDeadState(dt: number) {
         this.y += this.deathSpeed;
         this.deathSpeed += this.gravity;
-        if (this.y > 800) { // Fell off screen
+        if (this.y > 800) { 
             this.visible = false;
             this.enabled = false;
         }
@@ -254,25 +254,25 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
     }
 
     hitByPlayerNonStomp(): boolean {
-        // If not a shell, any non-stomp hit is harmful to the player.
+        
         return true; 
     }
 
     resetState() {
         super.resetState();
-        this.currentState = PumpkinState.IDLE; // Default to IDLE
+        this.currentState = PumpkinState.IDLE; 
         this.stompAnimationTimer = 0;
         this.attackTimer = 0;
         this.timeSinceLastAttack = TurtleEnemyComponent.ATTACK_COOLDOWN;
         this.isMoving = false;
         this.animFrame = 0;
         this.animTimer = 0;
-        this.hasSpawnedShell = false; // Reset spawn flag
+        this.hasSpawnedShell = false; 
         if (this.animator) {
             this.animator.currentFrame = TurtleEnemyComponent.IDLE_FRAMES[0];
-            this.animator.playing = true; // Ensure animator is set to play
+            this.animator.playing = true; 
         }
-        this.solid = false; // Becomes solid if it can collide with player/other things
+        this.solid = false; 
     }
 
     public isHarmfulOnContact(): boolean {
@@ -285,7 +285,7 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
         if (!this.visible) return;
 
         if (!this.assetsLoaded || !this.animator || !this.spritesheet) {
-            ctx.fillStyle = "#FF8C00"; // Pumpkin orange color
+            ctx.fillStyle = "#FF8C00"; 
             if (this.currentState === PumpkinState.STOMPED || this.currentState === PumpkinState.DEAD) {
                 ctx.fillRect(this.x, this.y + this.height * 0.6, this.width, this.height * 0.4);
             } else {
@@ -297,23 +297,23 @@ export class TurtleEnemyComponent extends BaseEnemyComponent {
         ctx.save();
         const sourceRect = this.animator.getFrameSourceRect();
         if (sourceRect) {
-            // pumpkin_0.png is designed for right-to-left. Flip if moving right (direction 1).
-            // Render using this.width and this.height for scaled display
+            
+            
             if (this.direction === 1) { 
                 ctx.translate(this.x + this.width, this.y);
                 ctx.scale(-1, 1);
                 ctx.drawImage(
                     this.spritesheet,
                     sourceRect.sx, sourceRect.sy, 
-                    this.spriteNativeFrameWidth, this.spriteNativeFrameHeight, // Source rect uses native sprite dimensions
-                    0, 0, this.width, this.height // Destination uses scaled game dimensions
+                    this.spriteNativeFrameWidth, this.spriteNativeFrameHeight, 
+                    0, 0, this.width, this.height 
                 );
             } else {
                 ctx.drawImage(
                     this.spritesheet,
                     sourceRect.sx, sourceRect.sy, 
-                    this.spriteNativeFrameWidth, this.spriteNativeFrameHeight, // Source rect
-                    this.x, this.y, this.width, this.height // Destination
+                    this.spriteNativeFrameWidth, this.spriteNativeFrameHeight, 
+                    this.x, this.y, this.width, this.height 
                 );
             }
         }
