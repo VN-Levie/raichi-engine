@@ -8,7 +8,7 @@ import { clearGameState } from "../utils/gameStateManager";
 import { GameAudioManager as AudioManager } from "../audio/gameAudioManager";
 import { getMusicEnabled } from "../utils/audioSettings";
 
-export class WinScene extends Scene {
+export class EndScene extends Scene {
   constructor() {
     super();
 
@@ -48,7 +48,11 @@ export class WinScene extends Scene {
     menuButton.hoverColor = "#45a049";
     menuButton.onClick = () => {
       clearGameState();
-      SceneManager.setScene(StartScene.getInstance());
+
+      setTimeout(() => {
+        SceneManager.setScene(StartScene.getInstance().getCurrentStartScene());
+      }
+        , 500);
     };
 
     this.add(menuButton);

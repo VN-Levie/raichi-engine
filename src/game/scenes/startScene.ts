@@ -13,7 +13,7 @@ import { LoadingScene } from "./LoadingScene";
 import { loadGameState, clearGameState, SavedGameState } from "../utils/gameStateManager";
 import { INITIAL_LIVES } from "../constants";
 import { Camera } from "../../core/camera";
-import { SettingScene } from "./settingScene";
+import { MenuScene } from "./menuScene";
 import { GameAudioManager as AudioManager } from "../audio/gameAudioManager";
 import { getMusicEnabled } from "../utils/audioSettings";
 
@@ -31,6 +31,13 @@ export class StartScene extends Scene {
         Camera.resetViewport();
         Camera.setPosition(0, 0);
 
+
+        this.initializeGameButtons();
+
+
+
+    }
+    private initializeGameButtons() {
         console.log("StartScene constructor called");
 
 
@@ -103,7 +110,7 @@ export class StartScene extends Scene {
             settingsButton.color = "#888";
             settingsButton.hoverColor = "#555";
             settingsButton.onClick = () => {
-                SceneManager.setScene(SettingScene.getInstance());
+                SceneManager.setScene(MenuScene.getInstance());
             };
             this.add(settingsButton);
 
@@ -129,12 +136,17 @@ export class StartScene extends Scene {
             settingsButton.color = "#888";
             settingsButton.hoverColor = "#555";
             settingsButton.onClick = () => {
-                SceneManager.setScene(SettingScene.getInstance());
+                SceneManager.setScene(MenuScene.getInstance());
             };
             this.add(settingsButton);
 
         }
+    }
 
+    public getCurrentStartScene(): StartScene {
+        this.components = [];
+        this.initializeGameButtons();
+        return StartScene.getInstance();
     }
 
     private isRecent(timestamp: number): boolean {

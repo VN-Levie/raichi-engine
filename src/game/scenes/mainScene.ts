@@ -25,7 +25,7 @@ import { TILE_SIZE, INITIAL_LIVES, MAX_LIVES_ON_LOAD } from "../constants"
 import { HUDController } from "../ui/HUDController"
 import { TextComponent } from "../../entities/textComponent"
 import { GoalComponent } from "../entities/map/goalComponent"
-import { WinScene } from "./WinScene"
+import { EndScene } from "./endScene"
 import { TurtleEnemyComponent } from "../entities/enemy/turtleEnemyComponent"
 import { LoadingScene } from "./LoadingScene";
 import { CheckpointComponent } from "../entities/map/checkpointComponent";
@@ -39,7 +39,7 @@ import { TornadoComponent } from "../entities/effects/TornadoComponent";
 import { PumpkinShellComponent } from "../entities/enemy/PumpkinShellComponent";
 import { getMusicEnabled } from "../utils/audioSettings";
 import { GameAudioManager as AudioManager } from "../audio/gameAudioManager";
-import { SettingScene } from "./settingScene"
+import { MenuScene } from "./menuScene"
 
 export class MainScene extends Scene {
   private player!: PlayerComponent
@@ -408,7 +408,7 @@ export class MainScene extends Scene {
         const wasAbove = playerPrevFeetY <= enemyTop + 2;
         const stompMargin = Math.max(5, Math.min(10, enemy.height * 0.4));
         const landedOnTop = playerFeetY >= enemyTop && playerFeetY <= enemyTop + stompMargin;
-
+        
         let stompedEnemy = false;
 
         const canStomp = (
@@ -418,7 +418,9 @@ export class MainScene extends Scene {
             Math.abs(playerFeetY - enemyTop) < 2
           )
         );
-        if (canStomp && wasAbove && landedOnTop) {
+        console.log(`isFalling: ${isFalling}, wasAbove: ${wasAbove}, landedOnTop: ${landedOnTop}, canStomp: ${canStomp}, name: ${enemy.constructor.name}`);
+
+        if (canStomp && wasAbove) {
 
 
           if (enemy instanceof PumpkinShellComponent) {
@@ -434,7 +436,7 @@ export class MainScene extends Scene {
               this.player.bounceOffEnemySlightly();
             }
             stompedEnemy = true;
-          } else if (enemy instanceof TurtleEnemyComponent || enemy instanceof GoombaEnemyComponent) {
+          } else if (enemy instanceof BaseEnemyComponent) {
             enemy.stomp();
             AudioManager.getInstance().playSound("assets/sound/sfx/hit.wav");
             this.player.bounceOffEnemy();
@@ -699,7 +701,7 @@ export class MainScene extends Scene {
 
       if (this.goalComponent.isWinGoal) {
         Camera.resetViewport()
-        SceneManager.setScene(new WinScene())
+        SceneManager.setScene(new EndScene())
       } else if (this.goalComponent.nextMapUrl) {
         const nextMapUrl = this.goalComponent.nextMapUrl
         const currentScore = this.score
@@ -933,7 +935,7 @@ export class MainScene extends Scene {
 
   private handleMenuButton(): void {
 
-    SceneManager.setScene(SettingScene.getInstance());
+    SceneManager.setScene(MenuScene.getInstance().getCurrentMenuScene());
 
   }
 }
