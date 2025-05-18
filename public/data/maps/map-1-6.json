@@ -1,5 +1,7 @@
 {
   "name": "World 1-6 (Enemy Gauntlet)",
+  "mapVersion": "1.1.0",
+  "bgm": "bgm_theme_2.mp3",
   "player": {
     "initialX": 120,
     "initialY": 450
@@ -8,20 +10,21 @@
     "groundLevelY": 570,
     "gameOverY": 600,
     "backgroundColor": "#FF6347",
-    "worldWidthTiles": 80
+    "worldWidthTiles": 110
   },
   "decorations": {
     "clouds": [],
     "bushes": [
       { "xTile": 5, "size": 2 },
-      { "xTile": 70, "size": 3 }
+      { "xTile": 70, "size": 3 },
+      { "xTile": 90, "size": 2 }
     ],
-    "flagPole": { "xTile": 75, "yTile": 18 }
+    "flagPole": { "xTile": 105, "yTile": 18 }
   },
   "terrain": {
     "ground": {
       "segments": [
-        { "startTile": 0, "endTile": 79 }
+        { "startTile": 0, "endTile": 109 }
       ],
       "color": "#D2691E",
       "topHighlightColor": "#F4A460",
@@ -32,37 +35,44 @@
       { "xTile": 25, "heightMultiplier": 2 },
       { "xTile": 40, "heightMultiplier": 1.5 },
       { "xTile": 55, "heightMultiplier": 2.5 },
-      { "xTile": 70, "heightMultiplier": 1 }
+      { "xTile": 70, "heightMultiplier": 1 },
+      { "xTile": 85, "heightMultiplier": 2 },
+      { "xTile": 95, "heightMultiplier": 1.5 }
     ],
     "floatingPlatforms": [
       { "xTile": 15, "yTile": 12, "widthTiles": 3, "style": "stone" },
       { "xTile": 30, "yTile": 10, "widthTiles": 2, "style": "stone" },
       { "xTile": 45, "yTile": 12, "widthTiles": 3, "style": "stone" },
-      { "xTile": 60, "yTile": 9, "widthTiles": 2, "style": "stone" }
+      { "xTile": 60, "yTile": 9, "widthTiles": 2, "style": "stone" },
+      { "xTile": 80, "yTile": 11, "widthTiles": 3, "style": "stone" },
+      { "xTile": 90, "yTile": 10, "widthTiles": 2, "style": "stone" }
     ]
   },
   "enemies": {
     "yOffsetFromGround": -32,
     "positions": [
-      { "xTile": 18, "type": "goomba" },
-      { "xTile": 22, "type": "goomba" },
-      { "xTile": 26, "yTile": 8, "type": "bat", "patrolRangeXTiles": [23, 30] },
-      { "xTile": 28, "type": "turtle" },
-      { "xTile": 33, "type": "goomba" },
-      { "xTile": 36, "yTile": 7, "type": "bat", "patrolRangeXTiles": [33, 40] },
-      { "xTile": 38, "type": "turtle" },
-      { "xTile": 43, "type": "goomba" },
-      { "xTile": 46, "yTile": 9, "type": "bat", "patrolRangeXTiles": [43, 50] },
-      { "xTile": 48, "type": "turtle" },
-      { "xTile": 53, "type": "goomba" },
-      { "xTile": 56, "yTile": 6, "type": "bat", "patrolRangeXTiles": [53, 60] },
-      { "xTile": 58, "type": "turtle" },
-      { "xTile": 63, "type": "goomba" },
-      { "xTile": 68, "type": "turtle" }
+      { "xTile": 18, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [15, 21], "hitSfx": "sfx_stomp" },
+      { "xTile": 22, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [19, 25], "hitSfx": "sfx_stomp" },
+      { "xTile": 26, "yTile": 8, "type": "bat", "patrolRangeXTiles": [23, 30], "hitSfx": "sfx_hit_bat" },
+      { "xTile": 28, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [25, 31], "hitSfx": "sfx_stomp" },
+      { "xTile": 33, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [30, 36], "hitSfx": "sfx_stomp" },
+      { "xTile": 36, "yTile": 7, "type": "bat", "patrolRangeXTiles": [33, 40], "hitSfx": "sfx_hit_bat" },
+      { "xTile": 38, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [35, 41], "hitSfx": "sfx_stomp" },
+      { "xTile": 43, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [40, 46], "hitSfx": "sfx_stomp" },
+      { "xTile": 46, "yTile": 9, "type": "bat", "patrolRangeXTiles": [43, 50], "hitSfx": "sfx_hit_bat" },
+      { "xTile": 48, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [45, 51], "hitSfx": "sfx_stomp" },
+      { "xTile": 53, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [50, 56], "hitSfx": "sfx_stomp" },
+      { "xTile": 56, "yTile": 6, "type": "bat", "patrolRangeXTiles": [53, 60], "hitSfx": "sfx_hit_bat" },
+      { "xTile": 58, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [55, 61], "hitSfx": "sfx_stomp" },
+      { "xTile": 63, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [60, 66], "hitSfx": "sfx_stomp" },
+      { "xTile": 68, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [65, 71], "hitSfx": "sfx_stomp" },
+      { "xTile": 82, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [79, 85], "hitSfx": "sfx_stomp" },
+      { "xTile": 88, "yTile": 8, "type": "bat", "patrolRangeXTiles": [85, 91], "hitSfx": "sfx_hit_bat" },
+      { "xTile": 92, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [89, 95], "hitSfx": "sfx_stomp" }
     ]
   },
   "goal": {
-    "xTile": 75,
+    "xTile": 105,
     "yTile": 15,
     "widthTiles": 2,
     "heightTiles": 3,
@@ -71,15 +81,19 @@
   },
   "checkpoints": [
     { "xTile": 25 },
-    { "xTile": 55 }
+    { "xTile": 55 },
+    { "xTile": 85 }
   ],
   "coins": [
     { "xTile": 16, "yTile": 10 },
     { "xTile": 31, "yTile": 8 },
     { "xTile": 46, "yTile": 10 },
-    { "xTile": 61, "yTile": 7 }
+    { "xTile": 61, "yTile": 7 },
+    { "xTile": 81, "yTile": 9 },
+    { "xTile": 91, "yTile": 8 }
   ],
   "lifeItems": [
-    { "xTile": 35, "yTile": 14 }
+    { "xTile": 35, "yTile": 14 },
+    { "xTile": 88, "yTile": 13 }
   ]
 }

@@ -1,5 +1,7 @@
 {
   "name": "World 1-1",
+  "mapVersion": "1.1.0",
+  "bgm": "bgm_theme_1.mp3",
   "player": {
     "initialX": 150,
     "initialY": 100
@@ -8,7 +10,7 @@
     "groundLevelY": 570,
     "gameOverY": 600,
     "backgroundColor": "lightblue",
-    "worldWidthTiles": 100
+    "worldWidthTiles": 130
   },
   "decorations": {
     "clouds": [
@@ -30,9 +32,11 @@
       { "xTile": 51, "size": 4 },
       { "xTile": 65, "size": 2 },
       { "xTile": 78, "size": 3 },
-      { "xTile": 89, "size": 5 }
+      { "xTile": 89, "size": 5 },
+      { "xTile": 105, "size": 3 },
+      { "xTile": 115, "size": 2 }
     ],
-    "flagPole": { "xTile": 95, "yTile": 18 },
+    "flagPole": { "xTile": 125, "yTile": 18 },
     "dynamicClouds": true
   },
   "terrain": {
@@ -41,7 +45,7 @@
         { "startTile": 0, "endTile": 15 },
         { "startTile": 19, "endTile": 40 },
         { "startTile": 44, "endTile": 70 },
-        { "startTile": 74, "endTile": 100 }
+        { "startTile": 74, "endTile": 129 }
       ],
       "color": "#A0522D",
       "topHighlightColor": "#DEB887",
@@ -55,7 +59,9 @@
       { "xTile": 50, "heightMultiplier": 2.5 },
       { "xTile": 60, "heightMultiplier": 2 },
       { "xTile": 80, "heightMultiplier": 2 },
-      { "xTile": 90, "heightMultiplier": 1.5 }
+      { "xTile": 90, "heightMultiplier": 1.5 },
+      { "xTile": 105, "heightMultiplier": 2 },
+      { "xTile": 115, "heightMultiplier": 1.5 }
     ],
     "floatingPlatforms": [
       { "xTile": 10, "yTile": 12, "widthTiles": 3, "style": "stone" },
@@ -67,23 +73,28 @@
       { "xTile": 55, "yTile": 13, "widthTiles": 3, "style": "stone" },
       { "xTile": 65, "yTile": 11, "widthTiles": 2, "style": "stone" },
       { "xTile": 75, "yTile": 9, "widthTiles": 3, "style": "stone" },
-      { "xTile": 88, "yTile": 12, "widthTiles": 2, "style": "stone" }
+      { "xTile": 88, "yTile": 12, "widthTiles": 2, "style": "stone" },
+      { "xTile": 102, "yTile": 11, "widthTiles": 3, "style": "stone" },
+      { "xTile": 112, "yTile": 10, "widthTiles": 4, "style": "stone" }
     ]
   },
   "enemies": {
     "yOffsetFromGround": -32,
     "positions": [
-      { "xTile": 8, "type": "goomba" },
-      { "xTile": 20, "type": "goomba" },
-      { "xTile": 32, "type": "goomba" },
-      { "xTile": 48, "type": "goomba" },
-      { "xTile": 57, "type": "goomba" },
-      { "xTile": 67, "type": "goomba" },
-      { "xTile": 85, "type": "goomba" }
+      { "xTile": 8, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [5, 11], "hitSfx": "sfx_stomp" },
+      { "xTile": 20, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [17, 23], "hitSfx": "sfx_stomp" },
+      { "xTile": 32, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [29, 35], "hitSfx": "sfx_stomp" },
+      { "xTile": 48, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [45, 51], "hitSfx": "sfx_stomp" },
+      { "xTile": 57, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [54, 60], "hitSfx": "sfx_stomp" },
+      { "xTile": 67, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [64, 70], "hitSfx": "sfx_stomp" },
+      { "xTile": 85, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [82, 88], "hitSfx": "sfx_stomp" },
+      { "xTile": 103, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [100, 106], "hitSfx": "sfx_stomp" },
+      { "xTile": 110, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [107, 113], "hitSfx": "sfx_stomp" },
+      { "xTile": 118, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [115, 121], "hitSfx": "sfx_stomp" }
     ]
   },
   "goal": {
-    "xTile": 95,
+    "xTile": 125,
     "yTile": 15, 
     "widthTiles": 2,
     "heightTiles": 3,
@@ -91,7 +102,9 @@
   },
   "checkpoints": [
     { "xTile": 30 },
-    { "xTile": 60 }
+    { "xTile": 60 },
+    { "xTile": 90 },
+    { "xTile": 110 }
   ],
   "coins": [
     { "xTile": 7, "yTile": 14 },
@@ -103,10 +116,14 @@
     { "xTile": 40, "yTile": 15 },
     { "xTile": 55, "yTile": 11 },
     { "xTile": 56, "yTile": 11 },
-    { "xTile": 70, "yTile": 16 }
+    { "xTile": 70, "yTile": 16 },
+    { "xTile": 104, "yTile": 9 },
+    { "xTile": 113, "yTile": 8 },
+    { "xTile": 114, "yTile": 8 }
   ],
   "lifeItems": [
     { "xTile": 15, "yTile": 10 },
-    { "xTile": 75, "yTile": 12 }
+    { "xTile": 75, "yTile": 12 },
+    { "xTile": 108, "yTile": 14 }
   ]
 }

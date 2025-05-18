@@ -1,413 +1,171 @@
 {
-    "name": "World 1-7 (Underwater Realm)",
-    "player": {
-        "initialX": 100,
-        "initialY": 300
+  "name": "World 1-7 (Underwater Realm)",
+  "mapVersion": "1.1.0",
+  "bgm": "bgm_underwater_1.mp3",
+  "player": {"initialX": 100, "initialY": 300},
+  "level": {
+    "groundLevelY": 580,
+    "gameOverY": 620,
+    "backgroundColor": "#1E90FF",
+    "worldWidthTiles": 120,
+    "type": "underwater"
+  },
+  "decorations": {"clouds": [], "bushes": [], "dynamicClouds": false},
+  "terrain": {
+    "ground": {
+      "segments": [ {"startTile": 0, "endTile": 119} ],
+      "color": "#B0E0E6",
+      "topHighlightColor": "#ADD8E6",
+      "textureColor": "#87CEEB"
     },
-    "level": {
-        "groundLevelY": 580,
-        "gameOverY": 620,
-        "backgroundColor": "#1E90FF",
-        "worldWidthTiles": 90,
-        "type": "underwater"
-    },
-    "decorations": {
-        "clouds": [],
-        "bushes": [],
-        "dynamicClouds": false
-    },
-    "terrain": {
-        "ground": {
-            "segments": [
-                {
-                    "startTile": 0,
-                    "endTile": 89
-                }
-            ],
-            "color": "#B0E0E6",
-            "topHighlightColor": "#ADD8E6",
-            "textureColor": "#87CEEB"
-        },
-        "pipes": [],
-        "floatingPlatforms": [
-            {
-                "xTile": 0,
-                "yTile": 0,
-                "widthTiles": 90,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 1,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 2,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 3,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 4,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 5,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 6,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 7,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 8,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 9,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 10,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 11,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 12,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 13,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 14,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 15,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 16,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 0,
-                "yTile": 17,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 1,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 2,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 3,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 4,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 5,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 6,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 7,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 8,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 9,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 10,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 11,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 12,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 13,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 14,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 15,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 16,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 89,
-                "yTile": 17,
-                "widthTiles": 1,
-                "style": "rock"
-            },
-            {
-                "xTile": 15,
-                "yTile": 10,
-                "widthTiles": 5,
-                "style": "rock"
-            },
-            {
-                "xTile": 40,
-                "yTile": 12,
-                "widthTiles": 6,
-                "style": "rock"
-            },
-            {
-                "xTile": 65,
-                "yTile": 8,
-                "widthTiles": 4,
-                "style": "rock"
-            }
-        ],
-        "tornadoes": [
-            {
-                "xTile": 25,
-                "yTile": 7,
-                "patrolRangeXTiles": [
-                    20,
-                    35
-                ],
-                "baseSpeedMultiplier": 1.0,
-                "speedRandomnessFactor": 0.3
-            },
-            {
-                "xTile": 50,
-                "yTile": 10,
-                "patrolRangeXTiles": [
-                    45,
-                    60
-                ],
-                "baseSpeedMultiplier": 0.8,
-                "speedRandomnessFactor": 0.25
-            },
-            {
-                "xTile": 70,
-                "yTile": 5,
-                "patrolRangeXTiles": [
-                    65,
-                    80
-                ],
-                "baseSpeedMultiplier": 1.2,
-                "speedRandomnessFactor": 0.4
-            },
-            {
-                "xTile": 1,
-                "yTile": 2,
-                "canToggle": true,
-                "toggleIntervalSeconds": [
-                    1.5,
-                    3.5
-                ]
-            },
-            {
-                "xTile": 3,
-                "yTile": 2,
-                "canToggle": true,
-                "toggleIntervalSeconds": [
-                    1.0,
-                    3.0
-                ]
-            },
-            {
-                "xTile": 5,
-                "yTile": 2,
-                "canToggle": true,
-                "toggleIntervalSeconds": [
-                    2.0,
-                    4.0
-                ]
-            },
-            {
-                "xTile": 7,
-                "yTile": 2,
-                "canToggle": true,
-                "toggleIntervalSeconds": [
-                    1.2,
-                    2.8
-                ]
-            },
-            {
-                "xTile": 81,
-                "yTile": 2,
-                "canToggle": true,
-                "toggleIntervalSeconds": [
-                    1.3,
-                    3.3
-                ]
-            },
-            {
-                "xTile": 83,
-                "yTile": 2,
-                "canToggle": true,
-                "toggleIntervalSeconds": [
-                    1.8,
-                    3.8
-                ]
-            },
-            {
-                "xTile": 85,
-                "yTile": 2,
-                "canToggle": true,
-                "toggleIntervalSeconds": [
-                    1.0,
-                    2.5
-                ]
-            },
-            {
-                "xTile": 87,
-                "yTile": 2,
-                "canToggle": true,
-                "toggleIntervalSeconds": [
-                    1.6,
-                    3.6
-                ]
-            }
-        ]
-    },
-    "enemies": {
-        "yOffsetFromGround": -32,
-        "positions": []
-    },
-    "goal": {
+    "pipes": [ {"xTile": 95, "heightMultiplier": 2} ],
+    "floatingPlatforms": [
+      {"xTile":   0, "yTile":  0, "widthTiles": 120, "style": "rock"},
+      {"xTile":   0, "yTile":  1, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile":  2, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile":  3, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile":  4, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile":  5, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile":  6, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile":  7, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile":  8, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile":  9, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile": 10, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile": 11, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile": 12, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile": 13, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile": 14, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile": 15, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile": 16, "widthTiles":   1, "style": "rock"},
+      {"xTile":   0, "yTile": 17, "widthTiles":   1, "style": "rock"},
+      
+      {"xTile": 119, "yTile":  1, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile":  2, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile":  3, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile":  4, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile":  5, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile":  6, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile":  7, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile":  8, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile":  9, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile": 10, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile": 11, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile": 12, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile": 13, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile": 14, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile": 15, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile": 16, "widthTiles":   1, "style": "rock"},
+      {"xTile": 119, "yTile": 17, "widthTiles":   1, "style": "rock"},
+      {"xTile":  15, "yTile": 10, "widthTiles":   5, "style": "rock"},
+      {"xTile":  40, "yTile": 12, "widthTiles":   6, "style": "rock"},
+      {"xTile":  65, "yTile":  8, "widthTiles":   4, "style": "rock"},
+      {"xTile":  95, "yTile": 10, "widthTiles":   5, "style": "rock"},
+      {"xTile": 105, "yTile": 14, "widthTiles":   6, "style": "rock"}
+    ],
+    "tornadoes": [
+      {
+        "xTile": 25,
+        "yTile": 7,
+        "patrolRangeXTiles": [20, 35],
+        "baseSpeedMultiplier": 1.0,
+        "speedRandomnessFactor": 0.3
+      },
+      {
+        "xTile": 50,
+        "yTile": 10,
+        "patrolRangeXTiles": [45, 60],
+        "baseSpeedMultiplier": 0.8,
+        "speedRandomnessFactor": 0.25
+      },
+      {
+        "xTile": 70,
+        "yTile": 5,
+        "patrolRangeXTiles": [65, 80],
+        "baseSpeedMultiplier": 1.2,
+        "speedRandomnessFactor": 0.4
+      },
+      {
+        "xTile": 1,
+        "yTile": 2,
+        "canToggle": true,
+        "toggleIntervalSeconds": [1.5, 3.5]
+      },
+      {
+        "xTile": 3,
+        "yTile": 2,
+        "canToggle": true,
+        "toggleIntervalSeconds": [1.0, 3.0]
+      },
+      {
+        "xTile": 5,
+        "yTile": 2,
+        "canToggle": true,
+        "toggleIntervalSeconds": [2.0, 4.0]
+      },
+      {
+        "xTile": 7,
+        "yTile": 2,
+        "canToggle": true,
+        "toggleIntervalSeconds": [1.2, 2.8]
+      },
+      {
+        "xTile": 81,
+        "yTile": 2,
+        "canToggle": true,
+        "toggleIntervalSeconds": [1.3, 3.3]
+      },
+      {
+        "xTile": 83,
+        "yTile": 2,
+        "canToggle": true,
+        "toggleIntervalSeconds": [1.8, 3.8]
+      },
+      {
         "xTile": 85,
-        "yTile": 8,
-        "widthTiles": 2,
-        "heightTiles": 4,
-        "nextMapUrl": "/data/maps/map-1-8.json",
-        "isWinGoal": false,
-        "style": "gate"
-    },
-    "checkpoints": [
-        {
-            "xTile": 45
-        }
-    ],
-    "coins": [
-        {
-            "xTile": 10,
-            "yTile": 15
-        },
-        {
-            "xTile": 20,
-            "yTile": 8
-        },
-        {
-            "xTile": 30,
-            "yTile": 14
-        },
-        {
-            "xTile": 55,
-            "yTile": 7
-        },
-        {
-            "xTile": 75,
-            "yTile": 12
-        }
-    ],
-    "lifeItems": [
-        {
-            "xTile": 60,
-            "yTile": 15
-        }
+        "yTile": 2,
+        "canToggle": true,
+        "toggleIntervalSeconds": [1.0, 2.5]
+      },
+      {
+        "xTile": 87,
+        "yTile": 2,
+        "canToggle": true,
+        "toggleIntervalSeconds": [1.6, 3.6]
+      },
+      {
+        "xTile": 95,
+        "yTile": 6,
+        "patrolRangeXTiles": [90, 100],
+        "baseSpeedMultiplier": 1.0,
+        "speedRandomnessFactor": 0.3
+      },
+      {
+        "xTile": 105,
+        "yTile": 3,
+        "canToggle": true,
+        "toggleIntervalSeconds": [1.5, 3.0]
+      }
     ]
+  },
+  "enemies": {"yOffsetFromGround": -32, "positions": []},
+  "goal": {
+    "xTile": 115,
+    "yTile": 8,
+    "widthTiles": 2,
+    "heightTiles": 4,
+    "nextMapUrl": "/data/maps/map-1-8.json",
+    "isWinGoal": false,
+    "style": "gate"
+  },
+  "checkpoints": [ {"xTile": 45}, {"xTile": 90}, {"xTile": 105} ],
+  "coins": [
+    {"xTile":  10, "yTile": 15},
+    {"xTile":  20, "yTile":  8},
+    {"xTile":  30, "yTile": 14},
+    {"xTile":  55, "yTile":  7},
+    {"xTile":  75, "yTile": 12},
+    {"xTile":  93, "yTile": 15},
+    {"xTile": 106, "yTile": 12}
+  ],
+  "lifeItems": [ {"xTile": 60, "yTile": 15}, {"xTile": 98, "yTile": 7} ]
 }

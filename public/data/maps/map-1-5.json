@@ -1,5 +1,7 @@
 {
   "name": "World 1-5 (Sky Platforms & Bats)",
+  "mapVersion": "1.1.0",
+  "bgm": "bgm_sky_1.mp3",
   "player": {
     "initialX": 80,
     "initialY": 50
@@ -8,7 +10,7 @@
     "groundLevelY": 570,
     "gameOverY": 600,
     "backgroundColor": "#87CEEB",
-    "worldWidthTiles": 100
+    "worldWidthTiles": 130
   },
   "decorations": {
     "clouds": [
@@ -19,14 +21,15 @@
       { "x": 950, "y": 160, "size": 3 }
     ],
     "bushes": [],
-    "flagPole": { "xTile": 95, "yTile": 18 },
+    "flagPole": { "xTile": 125, "yTile": 18 },
     "dynamicClouds": true
   },
   "terrain": {
     "ground": {
       "segments": [
         { "startTile": 0, "endTile": 5 },
-        { "startTile": 94, "endTile": 99 }
+        { "startTile": 94, "endTile": 99 },
+        { "startTile": 124, "endTile": 129 }
       ],
       "color": "#90EE90",
       "topHighlightColor": "#98FB98",
@@ -48,22 +51,27 @@
       { "xTile": 66, "yTile": 12, "widthTiles": 4, "style": "stone" },
       { "xTile": 72, "yTile": 14, "widthTiles": 5, "style": "stone" },
       { "xTile": 79, "yTile": 13, "widthTiles": 4, "style": "stone" },
-      { "xTile": 85, "yTile": 15, "widthTiles": 5, "style": "stone" }
+      { "xTile": 85, "yTile": 15, "widthTiles": 5, "style": "stone" },
+      { "xTile": 100, "yTile": 14, "widthTiles": 4, "style": "stone" },
+      { "xTile": 108, "yTile": 12, "widthTiles": 5, "style": "stone" },
+      { "xTile": 115, "yTile": 13, "widthTiles": 4, "style": "stone" }
     ]
   },
   "enemies": {
     "yOffsetFromGround": -32,
     "positions": [
-      { "xTile": 10, "yTile": 11, "type": "bat", "patrolRangeXTiles": [8, 18] },
-      { "xTile": 25, "yTile": 10, "type": "bat", "patrolRangeXTiles": [22, 32] },
-      { "xTile": 38, "yTile": 9, "type": "bat", "patrolRangeXTiles": [35, 45] },
-      { "xTile": 50, "yTile": 8, "type": "bat", "patrolRangeXTiles": [47, 57] },
-      { "xTile": 63, "yTile": 7, "type": "bat", "patrolRangeXTiles": [60, 70] },
-      { "xTile": 77, "yTile": 10, "type": "bat", "patrolRangeXTiles": [74, 88] }
+      { "xTile": 10, "yTile": 11, "type": "bat", "patrolRangeXTiles": [8, 18], "hitSfx": "sfx_hit_bat" },
+      { "xTile": 25, "yTile": 10, "type": "bat", "patrolRangeXTiles": [22, 32], "hitSfx": "sfx_hit_bat" },
+      { "xTile": 38, "yTile": 9, "type": "bat", "patrolRangeXTiles": [35, 45], "hitSfx": "sfx_hit_bat" },
+      { "xTile": 50, "yTile": 8, "type": "bat", "patrolRangeXTiles": [47, 57], "hitSfx": "sfx_hit_bat" },
+      { "xTile": 63, "yTile": 7, "type": "bat", "patrolRangeXTiles": [60, 70], "hitSfx": "sfx_hit_bat" },
+      { "xTile": 77, "yTile": 10, "type": "bat", "patrolRangeXTiles": [74, 88], "hitSfx": "sfx_hit_bat" },
+      
+      { "xTile": 112, "yTile": 8, "type": "bat", "patrolRangeXTiles": [108, 118], "hitSfx": "sfx_hit_bat" }
     ]
   },
   "goal": {
-    "xTile": 95,
+    "xTile": 125,
     "yTile": 15,
     "widthTiles": 2,
     "heightTiles": 3,
@@ -72,7 +80,8 @@
   },
   "checkpoints": [
     { "xTile": 22 },
-    { "xTile": 61 }
+    { "xTile": 61 },
+    { "xTile": 100 }
   ],
   "coins": [
     { "xTile": 11, "yTile": 13 },
@@ -80,7 +89,12 @@
     { "xTile": 36, "yTile": 12 },
     { "xTile": 52, "yTile": 13 },
     { "xTile": 70, "yTile": 9 },
-    { "xTile": 85, "yTile": 10 }
+    { "xTile": 85, "yTile": 10 },
+    { "xTile": 103, "yTile": 11 },
+    { "xTile": 116, "yTile": 10 }
   ],
-  "lifeItems": []
+  "lifeItems": [
+    { "xTile": 48, "yTile": 10 },
+    { "xTile": 110, "yTile": 10 }
+  ]
 }

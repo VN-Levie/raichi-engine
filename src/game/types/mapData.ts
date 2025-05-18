@@ -32,6 +32,7 @@ export interface MapData {
       yTile?: number;
       type?: "goomba" | "turtle" | "bat";
       patrolRangeXTiles?: [number, number]; 
+      hitSfx?: string; 
     }>;
   };
   goal?: {
@@ -46,6 +47,8 @@ export interface MapData {
   checkpoints?: Array<{ xTile: number }>; 
   coins?: Array<{ xTile: number; yTile: number }>; 
   lifeItems?: Array<{ xTile: number; yTile: number }>; 
+  mapVersion?: string; 
+  bgm?: string; 
 }
 
 export type TornadoConfigType = {

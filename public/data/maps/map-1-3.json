@@ -1,5 +1,7 @@
 {
   "name": "World 1-3 (The Castle Interior)",
+  "mapVersion": "1.1.0",
+  "bgm": "bgm_theme_1.mp3",
   "player": {
     "initialX": 80,
     "initialY": 450 
@@ -8,41 +10,47 @@
     "groundLevelY": 570,
     "gameOverY": 600,
     "backgroundColor": "#111122", 
-    "worldWidthTiles": 60
+    "worldWidthTiles": 90
   },
   "decorations": {
     "clouds": [], 
     "bushes": [],
-    "flagPole": { "xTile": 55, "yTile": 18 } 
+    "flagPole": { "xTile": 85, "yTile": 18 } 
   },
   "terrain": {
     "ground": {
       "segments": [
-        { "startTile": 0, "endTile": 59 }
+        { "startTile": 0, "endTile": 89 }
       ],
       "color": "#303030",
       "topHighlightColor": "#505050",
       "textureColor": "#202020"
     },
-    "pipes": [],
+    "pipes": [
+      { "xTile": 70, "heightMultiplier": 2 }
+    ],
     "floatingPlatforms": [
       { "xTile": 10, "yTile": 14, "widthTiles": 5, "style": "stone" },
       { "xTile": 20, "yTile": 12, "widthTiles": 4, "style": "stone" },
       { "xTile": 30, "yTile": 10, "widthTiles": 3, "style": "stone" },
-      { "xTile": 40, "yTile": 14, "widthTiles": 5, "style": "stone" }
+      { "xTile": 40, "yTile": 14, "widthTiles": 5, "style": "stone" },
+      { "xTile": 65, "yTile": 13, "widthTiles": 4, "style": "stone" },
+      { "xTile": 75, "yTile": 11, "widthTiles": 3, "style": "stone" }
     ]
   },
   "enemies": {
     "yOffsetFromGround": -32,
     "positions": [
-      { "xTile": 15, "type": "turtle" },
-      { "xTile": 25, "type": "turtle" },
-      { "xTile": 35, "type": "goomba" },
-      { "xTile": 45, "type": "turtle" }
+      { "xTile": 15, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [12, 18], "hitSfx": "sfx_stomp" },
+      { "xTile": 25, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [22, 28], "hitSfx": "sfx_stomp" },
+      { "xTile": 35, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [32, 38], "hitSfx": "sfx_stomp" },
+      { "xTile": 45, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [42, 48], "hitSfx": "sfx_stomp" },
+      { "xTile": 68, "yTile": 17, "type": "goomba", "patrolRangeXTiles": [65, 71], "hitSfx": "sfx_stomp" },
+      { "xTile": 78, "yTile": 17, "type": "turtle", "patrolRangeXTiles": [75, 81], "hitSfx": "sfx_stomp" }
     ]
   },
   "goal": {
-    "xTile": 55, 
+    "xTile": 85, 
     "yTile": 13, 
     "widthTiles": 3,
     "heightTiles": 5,
@@ -51,13 +59,16 @@
   },
   "checkpoints": [
     { "xTile": 20 },
-    { "xTile": 40 }
+    { "xTile": 40 },
+    { "xTile": 65 }
   ],
   "coins": [
     { "xTile": 12, "yTile": 12 },
     { "xTile": 22, "yTile": 10 },
     { "xTile": 32, "yTile": 8 },
     { "xTile": 42, "yTile": 12 },
-    { "xTile": 43, "yTile": 12 }
+    { "xTile": 43, "yTile": 12 },
+    { "xTile": 66, "yTile": 11 },
+    { "xTile": 76, "yTile": 9 }
   ]
 }
