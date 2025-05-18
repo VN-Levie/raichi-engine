@@ -1,7 +1,7 @@
 import { TextComponent } from "../../entities/textComponent";
 import { ButtonComponent } from "../../entities/buttonComponent";
 
-export class HUDController {
+export class GameHUDController {
   private scoreText: TextComponent;
   private livesText: TextComponent;
   private coinsText: TextComponent;

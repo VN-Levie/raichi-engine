@@ -22,7 +22,7 @@ import {
   createTornadoComponent
 } from "../factories/levelElementFactory"
 import { TILE_SIZE, INITIAL_LIVES, MAX_LIVES_ON_LOAD } from "../constants"
-import { HUDController } from "../ui/HUDController"
+import { GameHUDController } from "../ui/gameHUDController"
 import { TextComponent } from "../../entities/textComponent"
 import { GoalComponent } from "../entities/map/goalComponent"
 import { EndScene } from "./endScene"
@@ -58,7 +58,7 @@ export class MainScene extends Scene {
   private score = 0
   private lives = MAX_LIVES_ON_LOAD
   private totalCoinsCollected = 0
-  private hudController!: HUDController
+  private hudController!: GameHUDController
 
   private initialPlayerX!: number
   private initialPlayerY!: number
@@ -169,7 +169,7 @@ export class MainScene extends Scene {
       this.player = new PlayerComponent(this.initialPlayerX, this.initialPlayerY, this.isUnderwater);
     }
 
-    this.hudController = new HUDController()
+    this.hudController = new GameHUDController()
 
     this.hudController.getBackToCheckpointButton().onClick = () => this.handleBackToLastCheckpointClick()
     this.hudController.getRestartLevelButton().onClick = () => this.handleRestartLevelClick()
