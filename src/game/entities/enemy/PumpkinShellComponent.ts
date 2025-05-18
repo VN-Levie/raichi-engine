@@ -84,119 +84,153 @@ export class PumpkinShellComponent extends BaseEnemyComponent {
         return PumpkinShellComponent.SHELL_MOVE_SPEED;
     }
 
+    protected override checkObstacleCollision(): boolean {
+        const collisionEpsilon = 0.1; // Small tolerance for floating point comparisons
+
+        for (const c of this.scene) {
+            // If the component is itself, not solid, the player, or another PumpkinShell, skip it for obstacle check.
+            // Shell-shell interactions are handled by MainScene.checkShellInteractions.
+            if (c === this || !c.solid || c instanceof PlayerComponent || c instanceof PumpkinShellComponent) {
+                continue;
+            }
+
+            // Standard AABB collision check against other solid components
+            if (
+                this.x < c.x + c.width &&
+                this.x + this.width > c.x &&
+                this.y < c.y + c.height &&
+                (this.y + this.height) > (c.y + collisionEpsilon) 
+            ) {
+                const verticalOverlap = (this.y + this.height > c.y + collisionEpsilon) && (this.y < c.y + c.height - collisionEpsilon);
+
+                if (verticalOverlap) {
+                    return true; // Collision detected with a non-shell solid obstacle
+                }
+            }
+        }
+        return false; // No collision with standard obstacles
+    }
+
+    private handleIdleState(dt: number) {
+        if (this.animator) {
+            const frameDuration = 1 / PumpkinShellComponent.IDLE_ANIM_FPS;
+            this.animator.timer += dt;
+            if (this.animator.timer >= frameDuration) {
+                this.animator.timer -= frameDuration;
+                let currentFrameIndex = PumpkinShellComponent.IDLE_ANIM_FRAMES.indexOf(this.animator.currentFrame);
+                if (currentFrameIndex === -1) {
+                    currentFrameIndex = 0; // Default to first frame if not found
+                } else {
+                    currentFrameIndex = (currentFrameIndex + 1) % PumpkinShellComponent.IDLE_ANIM_FRAMES.length;
+                }
+                this.animator.currentFrame = PumpkinShellComponent.IDLE_ANIM_FRAMES[currentFrameIndex];
+            }
+        }
+        // Shell remains stationary in IDLE state, no movement logic needed here.
+        // Lifespan timer for IDLE state could be handled here if needed,
+        // but currently, it's reset/checked upon entering/exiting MOVING.
+    }
+
+    private handleMovingState(dt: number) {
+        this.x += this.speed * this.direction * dt * 60;
+
+        if (this.checkObstacleCollision()) {
+            this.x -= this.speed * this.direction * dt * 60; // Revert move
+            this.direction *= -1;
+        } else if (this.isLedgeAhead()) { // Check for ledge
+            this.currentState = PumpkinShellState.FALLING_DEAD;
+            this.solid = false; // No longer solid when falling into a pit
+            this.deathSpeed = 0; // Start falling from current y
+        }
+
+        this.lifespanTimer -= dt;
+        if (this.lifespanTimer <= 0) {
+            this.killAndFall(false);
+        }
+
+        if (this.animator) {
+            const frameDuration = 1 / PumpkinShellComponent.MOVE_ANIM_FPS;
+            this.animator.timer += dt;
+            if (this.animator.timer >= frameDuration) {
+                this.animator.timer -= frameDuration;
+                let currentFrameIndex = PumpkinShellComponent.MOVE_ANIM_FRAMES.indexOf(this.animator.currentFrame);
+                if (currentFrameIndex === -1) {
+                    currentFrameIndex = 0;
+                } else {
+                    currentFrameIndex = (currentFrameIndex + 1) % PumpkinShellComponent.MOVE_ANIM_FRAMES.length;
+                }
+                this.animator.currentFrame = PumpkinShellComponent.MOVE_ANIM_FRAMES[currentFrameIndex];
+            }
+        }
+    }
+
+    private handleFallingDeadState(dt: number) {
+        this.y += this.deathSpeed;
+        this.deathSpeed += this.gravity;
+
+        if (this.y > (this.scene.find(c => c.constructor.name === 'BoxComponent' && (c as any).color === 'gray')?.y || 800) + 200) { // Fall off screen
+            this.visible = false;
+            this.enabled = false;
+        }
+    }
+
     update(dt: number): void {
         if (!this.assetsLoaded || !this.animator) {
             if (this.currentState === PumpkinShellState.FALLING_DEAD) {
-                this.y += this.deathSpeed; this.deathSpeed += this.gravity;
-                if (this.y > 800) { this.visible = false; this.enabled = false; }
+                this.handleFallingDeadState(dt);
             }
             return;
         }
 
-        this.lifespanTimer -= dt;
-        if (this.lifespanTimer <= 0 && this.currentState !== PumpkinShellState.FALLING_DEAD) {
-            this.visible = false;
-            this.enabled = false;
-            this.isAlive = false;
-            return;
-        }
-
-        this.animator.update(dt);
-
-        if (this.debugLogCooldown > 0) {
-            this.debugLogCooldown -= dt;
-        }
+        this.debugLogCooldown -= dt;
 
         switch (this.currentState) {
             case PumpkinShellState.IDLE:
-                this.animator.frameRate = PumpkinShellComponent.IDLE_ANIM_FPS;
-                if (this.debugLogCooldown <= 0) {
-                    // console.log(`Shell IDLE: x=${this.x.toFixed(2)}, y=${this.y.toFixed(2)}`); // This can be spammy
-                    // this.debugLogCooldown = this.DEBUG_LOG_INTERVAL * 4; // Log idle less often
-                }
+                this.handleIdleState(dt);
                 break;
             case PumpkinShellState.MOVING:
-                this.animator.frameRate = PumpkinShellComponent.MOVE_ANIM_FPS;
-                const oldX = this.x;
-                const moveAmount = this.speed * this.direction * dt * 60;
-                this.x += moveAmount;
-
-                const collided = this.checkObstacleCollision();
-
-                if (this.debugLogCooldown <= 0) {
-                    console.log(`Shell MOVING ATTEMPT: x=${this.x.toFixed(2)} (was ${oldX.toFixed(2)}), y=${this.y.toFixed(2)}, dir=${this.direction}, speed=${this.speed.toFixed(2)}, moveAmt=${moveAmount.toFixed(2)}, collided=${collided}, dt=${dt.toFixed(4)}`);
-                    if (collided) {
-                        for (const c of this.scene) {
-                            if (c === this || !c.solid || c instanceof PlayerComponent) continue;
-                            const currentXAfterMove = this.x; // x after move attempt
-                            if (currentXAfterMove < c.x + c.width && currentXAfterMove + this.width > c.x && this.y < c.y + c.height && this.y + this.height > c.y) {
-                                console.log(`  Shell COLLIDED WITH: ${(c as any).constructor.name}, objX=${c.x.toFixed(2)}, objY=${c.y.toFixed(2)}, objW=${c.width.toFixed(2)}, objH=${c.height.toFixed(2)}`);
-                                console.log(`    Shell_bottom: ${(this.y + this.height).toFixed(2)}, Obstacle_top: ${c.y.toFixed(2)}`);
-                                break;
-                            }
-                        }
-                    }
-                    this.debugLogCooldown = this.DEBUG_LOG_INTERVAL;
-                }
-
-                if (collided) {
-                    this.x = oldX;
-                    this.direction *= -1;
-                    console.log(`  Shell COLLISION RESOLVED: x reverted to ${this.x.toFixed(2)}, new_dir=${this.direction}`);
-                }
-
-                if (this.x <= 0 && this.direction === -1) { this.x = 0; this.direction = 1; console.log("Shell hit left boundary, reversed."); }
-                const worldWidth = 3200;
-                if (this.x + this.width >= worldWidth && this.direction === 1) { this.x = worldWidth - this.width; this.direction = -1; console.log("Shell hit right boundary, reversed."); }
+                this.handleMovingState(dt);
                 break;
             case PumpkinShellState.FALLING_DEAD:
-                this.y += this.deathSpeed;
-                this.deathSpeed += this.gravity;
-                if (this.y > 800) {
-                    this.visible = false;
-                    this.enabled = false;
-                }
+                this.handleFallingDeadState(dt);
                 break;
+        }
+
+        if (this.debugLogCooldown <= 0) {
+            this.debugLogCooldown = this.DEBUG_LOG_INTERVAL;
         }
     }
 
     stomp(): void {
-        console.log("PumpkinShellComponent.stomp() called", this.currentState, this.x, this.y);
-        if (!this.isAlive) {
-            console.log("Shell STOMP IGNORED: Not alive.");
-            return;
-        }
-
-        if (this.currentState === PumpkinShellState.IDLE) {
-            console.log(`SHELL STOMPED (WAS IDLE): x:${this.x.toFixed(2)}, y:${this.y.toFixed(2)}. Transitioning to MOVING.`);
+        if (this.currentState === PumpkinShellState.MOVING) {
+            this.currentState = PumpkinShellState.IDLE;
+            this.lifespanTimer = PumpkinShellComponent.LIFESPAN_SECONDS; // Reset lifespan
+            if (this.animator) {
+                this.animator.currentFrame = PumpkinShellComponent.IDLE_ANIM_FRAMES[0];
+            }
+        } else if (this.currentState === PumpkinShellState.IDLE) {
             this.currentState = PumpkinShellState.MOVING;
+            // Determine direction based on player's position relative to the shell
             const player = this.scene.find(c => c instanceof PlayerComponent) as PlayerComponent | undefined;
             if (player) {
-                this.direction = (player.x + player.width / 2 < this.x + this.width / 2) ? 1 : -1; // Move away from player
-                console.log(`  Player center: ${(player.x + player.width / 2).toFixed(2)}, Shell center: ${(this.x + this.width / 2).toFixed(2)}. New shell direction: ${this.direction}`);
+                this.direction = (player.x + player.width / 2 < this.x + this.width / 2) ? 1 : -1;
             } else {
-                console.warn("  PumpkinShellComponent: Player not found for stomp direction. Defaulting direction to 1.");
-                this.direction = 1;
+                this.direction = 1; // Default direction if player not found
             }
             this.lifespanTimer = PumpkinShellComponent.LIFESPAN_SECONDS;
-            this.debugLogCooldown = 0; // Allow immediate logging for MOVING state
-        } else if (this.currentState === PumpkinShellState.MOVING) {
-            console.log("SHELL STOMPED (WAS MOVING): Transitioning to FALLING_DEAD.");
-            this.killAndFall(true);
-        } else {
-            console.log(`Shell STOMPED (UNHANDLED STATE): Current state is ${PumpkinShellState[this.currentState]}.`);
         }
     }
 
-    public killAndFall(flipped: boolean): void {
+    public killAndFall(isHitByAnotherShell: boolean = false): void {
         if (!this.isAlive) return;
-        console.log(`Shell killAndFall called. Flipped: ${flipped}. Current state: ${PumpkinShellState[this.currentState]}`);
         this.isAlive = false;
         this.solid = false;
         this.currentState = PumpkinShellState.FALLING_DEAD;
-        this.isFlippedVertically = flipped;
-        this.deathSpeed = -2;
-        this.lifespanTimer = 0.1;
+        this.deathSpeed = isHitByAnotherShell ? -2 : 0; // Small bounce if hit by another shell
+        if (this.animator) {
+            this.animator.currentFrame = PumpkinShellComponent.IDLE_ANIM_FRAMES[0];
+            this.animator.playing = false;
+        }
     }
 
     isHarmfulOnContact(): boolean {

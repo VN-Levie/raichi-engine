@@ -377,19 +377,19 @@ export class MainScene extends Scene {
       const enemyRight = enemy.x + enemy.width;
       if (enemy instanceof PumpkinShellComponent) {
         //log enemy type
-        console.log(`
-          Enemy type: ${enemy.constructor.name} 
-          isEnemyHarmful: ${isEnemyHarmful}, 
-          playerRight: ${playerRight}> enemyLeft: ${enemyLeft}, 
-          playerLeft: ${playerLeft} > enemyRight: ${enemyRight}, 
-          playerBottom: ${playerBottom}> enemyTop: ${enemyTop}, 
-          playerTop: ${playerTop} > enemyBottom: ${enemyBottom},          
-          playerVelocityYBeforeCollisionResolution: ${playerVelocityYBeforeCollisionResolution}`);
+        // console.log(`
+        //   Enemy type: ${enemy.constructor.name} 
+        //   isEnemyHarmful: ${isEnemyHarmful}, 
+        //   playerRight: ${playerRight}> enemyLeft: ${enemyLeft}, 
+        //   playerLeft: ${playerLeft} > enemyRight: ${enemyRight}, 
+        //   playerBottom: ${playerBottom}> enemyTop: ${enemyTop}, 
+        //   playerTop: ${playerTop} > enemyBottom: ${enemyBottom},          
+        //   playerVelocityYBeforeCollisionResolution: ${playerVelocityYBeforeCollisionResolution}`);
       }
       if (
         playerRight > enemyLeft &&
         playerLeft < enemyRight &&
-        playerBottom > enemyTop &&
+        playerBottom >= enemyTop && // Changed > to >=
         playerTop < enemyBottom
       ) {
         const isFalling = playerVelocityYBeforeCollisionResolution > 0;
@@ -407,16 +407,31 @@ export class MainScene extends Scene {
           )
         );
         if (canStomp && wasAbove && landedOnTop) {
-          console.log("Calling stomp() on", enemy.constructor.name, enemy.x, enemy.y, "state:", (enemy as any).currentState);
-          enemy.stomp();
-          this.score += 10;
-          this.hudController.updateScore(this.score);
-          stompedEnemy = true;
+          // console.log("Potential stomp on", enemy.constructor.name, enemy.x, enemy.y, "state:", (enemy as any).currentState);
 
-          if (enemy instanceof TurtleEnemyComponent || enemy instanceof GoombaEnemyComponent) {
+          if (enemy instanceof PumpkinShellComponent) {
+            const shell = enemy as PumpkinShellComponent;
+            if (shell.isHarmfulOnContact()) { // Shell is MOVING and player stomped it again
+              // console.log("Player stomped MOVING PumpkinShell. Making it fall.");
+              shell.killAndFall(true); // Make it fall
+              this.player.bounceOffEnemySlightly(); // Player still gets a slight bounce
+            } else { // Shell is IDLE and player stomped it
+              // console.log("Player stomped IDLE PumpkinShell. Making it move.");
+              shell.stomp(); // Makes it move
+              this.player.bounceOffEnemySlightly();
+            }
+            stompedEnemy = true;
+          } else if (enemy instanceof TurtleEnemyComponent || enemy instanceof GoombaEnemyComponent) {
+            // console.log(`Player stomped ${enemy.constructor.name}.`);
+            enemy.stomp();
             this.player.bounceOffEnemy();
-          } else if (enemy instanceof PumpkinShellComponent) {
-            this.player.bounceOffEnemySlightly();
+            stompedEnemy = true;
+          }
+          // else: other enemy types that can be stomped would go here
+
+          if (stompedEnemy) {
+            this.score += 10; 
+            this.hudController.updateScore(this.score);
           }
         }
 
@@ -437,28 +452,38 @@ export class MainScene extends Scene {
 
     for (let i = 0; i < this.shells.length; i++) {
       const shellA = this.shells[i];
-      if (!shellA.isHarmfulOnContact()) continue;
 
-      for (const enemy of this.enemies) {
-        if (!enemy.isAlive || !enemy.enabled || enemy === shellA) continue;
+      // Check collision between moving shell and other enemies
+      if (shellA.isHarmfulOnContact()) { // Shell is moving
+        for (const enemy of this.enemies) {
+          // Ensure enemy is valid, alive, enabled, and not the shell itself
+          if (!enemy || !enemy.isAlive || !enemy.enabled || enemy === shellA) continue;
 
-        if (
-          shellA.x < enemy.x + enemy.width &&
-          shellA.x + shellA.width > enemy.x &&
-          shellA.y < enemy.y + enemy.height &&
-          shellA.y + shellA.height > enemy.y
-        ) {
-          if (typeof (enemy as any).kill === 'function') {
-            (enemy as any).kill();
-          } else {
+          // AABB collision check
+          if (
+            shellA.x < enemy.x + enemy.width &&
+            shellA.x + shellA.width > enemy.x &&
+            shellA.y < enemy.y + enemy.height &&
+            shellA.y + shellA.height > enemy.y
+          ) {
+
             enemy.stomp();
+            //console.log(`Enemy ${enemy.constructor.name} killed by shell at (${shellA.x}, ${shellA.y})`);
+
+            // Potentially add score for shell killing enemy, etc.
+            this.score += 50; // Example
+            this.hudController.updateScore(this.score);
           }
         }
       }
 
+      // Shell-vs-shell collision logic
+      // shellA must be moving to initiate this type of collision
+      if (!shellA.isHarmfulOnContact()) continue;
+
       for (let j = i + 1; j < this.shells.length; j++) {
         const shellB = this.shells[j];
-        if (!shellB.isHarmfulOnContact()) continue;
+        // No need to check if shellB is harmful. If shellA (moving) hits shellB (any state), both are affected.
 
         if (
           shellA.x < shellB.x + shellB.width &&
